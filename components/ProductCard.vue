@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full max-w-sm mx-auto overflow-hidden cursor-pointer group">
+  <NuxtLink :to="`/products/${product.id}`" class="w-full max-w-sm mx-auto overflow-hidden cursor-pointer group">
     <div class="relative h-48 sm:h-64 md:h-80 lg:h-96 xl:h-[500px] aspect-3-4 overflow-hidden">
       <!-- Main Product Image -->
       <img
@@ -38,20 +38,20 @@
       </button> -->
 
       <!-- Quick Add to Cart (on hover) -->
-      <div class="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-        <Icon @click.prevent="addToCart" name="ic:baseline-add-shopping-cart" class="w-6 h-6 text-black hover:text-gray-700 transition-colors duration-300" />
-        <!-- <button
+      <!-- <div class="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+         <Icon @click.prevent="addToCart" name="ic:baseline-add-shopping-cart" class="w-6 h-6 text-black hover:text-gray-700 transition-colors duration-300" /> 
+         <button
           @click.prevent="addToCart"
           class="w-full bg-black text-white py-2 px-4 text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition duration-300"
         >
           
           Sepete Ekle
-        </button> -->
-      </div>
+        </button>
+      </div> -->
     </div>
 
     <!-- Product Info -->
-    <NuxtLink :to="`/products/${product.id}`" class="block">
+    <div  class="block">
       <div class="p-3 sm:p-4 lg:p-6 xl:p-8">
         <h2 class="text-sm sm:text-base lg:text-lg font-medium text-black truncate mb-1 sm:mb-2">
           {{ product.title }}
@@ -64,11 +64,11 @@
         <div class="flex justify-between items-center mt-3 sm:mt-4 lg:mt-6">
           <div class="flex items-center space-x-2">
             <span class="text-sm sm:text-base lg:text-lg font-semibold text-black whitespace-nowrap">
-              {{ formatPrice(product.discountedPrice || product.price) }}
+              {{ formatPrice(product.discountedPrice || product.price || 0) }}
             </span>
             
             <span
-              v-if="product.discountedPrice && product.price > product.discountedPrice"
+              v-if="product.discountedPrice && product.price && product.price > product.discountedPrice"
               class="text-xs sm:text-sm text-gray-500 line-through whitespace-nowrap"
             >
               {{ formatPrice(product.price) }}
@@ -109,8 +109,8 @@
           <span class="text-xs text-gray-500 ml-1">({{ product.reviewCount || 12 }})</span>
         </div> -->
       </div>
-    </NuxtLink>
-  </div>
+    </div>
+  </NuxtLink>
 </template>
 
 <script setup>
@@ -136,10 +136,12 @@ const discountPercentage = computed(() => {
 })
 
 const formatPrice = (price) => {
+  // Medusa stores prices in cents, so divide by 100
+  const actualPrice = typeof price === 'number' ? price : 0
   return new Intl.NumberFormat('tr-TR', {
     style: 'currency',
     currency: 'TRY'
-  }).format(price)
+  }).format(actualPrice)
 }
 
 const getColorClass = (color) => {
@@ -188,15 +190,30 @@ const toggleFavorite = () => {
 }
 
 const addToCart = async () => {
-  if (!props.product.variantId) {
-    console.warn('No variant ID available for product:', props.product.title)
+  if (!props.product.id) {
+    console.warn('No product ID available for product:', props.product.title)
     return
   }
   
   isAddingToCart.value = true
   try {
     const cartStore = useCartStore()
-    await cartStore.addItem(props.product.variantId, 1)
+    const { countryCode } = useCountry()
+    
+    // Get the first available variant ID from the product
+    const variantId = props.product.variants?.[0]?.id || props.product.variantId
+    
+    if (!variantId) {
+      console.warn('No variant ID available for product:', props.product.title)
+      return
+    }
+    
+    await cartStore.addToCart({
+      variantId: variantId,
+      quantity: 1,
+      countryCode: countryCode.value || 'tr'
+    })
+    
     console.log('Added to cart:', props.product.title)
     
     // Optional: Show success notification

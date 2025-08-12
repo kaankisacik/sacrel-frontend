@@ -28,7 +28,9 @@ export const useProducts = () => {
   // Tek ürün getir
   const getProduct = async (productId: string) => {
     try {
-      const { product } = await medusa.store.product.retrieve(productId);
+      const { product } = await medusa.store.product.retrieve(productId, {
+        fields: "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags",
+      });
       return product;
     } catch (error) {
       console.error("Error fetching product:", error);

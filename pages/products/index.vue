@@ -270,18 +270,18 @@ const priceRanges = [
 ]
 
 const colors = [
-  { value: 'black', label: 'Siyah', class: 'bg-black' },
-  { value: 'white', label: 'Beyaz', class: 'bg-white border' },
-  { value: 'gray', label: 'Gri', class: 'bg-gray-500' },
-  { value: 'red', label: 'Kırmızı', class: 'bg-red-500' },
-  { value: 'blue', label: 'Mavi', class: 'bg-blue-500' },
-  { value: 'green', label: 'Yeşil', class: 'bg-green-500' },
-  { value: 'pink', label: 'Pembe', class: 'bg-pink-500' },
-  { value: 'yellow', label: 'Sarı', class: 'bg-yellow-500' },
-  { value: 'purple', label: 'Mor', class: 'bg-purple-500' },
-  { value: 'brown', label: 'Kahverengi', class: 'bg-amber-800' },
-  { value: 'navy', label: 'Lacivert', class: 'bg-blue-900' },
-  { value: 'beige', label: 'Bej', class: 'bg-amber-100' }
+  { value: 'Black', label: 'Siyah', class: 'bg-black' },
+  { value: 'White', label: 'Beyaz', class: 'bg-white border' },
+  { value: 'Gray', label: 'Gri', class: 'bg-gray-500' },
+  { value: 'Red', label: 'Kırmızı', class: 'bg-red-500' },
+  { value: 'Blue', label: 'Mavi', class: 'bg-blue-500' },
+  { value: 'Green', label: 'Yeşil', class: 'bg-green-500' },
+  { value: 'Pink', label: 'Pembe', class: 'bg-pink-500' },
+  { value: 'Yellow', label: 'Sarı', class: 'bg-yellow-500' },
+  { value: 'Purple', label: 'Mor', class: 'bg-purple-500' },
+  { value: 'Brown', label: 'Kahverengi', class: 'bg-amber-800' },
+  { value: 'Navy', label: 'Lacivert', class: 'bg-blue-900' },
+  { value: 'Beige', label: 'Bej', class: 'bg-amber-100' }
 ]
 
 // Fetch products and collections from Medusa
@@ -368,10 +368,13 @@ const transformProduct = (product: any) => {
       })
     }
 
-    // Filter by colors (placeholder - would need product variant colors from Medusa)
+    // Filter by colors
     if (selectedColors.value.length > 0) {
-      // This is a placeholder since Medusa product structure doesn't include colors by default
-      // In a real implementation, you'd need to add color metadata to your products
+      filtered = filtered.filter(product => {
+        const colors = transformProduct(product).colors || []
+        console.log(`Checking colors for product ${product.title}:`, colors, selectedColors.value);
+        return selectedColors.value.some(color => colors.includes(color))
+      })
     }
 
     // Sort products
@@ -402,6 +405,7 @@ const transformProduct = (product: any) => {
   // Methods
   const toggleColor = (colorValue: string) => {
     const index = selectedColors.value.indexOf(colorValue)
+    console.log(`Toggling color: ${colorValue}`, index);
     if (index > -1) {
       selectedColors.value.splice(index, 1)
     } else {
