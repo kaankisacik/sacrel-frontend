@@ -220,48 +220,87 @@
         </div>
 
         <!-- Debug Section (temporary) -->
-        <div v-if="product.selectedVariant" class="mt-8 p-4 bg-gray-100 rounded-lg">
-          <h3 class="text-lg font-semibold mb-2">Seçili Varyant Bilgileri:</h3>
-          <p><strong>ID:</strong> {{ product.selectedVariant.id }}</p>
-          <p><strong>SKU:</strong> {{ product.selectedVariant.sku }}</p>
-          <p><strong>Başlık:</strong> {{ product.selectedVariant.title }}</p>
-          <p><strong>Stok:</strong> {{ product.selectedVariant.inventory_quantity }}</p>
-          <p v-if="product.selectedVariant.calculated_price">
-            <strong>Fiyat:</strong> {{ formatPrice(product.selectedVariant.calculated_price.calculated_amount) }}
-          </p>
-          <div v-if="product.selectedVariant.options">
-            <strong>Seçenekler:</strong>
-            <ul class="ml-4">
-              <li v-for="option in product.selectedVariant.options" :key="option.id">
-                {{ option.option?.title }}: {{ option.value }}
-              </li>
-            </ul>
+        <div v-if="product.selectedVariant" class="mt-8 p-6 bg-white rounded-xl shadow border border-gray-200">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-black flex items-center gap-2">
+              <Icon name="mdi:information-outline" class="text-blue-500" />
+              Seçili Varyant Bilgileri
+            </h3>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold"
+            :class="isVariantAvailable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+              {{ isVariantAvailable ? 'Stokta Var' : 'Stokta Yok' }}
+            </span>
           </div>
-          
-          <div class="mt-4">
-            <p><strong>Mevcut Renkler:</strong> {{ availableColors.length }} / {{ product.colors.length }}</p>
-            <p><strong>Seçili Renk için Mevcut Bedenler:</strong> {{ availableSizesForColor.length }}</p>
-            <div v-if="selectedColor.id">
-              <strong>{{ selectedColor.name }} için stok durumu:</strong>
-              <ul class="ml-4 text-sm">
-                <li v-for="size in product.sizes" :key="size" 
-                    :class="isSizeAvailableForColor(size) ? 'text-green-600' : 'text-red-600'">
-                  {{ size }}: {{ isSizeAvailableForColor(size) ? 'Var' : 'Yok' }}
-                </li>
-              </ul>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <div class="mb-2 flex items-center gap-2">
+          <span class="font-semibold text-gray-700">ID:</span>
+          <span class="text-gray-900">{{ product.selectedVariant.id }}</span>
+              </div>
+              <div class="mb-2 flex items-center gap-2">
+          <span class="font-semibold text-gray-700">SKU:</span>
+          <span class="text-gray-900">{{ product.selectedVariant.sku }}</span>
+              </div>
+              <div class="mb-2 flex items-center gap-2">
+          <span class="font-semibold text-gray-700">Başlık:</span>
+          <span class="text-gray-900">{{ product.selectedVariant.title }}</span>
+              </div>
+              <div class="mb-2 flex items-center gap-2">
+          <span class="font-semibold text-gray-700">Stok:</span>
+          <span class="text-gray-900">{{ product.selectedVariant.inventory_quantity }}</span>
+              </div>
+              <div v-if="product.selectedVariant.calculated_price" class="mb-2 flex items-center gap-2">
+          <span class="font-semibold text-gray-700">Fiyat:</span>
+          <span class="text-gray-900">{{ formatPrice(product.selectedVariant.calculated_price.calculated_amount) }}</span>
+              </div>
             </div>
-            
-            <div class="mt-2">
-              <p><strong>Renk-Beden Haritası:</strong></p>
-              <ul class="ml-4 text-xs">
-                <li v-for="color in product.colors" :key="color.id">
-                  <strong>{{ color.name }}:</strong> 
-                  <span v-if="byColorSizesMapRef.get(color.id)">
-                    {{ Array.from(byColorSizesMapRef.get(color.id) || []).join(', ') }}
-                  </span>
-                  <span v-else class="text-red-500">Hiç beden yok</span>
-                </li>
-              </ul>
+            <div>
+              <div v-if="product.selectedVariant.options" class="mb-2">
+          <span class="font-semibold text-gray-700">Seçenekler:</span>
+          <ul class="ml-2 mt-1 text-gray-800 text-sm">
+            <li v-for="option in product.selectedVariant.options" :key="option.id">
+              <span class="font-medium">{{ option.option?.title }}:</span> {{ option.value }}
+            </li>
+          </ul>
+              </div>
+              <div class="mb-2">
+          <span class="font-semibold text-gray-700">Mevcut Renkler:</span>
+          <span class="ml-1 text-gray-900">{{ availableColors.length }} / {{ product.colors.length }}</span>
+              </div>
+              <div class="mb-2">
+          <span class="font-semibold text-gray-700">Seçili Renk için Mevcut Bedenler:</span>
+          <span class="ml-1 text-gray-900">{{ availableSizesForColor.length }}</span>
+              </div>
+            </div>
+          </div>
+          <div v-if="selectedColor.id" class="mt-4">
+            <div class="font-semibold text-gray-700 mb-1 flex items-center gap-2">
+              <span>Stok Durumu:</span>
+              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs"
+              :style="{ backgroundColor: selectedColor.hex, color: '#fff' }">
+          {{ selectedColor.name }}
+              </span>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div v-for="size in product.sizes" :key="size"
+             class="flex items-center gap-2 px-2 py-1 rounded border"
+             :class="isSizeAvailableForColor(size) ? 'border-green-400 bg-green-50 text-green-700' : 'border-red-400 bg-red-50 text-red-700 opacity-70'">
+          <span class="font-medium">{{ size }}</span>
+          <span>{{ isSizeAvailableForColor(size) ? 'Var' : 'Yok' }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6">
+            <span class="font-semibold text-gray-700">Renk-Beden Haritası:</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+              <div v-for="color in product.colors" :key="color.id" class="flex items-center gap-2">
+          <span class="inline-block w-4 h-4 rounded-full border" :style="{ backgroundColor: color.hex }"></span>
+          <span class="font-medium">{{ color.name }}:</span>
+          <span v-if="byColorSizesMapRef.get(color.id)">
+            <span class="text-gray-800">{{ Array.from(byColorSizesMapRef.get(color.id) || []).join(', ') }}</span>
+          </span>
+          <span v-else class="text-red-500">Hiç beden yok</span>
+              </div>
             </div>
           </div>
         </div>
