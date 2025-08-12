@@ -1,0 +1,254 @@
+/* SACREL Brand Typography */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SACREL Brand Base Styles */
+:root {
+  --sacrel-primary: #1a1a1a;
+  --sacrel-secondary: #f8f6f0;
+  --sacrel-accent: #c9a876;
+  --sacrel-neutral: #8b8680;
+  --sacrel-light: #fefcf8;
+  --sacrel-dark: #0f0f0f;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  color: var(--sacrel-primary);
+  background-color: var(--sacrel-light);
+  line-height: 1.6;
+}
+
+/* SACREL Typography System */
+.sacrel-display {
+  font-family: 'Playfair Display', serif;
+  font-size: 4rem;
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--sacrel-primary);
+}
+
+.sacrel-heading-xl {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.sacrel-heading-lg {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.sacrel-heading-md {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.sacrel-heading-sm {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.sacrel-body-lg {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.sacrel-body {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.sacrel-body-sm {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.sacrel-caption {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* SACREL Component Styles */
+.sacrel-btn-primary {
+  @apply bg-sacrel-primary text-sacrel-light px-8 py-3 font-accent font-medium 
+         uppercase tracking-wider transition-all duration-300 
+         hover:bg-sacrel-dark hover:scale-105 
+         focus:outline-none focus:ring-2 focus:ring-sacrel-accent;
+}
+
+.sacrel-btn-secondary {
+  @apply border-2 border-sacrel-primary text-sacrel-primary px-8 py-3 
+         font-accent font-medium uppercase tracking-wider 
+         transition-all duration-300 hover:bg-sacrel-primary hover:text-sacrel-light 
+         focus:outline-none focus:ring-2 focus:ring-sacrel-accent;
+}
+
+.sacrel-btn-accent {
+  @apply bg-sacrel-accent text-sacrel-primary px-8 py-3 
+         font-accent font-medium uppercase tracking-wider 
+         transition-all duration-300 hover:bg-opacity-90 hover:scale-105 
+         focus:outline-none focus:ring-2 focus:ring-sacrel-primary;
+}
+
+.sacrel-card {
+  @apply bg-sacrel-light border border-sacrel-secondary shadow-lg 
+         transition-all duration-300 hover:shadow-xl hover:scale-105;
+}
+
+.sacrel-input {
+  @apply border-b-2 border-sacrel-neutral bg-transparent px-4 py-3 
+         font-accent focus:outline-none focus:border-sacrel-primary 
+         transition-colors duration-300;
+}
+
+/* Legacy support */
+.font-bodoni {
+  font-family: 'Playfair Display', serif;
+}
+
+/* Responsive helper classes */
+@layer utilities {
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+
+  /* SACREL Animations */
+  .sacrel-fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+  }
+
+  .sacrel-slide-up {
+    animation: slideUp 0.8s ease-out;
+  }
+
+  .sacrel-scale-in {
+    animation: scaleIn 0.5s ease-out;
+  }
+}
+
+/* Ensure images don't overflow on mobile */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Better scrolling on mobile */
+html {
+  scroll-behavior: smooth;
+}
+
+/* SACREL specific mobile optimizations */
+@media screen and (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .sacrel-display {
+    font-size: 2.5rem;
+  }
+
+  .sacrel-heading-xl {
+    font-size: 2rem;
+  }
+
+  .sacrel-heading-lg {
+    font-size: 1.75rem;
+  }
+}
+
+/* SACREL Loading States */
+.sacrel-loading {
+  @apply animate-pulse bg-sacrel-secondary;
+}
+
+/* SACREL Focus States for Accessibility */
+.sacrel-focus {
+  @apply focus:outline-none focus:ring-2 focus:ring-sacrel-accent focus:ring-offset-2;
+}
+
+
+/* Improved dropdown hover for navbar */
+@media (min-width: 1024px) {
+  .group:hover .lg\:group-hover\:block {
+    display: block !important;
+  }
+  
+  /* Ensure dropdown stays visible when hovering over submenu */
+  .group:hover ul,
+  .group ul:hover {
+    display: block !important;
+  }
+  
+  /* Add a small invisible bridge to prevent gap issues */
+  .group::before {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: transparent;
+    z-index: 40;
+  }
+}
+
+/* Better aspect ratio handling */
+.aspect-square {
+  aspect-ratio: 1 / 1;
+}
+
+.aspect-3-4 {
+  aspect-ratio: 3 / 4;
+}
+
+/* Mobile-first responsive breakpoints */
+@media (max-width: 640px) {
+  .text-responsive {
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+  }
+  
+  .heading-responsive {
+    font-size: clamp(1.5rem, 5vw, 2.25rem);
+  }
+}
+  
