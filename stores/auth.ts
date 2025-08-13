@@ -6,6 +6,7 @@ interface Customer {
   first_name: string;
   last_name: string;
   phone?: string;
+  addresses?: Address[];
   created_at: string;
   updated_at: string;
 }
@@ -22,6 +23,7 @@ interface Address {
   postal_code: string;
   country_code: string;
   phone?: string | null;
+  metadata?: Record<string, any>;
 }
 
 export const useAuthStore = defineStore("auth", {
@@ -209,8 +211,6 @@ export const useAuthStore = defineStore("auth", {
             throw error;
           }
         }
-
-       
       } catch (error: any) {
         this.error = error.message || "Kayıt oluşturulamadı";
         console.error("Registration error:", error);
@@ -324,6 +324,7 @@ export const useAuthStore = defineStore("auth", {
             Authorization: `Bearer ${this.getToken()}`,
           }
         );
+        console.log("Addresses fetched successfully:", addresses);
 
         this.addresses = (addresses || []) as Address[];
       } catch (error: any) {
@@ -359,10 +360,31 @@ export const useAuthStore = defineStore("auth", {
     async updateAddress(addressId: string, addressData: any) {
       if (!this.customer)
         return { success: false, error: "Müşteri bulunamadı" };
+      console.log(
+        "Updating address with ID:",
+        addressId,
+        "and data:",
+        addressData
+      );
 
       this.isLoading = true;
       this.error = null;
+      Object.keys(addressData).forEach((key) =>
+        addressData[key] === null || addressData[key] === ""
+          ? delete addressData[key]
+          : {}
+      );
 
+      Object.keys(addressData).forEach((key) =>
+        key === "id" ||
+        key === "created_at" ||
+        key === "updated_at" ||
+        key === "customer_id"
+          ? delete addressData[key]
+          : {}
+      );
+
+      console.log("Filtered address data:", addressData);
       try {
         const client = useMedusaClient();
         await client.store.customer.updateAddress(

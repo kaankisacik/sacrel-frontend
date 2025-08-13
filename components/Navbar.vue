@@ -3,86 +3,17 @@
     <div class="max-w-screen-2xl container mx-auto px-4">
       <nav class="flex items-center justify-between py-8 relative">
         <div class="flex items-center space-x-8">
-          <div class="hidden lg:flex flex-row items-start space-x-4 mb-2 font-accent">
-            <template v-if="isAuthenticated">
-              <!-- User dropdown menu -->
-              <div class="relative" ref="userMenuRef">
-                <button
-                  @click="toggleUserMenu"
-                  class="sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-1"
-                >
-                  <Icon name="uil:user" />
-                  <span>{{ fullName || 'Profil' }}</span>
-                  <Icon name="uil:angle-down" :class="{ 'rotate-180': showUserMenu }" class="transition-transform duration-200" />
-                </button>
-                
-                <!-- Dropdown menu -->
-                <div v-show="showUserMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                  <NuxtLink
-                    to="/profile"
-                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    @click="showUserMenu = false"
-                  >
-                    Profil Bilgileri
-                  </NuxtLink>
-                  <NuxtLink
-                    to="/orders"
-                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    @click="showUserMenu = false"
-                  >
-                    Siparişlerim
-                  </NuxtLink>
-                  <NuxtLink
-                    to="/favorites"
-                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    @click="showUserMenu = false"
-                  >
-                    Favorilerim
-                  </NuxtLink>
-                  <hr class="my-1">
-                  <button
-                    @click="logout"
-                    class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                  >
-                    Çıkış Yap
-                  </button>
-                </div>
-              </div>
-              
-              <router-link to="/cart"
-                class="sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-1 relative">
-                <Icon name="uil:shopping-cart" />
-                <span>Sepet</span>
-                <span v-if="cartStore.itemCount > 0" 
-                      class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {{ cartStore.itemCount }}
-                </span>
-              </router-link>
-            </template>
-            
-            <template v-else>
-              <router-link to="/cart"
-                class="sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-1 relative">
-                <Icon name="uil:shopping-cart" />
-                <span>Sepet</span>
-                <span v-if="cartStore.itemCount > 0" 
-                      class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {{ cartStore.itemCount }}
-                </span>
-              </router-link>
-              
-              <NuxtLink to="/login"
-                class="sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-1">
-                <Icon name="uil:signin" />
-                <span>Giriş Yap</span>
-              </NuxtLink>
-              
-              <NuxtLink to="/register"
-                class="sacrel-body-sm text-white bg-sacrel-accent hover:bg-sacrel-primary transition duration-300 ease-in-out px-3 py-1 rounded">
-                Kayıt Ol
-              </NuxtLink>
-            </template>
+          <div class="hidden lg:flex items-center space-x-6">
+          <div class="relative">
+            <input type="text" v-model="searchQuery" @keyup.enter="performSearch"
+              class="sacrel-input border-b-2 border-sacrel-neutral py-2 pr-10 pl-4 focus:outline-none focus:border-sacrel-primary transition duration-300 ease-in-out"
+              placeholder="Ara" />
+            <button class="absolute inset-y-0 right-0 pr-3 py-2 focus:outline-none">
+              <Icon name="uil:search" class="text-sacrel-primary" />
+            </button>
           </div>
+        </div>
+          
           <button @click="toggleMobileMenu" class="block lg:hidden focus:outline-none">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sacrel-primary" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
@@ -94,7 +25,7 @@
           <NuxtLink to="/"
             class="sacrel-heading-xl font-secondary text-sacrel-primary hover:text-sacrel-accent transition duration-300 ease-in-out">
             SACREL</NuxtLink>
-          <ul class="flex space-x-6 py-2">
+          <ul class="flex space-x-6 py-2 hidden lg:flex">
             <li>
               <NuxtLink to="/products"
                 class="sacrel-body font-accent text-sacrel-primary hover:text-sacrel-accent transition duration-300 ease-in-out">
@@ -112,16 +43,72 @@
             </li>
           </ul>
         </div>
-        <div class="hidden lg:flex items-center space-x-6">
-          <div class="relative">
-            <input type="text"
-              class="sacrel-input border-b-2 border-sacrel-neutral py-2 pr-10 pl-4 focus:outline-none focus:border-sacrel-primary transition duration-300 ease-in-out"
-              placeholder="Ara" />
-            <button class="absolute inset-y-0 right-0 pr-3 py-2 focus:outline-none">
-              <Icon name="uil:search" class="text-sacrel-primary" />
-            </button>
+        <div class="hidden lg:flex flex-row items-start space-x-4 mb-2 font-accent">
+            <template v-if="isAuthenticated">
+              <!-- User dropdown menu -->
+              <div class="relative" ref="userMenuRef">
+                <button @click="toggleUserMenu"
+                  class="sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-1">
+                  <Icon name="uil:user" />
+                  <span>{{ fullName || 'Profil' }}</span>
+                  <Icon name="uil:angle-down" :class="{ 'rotate-180': showUserMenu }"
+                    class="transition-transform duration-200" />
+                </button>
+
+                <!-- Dropdown menu -->
+                <div v-show="showUserMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                  <NuxtLink to="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    @click="showUserMenu = false">
+                    Profil Bilgileri
+                  </NuxtLink>
+                  <NuxtLink to="/orders" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    @click="showUserMenu = false">
+                    Siparişlerim
+                  </NuxtLink>
+                  <NuxtLink to="/favorites" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    @click="showUserMenu = false">
+                    Favorilerim
+                  </NuxtLink>
+                  <hr class="my-1">
+                  <button @click="logout"
+                    class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                    Çıkış Yap
+                  </button>
+                </div>
+              </div>
+
+              <router-link to="/cart"
+                class="sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-1 relative">
+                <Icon name="uil:shopping-cart" />
+                <span>Sepet</span>
+                <span v-if="cartStore.itemCount > 0"
+                  class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {{ cartStore.itemCount }}
+                </span>
+              </router-link>
+            </template>
+
+            <template v-else>
+              <NuxtLink to="/login"
+                class="sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-1">
+                <Icon name="uil:signin" />
+                <span>Giriş Yap</span>
+              </NuxtLink>
+              <router-link to="/cart"
+                class="sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-1 relative">
+                <Icon name="uil:shopping-cart" />
+                <span>Sepet</span>
+                <span v-if="cartStore.itemCount > 0"
+                  class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {{ cartStore.itemCount }}
+                </span>
+              </router-link>
+
+
+
+
+            </template>
           </div>
-        </div>
       </nav>
     </div>
     <div :class="`lg:hidden ${showMobileMenu ? 'block' : 'hidden'}`">
@@ -146,13 +133,13 @@
             class="sacrel-body font-accent text-sacrel-primary hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-2">
             <Icon name="uil:shopping-cart" />
             <span>Sepet</span>
-            <span v-if="cartStore.itemCount > 0" 
-                  class="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+            <span v-if="cartStore.itemCount > 0"
+              class="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
               {{ cartStore.itemCount }}
             </span>
           </NuxtLink>
         </li>
-        
+
         <template v-if="isAuthenticated">
           <li>
             <NuxtLink to="/profile"
@@ -176,27 +163,20 @@
             </NuxtLink>
           </li>
           <li>
-            <button
-              @click="logout"
+            <button @click="logout"
               class="sacrel-body font-accent text-red-600 hover:text-red-700 transition duration-300 ease-in-out flex items-center space-x-2">
               <Icon name="uil:signout" />
               <span>Çıkış Yap</span>
             </button>
           </li>
         </template>
-        
+
         <template v-else>
           <li>
             <NuxtLink to="/login"
               class="sacrel-body font-accent text-sacrel-primary hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-2">
               <Icon name="uil:signin" />
               <span>Giriş Yap</span>
-            </NuxtLink>
-          </li>
-          <li>
-            <NuxtLink to="/register"
-              class="sacrel-body font-accent text-white bg-sacrel-accent hover:bg-sacrel-primary transition duration-300 ease-in-out px-3 py-2 rounded">
-              Kayıt Ol
             </NuxtLink>
           </li>
         </template>

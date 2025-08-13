@@ -22,15 +22,13 @@
               <h3 class="text-lg leading-6 font-medium text-gray-900">Kişisel Bilgiler</h3>
               <p class="mt-1 max-w-2xl text-sm text-gray-500">Temel profil bilgileriniz</p>
             </div>
-            <button
-              @click="showEditProfile = !showEditProfile"
-              class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
+            <button @click="showEditProfile = !showEditProfile"
+              class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
               <Icon name="heroicons:pencil" class="h-4 w-4 mr-2" />
               Düzenle
             </button>
           </div>
-          
+
           <div v-if="!showEditProfile" class="border-t border-gray-200">
             <dl>
               <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -43,7 +41,8 @@
               </div>
               <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                 <dt class="text-sm font-medium text-gray-500">Telefon</dt>
-                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ customer.phone || 'Belirtilmemiş' }}</dd>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ customer.phone || 'Belirtilmemiş' }}
+                </dd>
               </div>
               <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                 <dt class="text-sm font-medium text-gray-500">Üyelik Tarihi</dt>
@@ -51,58 +50,40 @@
               </div>
             </dl>
           </div>
-          
+
           <!-- Edit Profile Form -->
           <div v-else class="border-t border-gray-200 p-6">
             <form @submit.prevent="updateProfile" class="space-y-4">
               <div v-if="error" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
                 {{ error }}
               </div>
-              
+
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label for="first_name" class="block text-sm font-medium text-gray-700">Ad</label>
-                  <input
-                    id="first_name"
-                    v-model="profileForm.first_name"
-                    type="text"
-                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  >
+                  <input id="first_name" v-model="profileForm.first_name" type="text"
+                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 </div>
                 <div>
                   <label for="last_name" class="block text-sm font-medium text-gray-700">Soyad</label>
-                  <input
-                    id="last_name"
-                    v-model="profileForm.last_name"
-                    type="text"
-                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  >
+                  <input id="last_name" v-model="profileForm.last_name" type="text"
+                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 </div>
               </div>
-              
+
               <div>
                 <label for="phone" class="block text-sm font-medium text-gray-700">Telefon</label>
-                <input
-                  id="phone"
-                  v-model="profileForm.phone"
-                  type="tel"
-                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                >
+                <input id="phone" v-model="profileForm.phone" type="tel"
+                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
               </div>
-              
+
               <div class="flex justify-end space-x-3">
-                <button
-                  type="button"
-                  @click="cancelEdit"
-                  class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
+                <button type="button" @click="cancelEdit"
+                  class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                   İptal
                 </button>
-                <button
-                  type="submit"
-                  :disabled="isLoading"
-                  class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-                >
+                <button type="submit" :disabled="isLoading"
+                  class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50">
                   Kaydet
                 </button>
               </div>
@@ -117,27 +98,24 @@
               <h3 class="text-lg leading-6 font-medium text-gray-900">Son Siparişler</h3>
               <p class="mt-1 max-w-2xl text-sm text-gray-500">En son verdiğiniz siparişler</p>
             </div>
-            <NuxtLink
-              to="/orders"
-              class="text-indigo-600 hover:text-indigo-500 text-sm font-medium"
-            >
+            <NuxtLink to="/orders" class="text-indigo-600 hover:text-indigo-500 text-sm font-medium">
               Tümünü görüntüle
             </NuxtLink>
           </div>
-          
+
           <div class="border-t border-gray-200">
             <div v-if="ordersLoading" class="p-6 text-center">
               <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
               <p class="mt-2 text-gray-600">Siparişler yükleniyor...</p>
             </div>
-            
+
             <div v-else-if="orders.length === 0" class="p-6 text-center text-gray-500">
               Henüz hiç siparişiniz bulunmuyor.
               <NuxtLink to="/products" class="text-indigo-600 hover:text-indigo-500 ml-1">
                 Alışverişe başlayın
               </NuxtLink>
             </div>
-            
+
             <div v-else class="divide-y divide-gray-200">
               <div v-for="order in orders.slice(0, 3)" :key="order.id" class="p-6">
                 <div class="flex items-center justify-between">
@@ -147,7 +125,8 @@
                   </div>
                   <div class="text-right">
                     <p class="text-sm font-medium text-gray-900">{{ formatPrice(order.total) }}</p>
-                    <span :class="getOrderStatusClass(order.status)" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
+                    <span :class="getOrderStatusClass(order.status)"
+                      class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
                       {{ getOrderStatusText(order.status) }}
                     </span>
                   </div>
@@ -164,45 +143,38 @@
               <h3 class="text-lg leading-6 font-medium text-gray-900">Adreslerim</h3>
               <p class="mt-1 max-w-2xl text-sm text-gray-500">Kayıtlı teslimat adresleriniz</p>
             </div>
-            <button
-              @click="showAddAddress = true"
-              class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
+            <button @click="showAddAddress = true"
+              class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
               <Icon name="heroicons:plus" class="h-4 w-4 mr-2" />
               Yeni Adres
             </button>
           </div>
-          
+
           <div class="border-t border-gray-200">
             <div v-if="addresses.length === 0" class="p-6 text-center text-gray-500">
               Henüz kayıtlı adresiniz bulunmuyor.
             </div>
-            
+
             <div v-else class="divide-y divide-gray-200">
               <div v-for="address in addresses" :key="address.id" class="p-6">
-                <div class="flex justify-between">
-                  <div>
-                    <p class="text-sm font-medium text-gray-900">
+                <div class="flex justify-between w-full items-start">
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">
                       {{ address.first_name }} {{ address.last_name }}
                     </p>
-                    <p class="text-sm text-gray-600">{{ address.address_1 }}</p>
-                    <p v-if="address.address_2" class="text-sm text-gray-600">{{ address.address_2 }}</p>
-                    <p class="text-sm text-gray-600">
-                      {{ address.city }}, {{ address.province }} {{ address.postal_code }}
+                    <p class="text-sm text-gray-600 w-full truncate">{{ address.address_1 }}</p>
+                    <p v-if="address.address_2" class="text-sm text-gray-600 w-full truncate">{{ address.address_2 }}
                     </p>
-                    <p v-if="address.phone" class="text-sm text-gray-600">{{ address.phone }}</p>
+                    <p class="text-sm text-gray-600 w-full truncate">
+                      {{ address.city }}, {{ address.metadata?.district }}, {{ address.postal_code }}
+                    </p>
+                    <p v-if="address.phone" class="text-sm text-gray-600 truncate">{{ address.phone }}</p>
                   </div>
-                  <div class="flex space-x-2">
-                    <button
-                      @click="editAddress(address)"
-                      class="text-indigo-600 hover:text-indigo-500 text-sm"
-                    >
+                  <div class="flex flex-shrink-0 space-x-2 ml-4">
+                    <button @click="editAddress(address)" class="text-indigo-600 hover:text-indigo-500 text-sm">
                       Düzenle
                     </button>
-                    <button
-                      @click="deleteAddressConfirm(address.id)"
-                      class="text-red-600 hover:text-red-500 text-sm"
-                    >
+                    <button @click="deleteAddressConfirm(address.id)" class="text-red-600 hover:text-red-500 text-sm">
                       Sil
                     </button>
                   </div>
@@ -219,10 +191,8 @@
             <p class="mt-1 max-w-2xl text-sm text-gray-500">Hesabınızla ilgili işlemler</p>
           </div>
           <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
-            <button
-              @click="handleLogout"
-              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-            >
+            <button @click="handleLogout"
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
               <Icon name="heroicons:arrow-right-on-rectangle" class="h-4 w-4 mr-2" />
               Çıkış Yap
             </button>
@@ -236,16 +206,12 @@
         <h2 class="text-xl font-medium text-gray-900 mb-2">Giriş yapmanız gerekiyor</h2>
         <p class="text-gray-600 mb-6">Profil bilgilerinizi görüntülemek için lütfen giriş yapın.</p>
         <div class="space-x-4">
-          <NuxtLink
-            to="/login"
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-          >
+          <NuxtLink to="/login"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
             Giriş Yap
           </NuxtLink>
-          <NuxtLink
-            to="/register"
-            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
+          <NuxtLink to="/register"
+            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
             Kayıt Ol
           </NuxtLink>
         </div>
@@ -253,118 +219,84 @@
     </div>
 
     <!-- Add/Edit Address Modal -->
-    <div v-if="showAddAddress || editingAddress" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div v-if="showAddAddress || editingAddress"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
       <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
           <h3 class="text-lg font-medium text-gray-900 mb-4">
             {{ editingAddress ? 'Adresi Düzenle' : 'Yeni Adres Ekle' }}
           </h3>
-          
+
           <form @submit.prevent="saveAddress" class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700">Ad</label>
-                <input
-                  v-model="addressForm.first_name"
-                  type="text"
-                  required
-                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                >
+                <input v-model="addressForm.first_name" type="text" required
+                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Soyad</label>
-                <input
-                  v-model="addressForm.last_name"
-                  type="text"
-                  required
-                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                >
+                <input v-model="addressForm.last_name" type="text" required
+                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
               </div>
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700">Adres</label>
-              <input
-                v-model="addressForm.address_1"
-                type="text"
-                required
-                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              >
+              <input v-model="addressForm.address_1" type="text" required
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
             </div>
-            
-            <div>
+
+            <!-- <div>
               <label class="block text-sm font-medium text-gray-700">Adres 2 (Opsiyonel)</label>
               <input
                 v-model="addressForm.address_2"
                 type="text"
                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               >
-            </div>
-            
+            </div> -->
+
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700">Şehir</label>
-                <input
-                  v-model="addressForm.city"
-                  type="text"
-                  required
-                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                >
-              </div>
-              <div>
                 <label class="block text-sm font-medium text-gray-700">İl</label>
-                <input
-                  v-model="addressForm.province"
-                  type="text"
-                  required
-                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                >
+                <input v-model="addressForm.city" type="text" required
+                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
               </div>
             </div>
-            
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">İlçe</label>
+                <input v-model="district" type="text" required
+                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              </div>
+            </div>
+
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700">Posta Kodu</label>
-                <input
-                  v-model="addressForm.postal_code"
-                  type="text"
-                  required
-                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                >
+                <input v-model="addressForm.postal_code" type="text" required
+                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Ülke Kodu</label>
-                <input
-                  v-model="addressForm.country_code"
-                  type="text"
-                  required
-                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                >
+                <input v-model="addressForm.country_code" type="text" required
+                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
               </div>
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700">Telefon</label>
-              <input
-                v-model="addressForm.phone"
-                type="tel"
-                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              >
+              <input v-model="addressForm.phone" type="tel"
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
             </div>
-            
+
             <div class="flex justify-end space-x-3 pt-4">
-              <button
-                type="button"
-                @click="closeAddressModal"
-                class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              >
+              <button type="button" @click="closeAddressModal"
+                class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                 İptal
               </button>
-              <button
-                type="submit"
-                :disabled="isLoading"
-                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50"
-              >
+              <button type="submit" :disabled="isLoading"
+                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50">
                 Kaydet
               </button>
             </div>
@@ -408,8 +340,12 @@ const addressForm = reactive({
   province: '',
   postal_code: '',
   country_code: 'TR',
-  phone: ''
+  phone: '',
+  metadata: {}
 })
+const district = ref('')
+
+
 
 // Computed properties
 const customer = computed(() => authStore.customer)
@@ -468,16 +404,24 @@ const editAddress = (address) => {
   editingAddress.value = address
   Object.assign(addressForm, address)
   showAddAddress.value = true
+  district.value = address.metadata?.district || ''
 }
 
+
+
 const saveAddress = async () => {
+  if (addressForm.metadata) {
+    addressForm.metadata.district = district.value
+  } else {
+    addressForm.metadata = { district: district.value }
+  }
   let result
   if (editingAddress.value) {
     result = await authStore.updateAddress(editingAddress.value.id, addressForm)
   } else {
     result = await authStore.addAddress(addressForm)
   }
-  
+
   if (result.success) {
     closeAddressModal()
   }
@@ -503,6 +447,8 @@ const closeAddressModal = () => {
     country_code: 'TR',
     phone: ''
   })
+
+  district.value = ''
 }
 
 const handleLogout = async () => {

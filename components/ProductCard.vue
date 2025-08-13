@@ -1,8 +1,8 @@
 <template>
   <NuxtLink :to="`/products/${product.id}`" class="w-full max-w-sm mx-auto overflow-hidden cursor-pointer group">
-    <div class="relative h-48 sm:h-64 md:h-80 lg:h-96 xl:h-[500px] aspect-3-4 overflow-hidden">
+    <div class="relative h-48 sm:h-64 md:h-80 lg:h-96 xl:h-[500px]  lg:aspect-3-4  overflow-hidden">
       <!-- Main Product Image -->
-      <img
+        <img
         :src="product.image"
         :alt="product.title"
         class="absolute h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"

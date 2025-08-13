@@ -125,9 +125,9 @@
             <div v-if="product.sizes.length > 0" class="space-y-3">
               <div class="flex items-center justify-between">
                 <span class="font-medium">BEDEN SEÇİMİ:</span>
-                <button class="text-sm text-gray-600 underline hover:text-black">
+                <!-- <button class="text-sm text-gray-600 underline hover:text-black">
                   Beden Tablosu
-                </button>
+                </button> -->
               </div>
               <div class="grid grid-cols-6 gap-2">
                 <button
@@ -220,79 +220,89 @@
         </div>
 
         <!-- Debug Section (temporary) -->
-        <div v-if="product.selectedVariant" class="mt-8 p-6 bg-white rounded-xl shadow border border-gray-200">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-bold text-black flex items-center gap-2">
-              <Icon name="mdi:information-outline" class="text-blue-500" />
-              Seçili Varyant Bilgileri
-            </h3>
+        <!-- Product Variant Quick Info (E-commerce Style) -->
+        <div v-if="product.selectedVariant" class="mt-10 mb-12 p-6 bg-gray-50 rounded-lg border border-gray-200 shadow-sm">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            <div class="flex items-center gap-3">
+              <Icon name="mdi:tag-outline" class="text-blue-500 text-xl" />
+              <span class="font-semibold text-lg text-black">{{ product.title }}</span>
+              <span v-if="selectedColor.id" class="inline-flex items-center px-2 py-1 rounded-full text-xs ml-2"
+          :style="{ backgroundColor: selectedColor.hex, color: '#fff' }">
+          {{ selectedColor.name }}
+              </span>
+              <span v-if="selectedSize" class="ml-2 px-2 py-1 rounded-full bg-gray-200 text-xs text-gray-700">
+          {{ selectedSize }}
+              </span>
+            </div>
             <span class="px-3 py-1 rounded-full text-xs font-semibold"
-            :class="isVariantAvailable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+              :class="isVariantAvailable ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
               {{ isVariantAvailable ? 'Stokta Var' : 'Stokta Yok' }}
             </span>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
-              <div class="mb-2 flex items-center gap-2">
-          <span class="font-semibold text-gray-700">ID:</span>
+              <div class="mb-1 flex items-center gap-2">
+          <span class="font-medium text-gray-600">Varyant ID:</span>
           <span class="text-gray-900">{{ product.selectedVariant.id }}</span>
               </div>
-              <div class="mb-2 flex items-center gap-2">
-          <span class="font-semibold text-gray-700">SKU:</span>
-          <span class="text-gray-900">{{ product.selectedVariant.sku }}</span>
+              <div class="mb-1 flex items-center gap-2">
+          <span class="font-medium text-gray-600">SKU:</span>
+          <span class="text-gray-900">{{ product.selectedVariant.sku || '-' }}</span>
               </div>
-              <div class="mb-2 flex items-center gap-2">
-          <span class="font-semibold text-gray-700">Başlık:</span>
+              <div class="mb-1 flex items-center gap-2">
+          <span class="font-medium text-gray-600">Başlık:</span>
           <span class="text-gray-900">{{ product.selectedVariant.title }}</span>
-              </div>
-              <div class="mb-2 flex items-center gap-2">
-          <span class="font-semibold text-gray-700">Stok:</span>
-          <span class="text-gray-900">{{ product.selectedVariant.inventory_quantity }}</span>
-              </div>
-              <div v-if="product.selectedVariant.calculated_price" class="mb-2 flex items-center gap-2">
-          <span class="font-semibold text-gray-700">Fiyat:</span>
-          <span class="text-gray-900">{{ formatPrice(product.selectedVariant.calculated_price.calculated_amount) }}</span>
               </div>
             </div>
             <div>
-              <div v-if="product.selectedVariant.options" class="mb-2">
-          <span class="font-semibold text-gray-700">Seçenekler:</span>
-          <ul class="ml-2 mt-1 text-gray-800 text-sm">
+              <div class="mb-1 flex items-center gap-2">
+          <span class="font-medium text-gray-600">Stok:</span>
+          <span class="text-gray-900">{{ product.selectedVariant.inventory_quantity }}</span>
+              </div>
+              <div v-if="product.selectedVariant.calculated_price" class="mb-1 flex items-center gap-2">
+          <span class="font-medium text-gray-600">Fiyat:</span>
+          <span class="text-gray-900">{{ formatPrice(product.selectedVariant.calculated_price.calculated_amount) }}</span>
+          <span v-if="product.selectedVariant.calculated_price.original_amount > product.selectedVariant.calculated_price.calculated_amount"
+            class="ml-2 text-xs text-gray-400 line-through">
+            {{ formatPrice(product.selectedVariant.calculated_price.original_amount) }}
+          </span>
+              </div>
+              <div class="mb-1 flex items-center gap-2">
+          <span class="font-medium text-gray-600">Renkler:</span>
+          <span class="text-gray-900">{{ availableColors.length }} / {{ product.colors.length }}</span>
+              </div>
+            </div>
+            <div>
+              <div v-if="product.selectedVariant.options" class="mb-1">
+          <span class="font-medium text-gray-600">Seçenekler:</span>
+          <ul class="ml-2 mt-1 text-gray-800">
             <li v-for="option in product.selectedVariant.options" :key="option.id">
               <span class="font-medium">{{ option.option?.title }}:</span> {{ option.value }}
             </li>
           </ul>
               </div>
-              <div class="mb-2">
-          <span class="font-semibold text-gray-700">Mevcut Renkler:</span>
-          <span class="ml-1 text-gray-900">{{ availableColors.length }} / {{ product.colors.length }}</span>
-              </div>
-              <div class="mb-2">
-          <span class="font-semibold text-gray-700">Seçili Renk için Mevcut Bedenler:</span>
+              <div class="mb-1">
+          <span class="font-medium text-gray-600">Mevcut Bedenler:</span>
           <span class="ml-1 text-gray-900">{{ availableSizesForColor.length }}</span>
               </div>
             </div>
           </div>
           <div v-if="selectedColor.id" class="mt-4">
-            <div class="font-semibold text-gray-700 mb-1 flex items-center gap-2">
-              <span>Stok Durumu:</span>
-              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs"
-              :style="{ backgroundColor: selectedColor.hex, color: '#fff' }">
-          {{ selectedColor.name }}
-              </span>
+            <div class="font-medium text-gray-700 mb-1 flex items-center gap-2">
+              <span>Stok Durumu (Bedenler):</span>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <div class="flex flex-wrap gap-2">
               <div v-for="size in product.sizes" :key="size"
-             class="flex items-center gap-2 px-2 py-1 rounded border"
-             :class="isSizeAvailableForColor(size) ? 'border-green-400 bg-green-50 text-green-700' : 'border-red-400 bg-red-50 text-red-700 opacity-70'">
+          class="flex items-center gap-2 px-2 py-1 rounded border text-xs"
+          :class="isSizeAvailableForColor(size) ? 'border-green-400 bg-green-50 text-green-700' : 'border-red-400 bg-red-50 text-red-700 opacity-70'">
           <span class="font-medium">{{ size }}</span>
           <span>{{ isSizeAvailableForColor(size) ? 'Var' : 'Yok' }}</span>
               </div>
             </div>
           </div>
           <div class="mt-6">
-            <span class="font-semibold text-gray-700">Renk-Beden Haritası:</span>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+            <span class="font-medium text-gray-700">Renk / Beden Haritası:</span>
+            <div class="flex flex-wrap gap-4 mt-2">
               <div v-for="color in product.colors" :key="color.id" class="flex items-center gap-2">
           <span class="inline-block w-4 h-4 rounded-full border" :style="{ backgroundColor: color.hex }"></span>
           <span class="font-medium">{{ color.name }}:</span>

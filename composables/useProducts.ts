@@ -38,6 +38,9 @@ export const useProducts = () => {
     }
   };
 
+  // get product by handle string
+  
+
   // Kategorileri getir
   const getCategories = async () => {
     try {

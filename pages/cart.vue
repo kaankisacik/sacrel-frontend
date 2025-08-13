@@ -76,7 +76,7 @@
                 <!-- Product Info -->
                 <div class="flex-1 min-w-0">
                   <h3 class="text-lg font-medium text-gray-900 mb-1">{{ item.title }}</h3>
-                  <p class="text-sm text-gray-600 mb-2">{{ item.subtitle || item.description }}</p>
+                  <p class="text-sm text-gray-600 mb-2">{{ item.variant_title }}</p>
                   <p class="text-lg font-semibold text-gray-900">{{ formatPrice(item.unit_price) }}</p>
                 </div>
 
@@ -101,7 +101,7 @@
 
                 <!-- Item Total -->
                 <div class="text-right">
-                  <p class="text-lg font-semibold text-gray-900">{{ formatPrice(item.total) }}</p>
+                  <p class="text-lg font-semibold text-gray-900">{{ formatPrice( item.unit_price * item.quantity) }}</p>
                   <button
                     @click="removeItem(item.id)"
                     :disabled="cartStore.isLoading"
@@ -195,8 +195,10 @@ onMounted(async () => {
 
 // Helper functions
 const formatPrice = (amount) => {
+  console.log('Formatting price:', amount);
+  
   if (!amount) return '0 TL'
-  return `${(amount / 100).toLocaleString('tr-TR')} TL`
+  return `${(amount).toLocaleString('tr-TR')} TL`
 }
 
 const handleImageError = (event) => {
