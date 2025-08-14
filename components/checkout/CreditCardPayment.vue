@@ -56,7 +56,7 @@
         </div>
       </div>
       
-      <div class="flex items-center">
+      <!-- <div class="flex items-center">
         <input 
           id="saveCard" 
           v-model="cardInfo.save_card" 
@@ -64,7 +64,7 @@
           class="text-black focus:ring-black border-gray-300 rounded"
         />
         <label for="saveCard" class="ml-2 text-sm text-gray-700">Kartımı kaydet</label>
-      </div>
+      </div> -->
     </div>
     
     <!-- Güvenlik Bilgisi -->

@@ -1,11 +1,11 @@
 <template>
     <div class="bg-sacrel-light min-h-screen">
         <Banner />
-        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-            <ShowCase />
+        <!-- <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8"> -->
+            <!-- <ShowCase /> -->
             
             <!-- Featured Products Section -->
-            <section class="mt-16 md:mt-20 lg:mt-32">
+            <!-- <section class="mt-16 md:mt-20 lg:mt-32">
                 <div class="text-center mb-12">
                     <h2 class="text-3xl font-bold text-gray-900 mb-4">Öne Çıkan Ürünler</h2>
                     <p class="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -47,12 +47,12 @@
                         Tüm Ürünleri Görüntüle
                     </NuxtLink>
                 </div>
-            </section>
+            </section> -->
             
-            <div class="mt-16 md:mt-20 lg:mt-32">
+            <!-- <div class="mt-16 md:mt-20 lg:mt-32">
                 <Freebook />
-            </div>
-        </div>
+            </div> -->
+        <!-- </div> -->
     </div>
 </template>
 

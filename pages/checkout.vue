@@ -141,14 +141,14 @@
                 <input v-model="paymentMethod" type="radio" value="credit_card" class="text-black focus:ring-black" />
                 <span class="ml-3 font-medium">Kredi Kartı</span>
               </label>
-              <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50" :class="{ 'border-black bg-gray-50': paymentMethod === 'bank_transfer' }">
+              <!-- <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50" :class="{ 'border-black bg-gray-50': paymentMethod === 'bank_transfer' }">
                 <input v-model="paymentMethod" type="radio" value="bank_transfer" class="text-black focus:ring-black" />
                 <span class="ml-3 font-medium">Banka Havalesi</span>
               </label>
               <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50" :class="{ 'border-black bg-gray-50': paymentMethod === 'cash_on_delivery' }">
                 <input v-model="paymentMethod" type="radio" value="cash_on_delivery" class="text-black focus:ring-black" />
                 <span class="ml-3 font-medium">Kapıda Ödeme</span>
-              </label>
+              </label> -->
             </div>
 
             <!-- Payment Method Components -->
@@ -159,7 +159,7 @@
                 @validate="handlePaymentValidation"
               />
               
-              <BankTransferPayment 
+              <!-- <BankTransferPayment 
                 v-if="paymentMethod === 'bank_transfer'"
                 :order-total="cartStore.cart.total"
                 :order-reference="generateOrderReference()"
@@ -172,7 +172,7 @@
                 :extra-fee="codExtraFee"
                 @validate="handlePaymentValidation"
                 @update:payment-option="handleCodPaymentOption"
-              />
+              /> -->
             </div>
           </div>
         </div>
@@ -221,7 +221,7 @@
               <div class="border-t pt-2">
                 <div class="flex justify-between text-lg font-semibold">
                   <span class="text-gray-900">Toplam:</span>
-                  <span class="text-gray-900">{{ formatPrice(finalTotal) }}</span>
+                  <p class="text-gray-900">{{ formatPrice(finalTotal) }}</p>
                 </div>
               </div>
             </div>
@@ -249,6 +249,10 @@
 </template>
 
 <script setup>
+// Import the checkout components explicitly
+import CreditCardPayment from '~/components/checkout/CreditCardPayment.vue'
+import BankTransferPayment from '~/components/checkout/BankTransferPayment.vue'
+import CashOnDeliveryPayment from '~/components/checkout/CashOnDeliveryPayment.vue'
 
 // SEO
 useHead({
@@ -325,6 +329,30 @@ const paymentData = ref({
 })
 // Computed properties
 const isFormValid = computed(() => {
+if( !customerInfo.value.email)
+  console.log("Form validation failed: email is required");
+
+if( !customerInfo.value.first_name)
+  console.log("Form validation failed: first name is required");
+
+  if( !customerInfo.value.last_name)
+    console.log("Form validation failed: last name is required");
+
+  if( !shippingAddress.value.address_1)
+    console.log("Form validation failed: address is required");
+
+  if( !shippingAddress.value.city)
+    console.log("Form validation failed: city is required");
+
+  if( !shippingAddress.value.postal_code)
+    console.log("Form validation failed: postal code is required");
+
+  if( !paymentMethod.value)
+    console.log("Form validation failed: payment method is required");
+
+  if( !isPaymentValid.value)
+    console.log("Form validation failed: payment is not valid");
+  
   return (
     customerInfo.value.email &&
     customerInfo.value.first_name &&
@@ -348,7 +376,7 @@ const finalTotal = computed(() => {
 // Helper functions
 const formatPrice = (amount) => {
   if (!amount) return '0 TL'
-  return `${(amount / 100).toLocaleString('tr-TR')} TL`
+  return `${(amount ).toLocaleString('tr-TR')} TL`
 }
 
 const generateOrderReference = () => {
@@ -369,6 +397,7 @@ const getOrderButtonText = () => {
 }
 
 const handlePaymentValidation = (isValid) => {
+  console.log("Payment validation status:", isValid);
   isPaymentValid.value = isValid
 }
 
@@ -382,10 +411,13 @@ watch(paymentMethod, () => {
 })
 
 const completeOrder = async () => {
+  console.log("Completing order with payment method:", paymentMethod.value);
+  
   if (!isFormValid.value || isProcessing.value) return
 
   isProcessing.value = true
-
+  console.log("Processing order...");
+  
   try {
     // Ödeme yöntemine göre farklı işlemler
     const orderData = {
@@ -412,7 +444,13 @@ const completeOrder = async () => {
       // Kapıda ödeme için sipariş oluştur
       console.log('Creating COD order...', codPaymentOption.value)
     }
+    // Simulate order creation
 
+    console.log("Simulating order creation...");
+    
+    await authStore.addOrder(orderData)
+
+    console.log("Order created successfully, redirecting to success page...");
     // Simulated order completion
     await new Promise(resolve => setTimeout(resolve, 2000))
 
