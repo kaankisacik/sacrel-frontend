@@ -1,0 +1,82 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Nuxt: Server",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/nuxt/bin/nuxt.mjs",
+      "args": ["dev"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "console": "integratedTerminal",
+      "runtimeArgs": ["--inspect"],
+      "skipFiles": ["<node_internals>/**"],
+      "restart": true,
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "Nuxt: Client",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///./*": "${webRoot}/*",
+        "webpack:///src/*": "${webRoot}/*",
+        "webpack:///*": "*",
+        "webpack:///./~/*": "${webRoot}/node_modules/*"
+      },
+      "userDataDir": false,
+      "runtimeArgs": [
+        "--disable-web-security",
+        "--allow-running-insecure-content"
+      ]
+    },
+    {
+      "name": "Nuxt: Full Stack",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/nuxt/bin/nuxt.mjs",
+      "args": ["dev"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "console": "integratedTerminal",
+      "runtimeArgs": ["--inspect"],
+      "skipFiles": ["<node_internals>/**"],
+      "restart": true,
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ],
+      "serverReadyAction": {
+        "pattern": "Local:.*?(https?://\\S+)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      }
+    },
+    {
+      "name": "Nuxt: Build",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/nuxt/bin/nuxt.mjs",
+      "args": ["build"],
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
