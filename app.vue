@@ -5,5 +5,8 @@
 </template>
 
 <script setup>
- useAuthStore();
+onNuxtReady(() => {
+  useAuthStore();
+  useProductStore();
+});
 </script>

@@ -100,7 +100,7 @@ export const useCart = () => {
   };
 
 
-  const submitPromotion = async (
+  const updatePromotion = async (
     cartId: string,
     promotionData: string[]
   ): Promise<StoreCartResponse> => {
@@ -150,9 +150,8 @@ export const useCart = () => {
     addLineItem,
     updateLineItem,
     deleteLineItem,
-    addPromotion: submitPromotion,
+    updatePromotion,
     addShippingMethod,
     completeCart,
-
   };
 };

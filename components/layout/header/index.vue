@@ -14,7 +14,7 @@
             </div>
           </div>
 
-          <button class="block lg:hidden focus:outline-none">
+          <button class="block lg:hidden focus:outline-none" @click="menuStore.toggleMobileMenu()">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sacrel-primary" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
@@ -48,7 +48,6 @@
             </li>
           </ul>
         </div>
-
         <div class="hidden lg:flex flex-row items-start space-x-4 mb-2 font-accent">
           <!-- User Menu -->
           <div v-if="isUserAuthenticated" class="relative" @mouseleave="menuStore.setIsMenuOpen(false)">
@@ -98,7 +97,7 @@
     </div>
 
     <!-- Mobile Menu -->
-    <div class="lg:hidden hidden">
+    <div class="lg:hidden" v-if="menuStore.isMobileMenuOpen">
       <ul class="flex flex-col space-y-4 mt-4 px-4 pb-4">
         <li>
           <NuxtLink href="/products"
@@ -120,35 +119,35 @@
         </li>
         <li>
           <NuxtLink href="/cart"
-            class="sacrel-body font-accent text-sacrel-primary hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-2">
+            class="sacrel-body font-accent text-sacrel-primary hover:text-sacrel-accent transition duration-300 ease-in-out ">
             <i class="uil uil-shopping-cart"></i>
             <span>Sepet</span>
           </NuxtLink>
         </li>
         <li>
           <NuxtLink href="/profile"
-            class="sacrel-body font-accent text-sacrel-primary hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-2">
+            class="sacrel-body font-accent text-sacrel-primary hover:text-sacrel-accent transition duration-300 ease-in-out ">
             <i class="uil uil-user"></i>
             <span>Profil</span>
           </NuxtLink>
         </li>
         <li>
           <NuxtLink href="/profile/orders"
-            class="sacrel-body font-accent text-sacrel-primary hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-2">
+            class="sacrel-body font-accent text-sacrel-primary hover:text-sacrel-accent transition duration-300 ease-in-out ">
             <i class="uil uil-file-alt"></i>
             <span>Siparişlerim</span>
           </NuxtLink>
         </li>
         <li>
           <NuxtLink href="/profile/favorites"
-            class="sacrel-body font-accent text-sacrel-primary hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-2">
+            class="sacrel-body font-accent text-sacrel-primary hover:text-sacrel-accent transition duration-300 ease-in-out ">
             <i class="uil uil-heart"></i>
             <span>Favorilerim</span>
           </NuxtLink>
         </li>
         <li>
           <NuxtLink href="/auth/login"
-            class="sacrel-body font-accent text-sacrel-primary hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-2">
+            class="sacrel-body font-accent text-sacrel-primary hover:text-sacrel-accent transition duration-300 ease-in-out ">
             <i class="uil uil-signin"></i>
             <span>Giriş Yap</span>
           </NuxtLink>

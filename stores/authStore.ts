@@ -72,6 +72,16 @@ export const useAuthStore = defineStore("authStore", () => {
     }
   }
 
+  async function refreshToken() {
+    try {
+      await auth.refreshToken();
+      isUserAuthenticated.value = true;
+    } catch (error) {
+      console.error("Error refreshing token:", error);
+      isUserAuthenticated.value = false;
+    }
+  }
+
   function logout() {
     try {
       console.log("Logging out user...");
@@ -80,11 +90,11 @@ export const useAuthStore = defineStore("authStore", () => {
         .logout()
         .then(() => {
           console.log("User logged out successfully.");
+          isUserAuthenticated.value = false;
         })
         .catch((error) => {
           console.error("Error during logout:", error);
         });
-      isUserAuthenticated.value = false;
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -93,17 +103,32 @@ export const useAuthStore = defineStore("authStore", () => {
   function checkUserAuthenticated() {
     customer
       .getCustomer()
-      .then((storeCustomerResponse) => {
+      .then((_) => {
         isUserAuthenticated.value = true;
       })
-      .catch(() => {
+      .catch((_) => {
         auth
           .refreshToken()
-          .then(() => {
+          .then((_) => {
             isUserAuthenticated.value = true;
           })
-          .catch(() => {
-            isUserAuthenticated.value = false;
+          .catch((_) => {
+            console.error(
+              "User is not authenticated. Trying to refresh token..."
+            );
+            //try refreshing token
+            refreshToken()
+              .then((_) => {
+                isUserAuthenticated.value = true;
+                console.log("Token refreshed successfully.");
+              })
+              .catch((_) => {
+                console.error(
+                  "Token refresh failed, user is not authenticated."
+                );
+                // If token refresh fails, set authentication to false
+                isUserAuthenticated.value = false;
+              });
           });
       });
   }
@@ -113,7 +138,6 @@ export const useAuthStore = defineStore("authStore", () => {
   // lifecycle hook, or ensure you only call it in the browser by checking `false`.
 
   // To use lifecycle hooks like onMounted, call this function inside your component's setup()
-
 
   onNuxtReady(() => {
     checkUserAuthenticated();

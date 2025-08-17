@@ -2,10 +2,9 @@ export const useAuth = () => {
   const medusa = useMedusaClient();
 
   //setToken
-  const setToken = (token: string) => {
-    medusa.client.setToken(token);
+  const setToken = async (token: string) => {
+    await medusa.client.setToken(token);
   };
-
 
   //removeToken
   const removeToken = async () => {
@@ -33,10 +32,7 @@ export const useAuth = () => {
     }
   };
 
-  const register = async (userData: {
-    email: string;
-    password: string;
-  }) => {
+  const register = async (userData: { email: string; password: string }) => {
     try {
       const response = await medusa.auth.register(
         "customer",
@@ -57,7 +53,6 @@ export const useAuth = () => {
     authProvider: string = "emailpass"
   ): Promise<void> => {
     try {
-     
       await medusa.auth.resetPassword("customer", authProvider, {
         identifier: email,
       });
@@ -99,7 +94,6 @@ export const useAuth = () => {
     }
   };
 
-
   // POST /auth/customer/{auth_provider}/callback
   const handleCallback = async (
     callbackData: Record<string, any>,
@@ -128,8 +122,6 @@ export const useAuth = () => {
       throw error;
     }
   };
-
-
 
   return {
     login,

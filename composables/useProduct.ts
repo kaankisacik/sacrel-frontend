@@ -1,13 +1,5 @@
 import type {
   StoreProductResponse,
-  PaginatedResponse,
-  StoreProduct,
-  StoreProductCategoryResponse,
-  StoreProductCategory,
-  StoreProductTagResponse,
-  StoreProductTag,
-  StoreProductTypeResponse,
-  StoreProductType,
   StoreProductListParams,
   StoreProductListResponse,
   StoreProductParams,
@@ -15,7 +7,6 @@ import type {
 
 export const useProducts = () => {
   const medusa = useMedusaClient();
-
 
   const getProduct = async (
     productId: string,
@@ -37,7 +28,11 @@ export const useProducts = () => {
     queryParams?: StoreProductListParams
   ): Promise<StoreProductListResponse> => {
     try {
-      const response = await medusa.store.product.list(queryParams);
+      const response = await medusa.store.product.list({
+        ...queryParams,
+        fields:
+          "*categories,*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags",
+      });
       return response;
     } catch (error) {
       console.error("Products retrieval failed:", error);
