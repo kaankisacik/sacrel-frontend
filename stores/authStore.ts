@@ -1,18 +1,21 @@
 import { defineStore } from "pinia";
+
 export const useAuthStore = defineStore("authStore", () => {
   const isUserAuthenticated = ref(false);
-  const auth = useAuth();
-  const customer = useCustomer();
+  const isCheckingAuth = ref(false);
+  const authService = useAuth();
+  const customerService = useCustomer();
 
   async function login(email: string, password: string) {
     try {
-      await auth.login(email, password);
+      await authService.login(email, password);
       isUserAuthenticated.value = true;
     } catch (err) {
       if ((err as any).message.includes("Unauthorized")) {
         throw new Error("Lütfen aynı giriş bilgilerini kullanarak kayıt olun.");
       }
       isUserAuthenticated.value = false;
+      throw err;
     }
   }
 
@@ -31,126 +34,130 @@ export const useAuthStore = defineStore("authStore", () => {
       phone: userData.phone,
       metadata: userData.metadata,
     };
+
     try {
-      await auth.register({
+      await authService.register({
         email: userData.email,
         password: userData.password,
       });
 
-      await customer.createCustomer(customerData);
-
+      await customerService.createCustomer(customerData);
       isUserAuthenticated.value = true;
     } catch (error) {
-      if (error) {
-        console.error("Registration failed:", error);
-        if (
-          (error as any).message.includes("Identity with email already exists")
-        ) {
-          try {
-            await auth.login(userData.email, userData.password);
-
-            await customer.createCustomer(customerData);
-          } catch (error) {
-            console.error("Login after registration failed:", error);
-            if (
-              (error as any).message.includes(
-                "Request already authenticated as a customer."
-              )
-            ) {
-              // throw new Error("Kullanıcı zaten kayıtlı. Lütfen giriş yapın.");
-              navigateTo("/");
-            }
-            if ((error as any).message.includes("Invalid email or password")) {
-              throw new Error(
-                "Daha önce kayıt olurken kullandığınız e-posta adresi veya şifre yanlış."
-              );
-            }
+      if ((error as any).message.includes("Identity with email already exists")) {
+        try {
+          await authService.login(userData.email, userData.password);
+          await customerService.createCustomer(customerData);
+          isUserAuthenticated.value = true;
+        } catch (loginError) {
+          console.error("Login after registration failed:", loginError);
+          if (
+            (loginError as any).message.includes(
+              "Request already authenticated as a customer."
+            )
+          ) {
+            isUserAuthenticated.value = true;
+            return navigateTo("/");
           }
+          if ((loginError as any).message.includes("Invalid email or password")) {
+            throw new Error(
+              "Daha önce kayıt olurken kullandığınız e-posta adresi veya şifre yanlış."
+            );
+          }
+          throw loginError;
         }
+      } else {
         throw error;
       }
-    }
-  }
-
-  async function refreshToken() {
-    try {
-      await auth.refreshToken();
-      isUserAuthenticated.value = true;
-    } catch (error) {
-      console.error("Error refreshing token:", error);
-      isUserAuthenticated.value = false;
     }
   }
 
   function logout() {
     try {
       console.log("Logging out user...");
-
-      auth
+      authService
         .logout()
         .then(() => {
           console.log("User logged out successfully.");
           isUserAuthenticated.value = false;
+          // Clear any stored tokens
+          if (process.client) {
+            localStorage.removeItem("medusa_auth_token");
+          }
         })
         .catch((error) => {
           console.error("Error during logout:", error);
+          // Even if logout fails, clear local state
+          isUserAuthenticated.value = false;
+          if (process.client) {
+            localStorage.removeItem("medusa_auth_token");
+          }
         });
     } catch (error) {
       console.error("Logout failed:", error);
+      isUserAuthenticated.value = false;
     }
   }
 
-  function checkUserAuthenticated() {
-    customer
-      .getCustomer()
-      .then((_) => {
+  async function checkUserAuthenticated(): Promise<boolean> {
+    if (isCheckingAuth.value) {
+      return isUserAuthenticated.value;
+    }
+
+    isCheckingAuth.value = true;
+
+    try {
+      // First try to get customer
+      await customerService.getCustomer();
+      isUserAuthenticated.value = true;
+      console.log("User is authenticated.");
+    } catch (error) {
+      console.log("User is not authenticated. Trying to refresh token...");
+
+      try {
+        // Try to refresh token
+        await authService.refreshToken();
+
+        // Try to get customer again after refresh
+        await customerService.getCustomer();
         isUserAuthenticated.value = true;
-      })
-      .catch((_) => {
-        auth
-          .refreshToken()
-          .then((_) => {
-            isUserAuthenticated.value = true;
-          })
-          .catch((_) => {
-            console.error(
-              "User is not authenticated. Trying to refresh token..."
-            );
-            //try refreshing token
-            refreshToken()
-              .then((_) => {
-                isUserAuthenticated.value = true;
-                console.log("Token refreshed successfully.");
-              })
-              .catch((_) => {
-                console.error(
-                  "Token refresh failed, user is not authenticated."
-                );
-                // If token refresh fails, set authentication to false
-                isUserAuthenticated.value = false;
-              });
-          });
-      });
+        console.log("Token refreshed successfully.");
+      } catch (refreshError) {
+        // If token refresh fails, clear everything
+        console.error("Token refresh failed, user is not authenticated.");
+        isUserAuthenticated.value = false;
+
+        if (process.client) {
+          localStorage.removeItem("medusa_auth_token");
+        }
+      }
+    } finally {
+      isCheckingAuth.value = false;
+    }
+
+    return isUserAuthenticated.value;
   }
 
-  ///[nuxt] `setInterval` should not be used on the server.
-  // Consider wrapping it with an `onNuxtReady`, `onBeforeMount` or `onMounted`
-  // lifecycle hook, or ensure you only call it in the browser by checking `false`.
-
-  // To use lifecycle hooks like onMounted, call this function inside your component's setup()
-
-  onNuxtReady(() => {
-    checkUserAuthenticated();
-    // Check user authentication every 60 seconds
-    setInterval(() => {
+  // Initialize auth check when store is created
+  if (process.client) {
+    onNuxtReady(() => {
       checkUserAuthenticated();
-    }, 60000);
-  });
+
+      // Check user authentication every 5 minutes instead of 5 seconds
+      setInterval(() => {
+        if (!isCheckingAuth.value) {
+          checkUserAuthenticated();
+        }
+      }, 300000); // 5 minutes
+    });
+  }
 
   return {
     login,
     register,
     logout,
+    checkUserAuthenticated,
     isUserAuthenticated,
+    isCheckingAuth,
   };
 });

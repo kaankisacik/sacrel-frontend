@@ -156,12 +156,12 @@
                     </div>
 
                     <!-- Load More Button -->
-                    <div v-if="!isLoading && filteredItems.length > 0 && hasMore" class="text-center mt-12">
+                    <!-- <div v-if="!isLoading && filteredItems.length > 0 && hasMore" class="text-center mt-12">
                         <button @click="loadMoreItems" :disabled="loadingMore"
                             class="bg-gray-900 text-white px-8 py-3 font-medium hover:bg-gray-800 transition duration-300 disabled:opacity-50">
                             {{ loadingMore ? 'Yükleniyor...' : 'Daha Fazla Yükle' }}
                         </button>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -246,10 +246,8 @@
 
 <script setup lang="ts">
 
-const { products, allProductFilters } = storeToRefs(useProductStore())
+const { products, allProductFilters,searchQuery } = storeToRefs(useProductStore())
 
-// Reactive state
-const searchQuery = ref<string>('')
 const selectedCategories = ref<string[]>([])
 const selectedPriceRange = ref<string>('')
 const selectedColors = ref<string[]>([])
@@ -282,6 +280,26 @@ const colors = computed<any[]>(() => {
     return colors
 })
 
+// Handle search query from router and sync with URL
+const router = useRouter()
+const route = useRoute()
+
+// Check if user came with search query in URL and set it
+onMounted(() => {
+    const urlSearchQuery = route.query.search as string
+    if (urlSearchQuery) {
+        searchQuery.value = urlSearchQuery
+    }
+})
+
+// Watch for search query changes and update URL
+watch(searchQuery, (newQuery) => {
+    if (newQuery.trim()) {
+        router.push(`/products?search=${encodeURIComponent(newQuery.trim())}`)
+    } else {
+        router.push('/products')
+    }
+})
 
 
 // Computed properties

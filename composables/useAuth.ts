@@ -4,11 +4,21 @@ export const useAuth = () => {
   //setToken
   const setToken = async (token: string) => {
     await medusa.client.setToken(token);
+
+    // Store token in localStorage for persistence
+    if (import.meta.client) {
+      localStorage.setItem("medusa_auth_token", token);
+    }
   };
 
   //removeToken
   const removeToken = async () => {
     await medusa.client.clearToken();
+
+    // Remove from localStorage
+    if (import.meta.client) {
+      localStorage.removeItem("medusa_auth_token");
+    }
   };
 
   const login = async (email: string, password: string) => {
@@ -67,8 +77,10 @@ export const useAuth = () => {
     try {
       const response = await medusa.auth.refresh();
       setToken(response);
+      return response;
     } catch (error) {
       console.error("Token refresh failed:", error);
+      await removeToken();
       throw error;
     }
   };
@@ -116,12 +128,20 @@ export const useAuth = () => {
   const logout = async (): Promise<void> => {
     try {
       await medusa.auth.logout();
-      removeToken();
+      await removeToken();
     } catch (error) {
       console.error("Logout failed:", error);
+      await removeToken();
       throw error;
     }
   };
+
+  if (import.meta.client) {
+    const storedToken = localStorage.getItem("medusa_auth_token");
+    if (storedToken) {
+      medusa.client.setToken(storedToken);
+    }
+  }
 
   return {
     login,

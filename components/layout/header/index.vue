@@ -5,7 +5,7 @@
         <div class="flex items-center space-x-8">
           <div class="hidden lg:flex items-center space-x-6">
             <div class="relative">
-              <input type="text"
+              <input type="text" v-model="searchQuery" @keyup.enter="navigateTo(`/products?search=${searchQuery}`)"
                 class="sacrel-input border-b-2 border-sacrel-neutral py-2 pr-10 pl-4 focus:outline-none focus:border-sacrel-primary transition duration-300 ease-in-out"
                 placeholder="Ara" />
               <button class="absolute inset-y-0 right-0 pr-3 py-2 focus:outline-none">
@@ -69,11 +69,12 @@
               <NuxtLink href="/profile/orders" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                 Siparişlerim
               </NuxtLink>
-              <NuxtLink href="/profile/favorites" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <!-- <NuxtLink href="/profile/favorites" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                 Favorilerim
-              </NuxtLink>
+              </NuxtLink> -->
               <hr class="my-1">
-              <button class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100" @click="authStore.logout();navigateTo('/')">
+              <button class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                @click="logout(); navigateTo('/')">
                 Çıkış Yap
               </button>
             </div>
@@ -85,11 +86,12 @@
           </NuxtLink>
 
           <NuxtLink href="/cart"
-            class="sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-1 relative">
+            class="text-sacrel-body-lg text-sacrel-neutral hover:text-sacrel-accent transition duration-300 ease-in-out flex items-center space-x-1 relative">
             <Icon name="uil:shopping-cart" class="text-sacrel-neutral" />
-            <span>Sepet</span>
-            <span class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5">
-              0
+
+            <span
+              class="absolute -top-4 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              {{ totalQuantity }}
             </span>
           </NuxtLink>
         </div>
@@ -162,6 +164,10 @@
 
 const menuStore = useMenuStore();
 const authStore = useAuthStore();
-const { isUserAuthenticated } = storeToRefs(authStore)
+const { isUserAuthenticated } = storeToRefs(authStore);
+const { totalQuantity } = storeToRefs(useCartStore());
+const { logout } = authStore;
+const { searchQuery } = storeToRefs(useProductStore());
+
 
 </script>

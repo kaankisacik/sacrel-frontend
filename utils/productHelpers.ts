@@ -4,6 +4,19 @@ interface IProductHelper {
   ): Record<string, any>;
   extractProductFilters(jsonObject: Record<string, any>): Record<string, any>;
   getColorBgTailwind(color: string): string;
+  getAvailableSizesForColor(
+    product: Record<string, any>,
+    colorValue: string
+  ): string[];
+  getAvailableColorsForSize(
+    product: Record<string, any>,
+    sizeValue: string
+  ): string[];
+  isProductInStock(product: Record<string, any>): boolean;
+  getFirstAvailableSize(
+    product: Record<string, any>,
+    colorValue: string
+  ): string | null;
 }
 
 class ProductHelper implements IProductHelper {
@@ -139,6 +152,89 @@ class ProductHelper implements IProductHelper {
       yellow: "bg-yellow-500",
     };
     return colorMap[color] || "bg-gray-500";
+  }
+
+  // Belirli bir renk için mevcut bedenleri döndürür
+  getAvailableSizesForColor(
+    product: Record<string, any>,
+    colorValue: string
+  ): string[] {
+    if (!product.variants) return [];
+    console.log("Product variants:", product.variants);
+
+    console.log("Available sizes for color:", colorValue);
+
+    const availableSizes = product.variants
+      .filter((variant: Record<string, any>) => {
+        // Stokta olan ve seçilen renk ile eşleşen varyantları filtrele
+        const hasStock = variant.inventory_quantity > 0;
+        const hasColor = variant.options?.some(
+          (opt: Record<string, any>) =>
+            opt.option.title.toLowerCase() === "color" &&
+            opt.value === colorValue
+        );
+        return hasStock && hasColor;
+      })
+      .map((variant: Record<string, any>) => {
+        // Size değerini al
+        const sizeOption = variant.options?.find(
+          (opt: Record<string, any>) =>
+            opt.option.title.toLowerCase() === "size"
+        );
+        return sizeOption?.value;
+      })
+      .filter(Boolean); // null/undefined değerleri filtrele
+      
+      
+    return Array.from(new Set(availableSizes)); // Tekrarları kaldır
+  }
+
+  // Belirli bir beden için mevcut renkleri döndürür
+  getAvailableColorsForSize(
+    product: Record<string, any>,
+    sizeValue: string
+  ): string[] {
+    if (!product.variants) return [];
+
+    const availableColors = product.variants
+      .filter((variant: Record<string, any>) => {
+        // Stokta olan ve seçilen beden ile eşleşen varyantları filtrele
+        const hasStock = variant.inventory_quantity > 0;
+        const hasSize = variant.options?.some(
+          (opt: Record<string, any>) =>
+            opt.option.title.toLowerCase() === "size" && opt.value === sizeValue
+        );
+        return hasStock && hasSize;
+      })
+      .map((variant: Record<string, any>) => {
+        // Color değerini al
+        const colorOption = variant.options?.find(
+          (opt: Record<string, any>) =>
+            opt.option.title.toLowerCase() === "color"
+        );
+        return colorOption?.value;
+      })
+      .filter(Boolean); // null/undefined değerleri filtrele
+
+    return Array.from(new Set(availableColors)); // Tekrarları kaldır
+  }
+
+  // Ürünün genel stok durumunu kontrol eder
+  isProductInStock(product: Record<string, any>): boolean {
+    if (!product.variants) return false;
+
+    return product.variants.some(
+      (variant: Record<string, any>) => variant.inventory_quantity > 0
+    );
+  }
+
+  // Belirli bir renk için ilk mevcut bedeni döndürür
+  getFirstAvailableSize(
+    product: Record<string, any>,
+    colorValue: string
+  ): string | null {
+    const availableSizes = this.getAvailableSizesForColor(product, colorValue);
+    return availableSizes.length > 0 ? availableSizes[0] || null : null;
   }
 }
 export const productHelper = new ProductHelper();

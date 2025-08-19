@@ -4,7 +4,8 @@ import type {
 } from "@medusajs/types";
 import { defineStore } from "pinia";
 export const useProductStore = defineStore("productStore", () => {
-  const productData = useProducts();
+  const productService = useProducts();
+  const searchQuery = ref<string>('')
   const product = ref<StoreProductResponse>({} as StoreProductResponse);
   const products = ref<StoreProductListResponse>(
     {} as StoreProductListResponse
@@ -13,16 +14,30 @@ export const useProductStore = defineStore("productStore", () => {
 
   const getProduct = async (productId: string) => {
     try {
-      product.value = await productData.getProduct(productId);
+      product.value = await productService.getProduct(productId);
     } catch (error) {
       console.error("Failed to getting product:", error);
       throw error;
     }
   };
 
+  const getProductByHandle = async (handle: string) => {
+    try {
+      const response = await productService.getProducts({ handle });
+      if (response.products && response.products.length > 0) {
+        product.value = { product: response.products[0] } as StoreProductResponse;
+      } else {
+        throw new Error('Product not found');
+      }
+    } catch (error) {
+      console.error("Failed to getting product by handle:", error);
+      throw error;
+    }
+  };
+
   const getProducts = async (queryParams?: any) => {
     try {
-      const getProducts = await productData.getProducts(queryParams);
+      const getProducts = await productService.getProducts(queryParams);
       products.value = getProducts;
 
       allProductFilters.value = productHelper.extractAllProductFilters(
@@ -37,11 +52,19 @@ export const useProductStore = defineStore("productStore", () => {
   };
 
   onNuxtReady(() => {
+    useRegion().getRegions().then((x) => {
+      console.log("Regions loaded successfully", x);
+    }).catch((error) => {
+      console.error("Failed to load regions:", error);
+    });
     getProducts();
   });
   return {
     product,
     products,
     allProductFilters,
+    searchQuery,
+    getProduct,
+    getProductByHandle,
   };
 });

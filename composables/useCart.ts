@@ -14,6 +14,26 @@ import type {
 export const useCart = () => {
   const medusa = useMedusaClient();
 
+  // Cart ID Management (following useAuth pattern)
+  const getCartId = (): string | null => {
+    if (import.meta.client) {
+      return localStorage.getItem("medusa_cart_id");
+    }
+    return null;
+  };
+
+  const setCartId = (cartId: string): void => {
+    if (import.meta.client) {
+      localStorage.setItem("medusa_cart_id", cartId);
+    }
+  };
+
+  const removeCartId = (): void => {
+    if (import.meta.client) {
+      localStorage.removeItem("medusa_cart_id");
+    }
+  };
+
   // Cart Management
   const createCart = async (cartData: StoreCreateCart): Promise<StoreCartResponse> => {
     try {
@@ -143,7 +163,89 @@ export const useCart = () => {
     }
   };
 
+  // Higher-level cart operations with ID management
+  const getCurrentCart = async (): Promise<StoreCartResponse | null> => {
+    try {
+      const cartId = getCartId();
+      if (!cartId) {
+        return null;
+      }
+      return await getCart(cartId);
+    } catch (error) {
+      console.error("Failed to get current cart:", error);
+      removeCartId(); // Clear invalid cart ID
+      return null;
+    }
+  };
+
+  const createNewCart = async (cartData: StoreCreateCart): Promise<StoreCartResponse> => {
+    try {
+      const response = await createCart(cartData);
+      setCartId(response.cart.id);
+      return response;
+    } catch (error) {
+      console.error("Cart creation failed:", error);
+      throw error;
+    }
+  };
+
+  const addItemToCart = async (variantId: string, quantity: number = 1): Promise<StoreCartResponse> => {
+    try {
+      let cartId = getCartId();
+      
+      // Create cart if none exists
+      if (!cartId) {
+        // This should now be handled by the cart store
+        throw new Error('No cart available. Cart should be created first.');
+      }
+
+      const lineItemData: StoreAddCartLineItem = {
+        variant_id: variantId,
+        quantity: quantity
+      };
+
+      return await addLineItem(cartId, lineItemData);
+    } catch (error) {
+      console.error("Failed to add item to cart:", error);
+      throw error;
+    }
+  };
+
+  const updateCartLineItem = async (lineItemId: string, quantity: number): Promise<StoreCartResponse> => {
+    try {
+      const cartId = getCartId();
+      if (!cartId) {
+        throw new Error('No cart available');
+      }
+
+      const updateData: StoreUpdateCartLineItem = { quantity };
+      return await updateLineItem(cartId, lineItemId, updateData);
+    } catch (error) {
+      console.error("Failed to update cart item:", error);
+      throw error;
+    }
+  };
+
+  const removeCartLineItem = async (lineItemId: string): Promise<StoreLineItemDeleteResponse> => {
+    try {
+      const cartId = getCartId();
+      if (!cartId) {
+        throw new Error('No cart available');
+      }
+
+      return await deleteLineItem(cartId, lineItemId);
+    } catch (error) {
+      console.error("Failed to remove cart item:", error);
+      throw error;
+    }
+  };
+
+  const clearCurrentCart = (): void => {
+    removeCartId();
+  };
+
   return {
+    // Low-level API methods
     createCart,
     getCart,
     updateCart,
@@ -153,5 +255,12 @@ export const useCart = () => {
     updatePromotion,
     addShippingMethod,
     completeCart,
+    // High-level cart operations with ID management
+    getCurrentCart,
+    createNewCart,
+    addItemToCart,
+    updateCartLineItem,
+    removeCartLineItem,
+    clearCurrentCart,
   };
 };

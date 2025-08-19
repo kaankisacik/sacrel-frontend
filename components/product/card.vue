@@ -1,5 +1,5 @@
 <template>
-    <NuxtLink :to="`/products/${product.id}`" class="w-full max-w-sm mx-auto overflow-hidden cursor-pointer group">
+    <NuxtLink :to="`/products/${product.handle}`" class="w-full max-w-sm mx-auto overflow-hidden cursor-pointer group">
         <div class="relative h-48 sm:h-64 md:h-80 lg:h-96 xl:h-[500px]  lg:aspect-3-4  overflow-hidden">
             <!-- Main Product Image -->
             <img :src="product.thumbnail || ''" :alt="product.title"
@@ -10,19 +10,19 @@
                 class="absolute inset-0 h-full w-full object-cover transition-all duration-700 opacity-0 group-hover:opacity-100 group-hover:scale-105" /> -->
 
             <!-- Discount Badge -->
-            <div v-if="true" class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+            <!-- <div v-if="true" class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
                 -%20
-            </div>
+            </div> -->
 
             <!-- Favorite Button -->
-            <button @click.prevent="toggleFavorite"
+            <!-- <button @click.prevent="toggleFavorite"
                 class="absolute top-3 right-3 w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all duration-300 opacity-0 group-hover:opacity-100"
                 :class="{ 'text-red-500': isFavorite, 'text-gray-400': !isFavorite }">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path
                         d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
-            </button>
+            </button> -->
 
             <!-- Quick Add to Cart (on hover) -->
             <!-- <div class="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
