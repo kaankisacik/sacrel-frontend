@@ -60,7 +60,9 @@
                         <div class="mb-6">
                             <h4 class="text-sm font-medium text-gray-900 mb-3">Renkler</h4>
                             <div class="grid grid-cols-4 gap-2">
-                                <button v-for="color in colors" :key="color.value" @click="toggleColor(color.value)"
+                                <button v-for="color in colors" :key="color.value" 
+                                    @click.prevent="toggleColor(color.value)"
+                                    type="button"
                                     :class="[
                                         'w-8 h-8 rounded-full border-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500',
                                         color.class,
@@ -220,7 +222,7 @@
                     <div>
                         <h4 class="text-sm font-medium text-gray-900 mb-3">Colors</h4>
                         <div class="grid grid-cols-4 gap-2">
-                            <button v-for="color in colors" :key="color.value" @click="toggleColor(color.value)" :class="[
+                            <button v-for="color in colors" :key="color.value" @click.prevent="toggleColor(color.value)" :class="[
                                 'w-8 h-8 rounded-full border-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500',
                                 color.class,
                                 selectedColors.includes(color.value) ? 'ring-2 ring-gray-900' : 'border-gray-300'
