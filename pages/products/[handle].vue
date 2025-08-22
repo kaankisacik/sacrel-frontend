@@ -41,27 +41,15 @@
           <div class="space-y-4">
             <!-- Main Image -->
             <div class="aspect-square overflow-hidden rounded-lg bg-gray-100">
-              <img
-                :src="currentImage"
-                :alt="product?.product?.title"
-                class="w-full h-full object-cover"
-              />
+              <img :src="currentImage" :alt="product?.product?.title" class="w-full h-full object-cover" />
             </div>
-            
+
             <!-- Thumbnail Images -->
             <div class="flex space-x-3 overflow-x-auto" v-if="productImages.length > 1">
-              <button
-                v-for="(image, index) in productImages"
-                :key="index"
-                @click="currentImage = image"
+              <button v-for="(image, index) in productImages" :key="index" @click="currentImage = image"
                 class="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all"
-                :class="currentImage === image ? 'border-black' : 'border-gray-200 hover:border-gray-400'"
-              >
-                <img
-                  :src="image"
-                  :alt="`${product?.product?.title} ${index + 1}`"
-                  class="w-full h-full object-cover"
-                />
+                :class="currentImage === image ? 'border-black' : 'border-gray-200 hover:border-gray-400'">
+                <img :src="image" :alt="`${product?.product?.title} ${index + 1}`" class="w-full h-full object-cover" />
               </button>
             </div>
           </div>
@@ -91,21 +79,15 @@
                 <span class="font-medium">Renk:</span>
                 <span class="text-sm text-gray-600">({{ selectedColor.name }})</span>
               </div>
-              
+
               <div class="flex space-x-3">
-                <button
-                  v-for="color in productColors"
-                  :key="color.id"
-                  @click="selectedColor = color"
+                <button v-for="color in productColors" :key="color.id" @click="selectedColor = color"
                   :disabled="!color.isAvailable"
-                  class="w-8 h-8 rounded-full border-2 transition-all cursor-pointer relative"
-                  :class="[
+                  class="w-8 h-8 rounded-full border-2 transition-all cursor-pointer relative" :class="[
                     selectedColor.id === color.id ? 'border-black' : 'border-gray-300 hover:border-gray-500',
                     color.class,
                     !color.isAvailable ? 'opacity-50 cursor-not-allowed' : ''
-                  ]"
-                  :title="color.name + (color.isAvailable ? '' : ' (Stokta Yok)')"
-                >
+                  ]" :title="color.name + (color.isAvailable ? '' : ' (Stokta Yok)')">
                   <!-- Çizgi stokta olmayan renkler için -->
                   <span v-if="!color.isAvailable" class="absolute inset-0 flex items-center justify-center">
                     <span class="w-full h-0.5 bg-gray-400 transform rotate-45"></span>
@@ -123,18 +105,12 @@
                 </button> -->
               </div>
               <div class="grid grid-cols-6 gap-2">
-                <button
-                  v-for="size in productSizes"
-                  :key="size.value"
-                  @click="selectedSize = size.value"
+                <button v-for="size in productSizes" :key="size.value" @click="selectedSize = size.value"
                   :disabled="!size.isAvailable"
-                  class="py-2 px-3 border rounded transition-all text-sm cursor-pointer relative"
-                  :class="[
+                  class="py-2 px-3 border rounded transition-all text-sm cursor-pointer relative" :class="[
                     selectedSize === size.value ? 'border-black bg-black text-white' : 'border-gray-300 hover:border-black',
                     !size.isAvailable ? 'opacity-50 cursor-not-allowed bg-gray-100' : ''
-                  ]"
-                  :title="size.value + (size.isAvailable ? '' : ' (Bu renkte stokta yok)')"
-                >
+                  ]" :title="size.value + (size.isAvailable ? '' : ' (Bu renkte stokta yok)')">
                   {{ size.value }}
                   <!-- Çizgi stokta olmayan bedenler için -->
                   <span v-if="!size.isAvailable" class="absolute inset-0 flex items-center justify-center">
@@ -156,25 +132,19 @@
               <div class="flex items-center space-x-4">
                 <span class="font-medium">Adet:</span>
                 <div class="flex items-center border border-gray-300 rounded">
-                  <button
-                    @click="quantity = Math.max(1, quantity - 1)"
-                    :disabled="quantity <= 1"
-                    class="px-3 py-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
+                  <button @click="quantity = Math.max(1, quantity - 1)" :disabled="quantity <= 1"
+                    class="px-3 py-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
                     -
                   </button>
                   <span class="px-4 py-2 min-w-[50px] text-center">{{ quantity }}</span>
-                  <button
-                    @click="increaseQuantity"
-                    :disabled="!selectedVariant || quantity >= maxAddableQuantity"
-                    class="px-3 py-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
+                  <button @click="increaseQuantity" :disabled="!selectedVariant || quantity >= maxAddableQuantity"
+                    class="px-3 py-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
                     +
                   </button>
                 </div>
                 <div v-if="selectedVariant" class="text-sm text-gray-500">
                   <div>(Stok: {{ selectedVariant.inventory_quantity }})</div>
-                  
+
                 </div>
               </div>
 
@@ -184,27 +154,21 @@
                 <div v-if="!isProductInStock" class="text-center py-4 bg-red-50 rounded border border-red-200">
                   <p class="text-red-600 font-medium">Bu ürün şu anda stokta bulunmamaktadır.</p>
                 </div>
-                
-                <div v-else-if="maxAddableQuantity === 0" class="text-center py-4 bg-orange-50 rounded border border-orange-200">
+
+                <div v-else-if="maxAddableQuantity === 0"
+                  class="text-center py-4 bg-orange-50 rounded border border-orange-200">
                   <p class="text-orange-600 font-medium">Bu üründen sepetinizde maksimum miktar bulunmaktadır.</p>
                 </div>
-                
-                <button
-                  v-else
-                  @click="addToCart"
-                  :disabled="!canAddToCart"
-                  class="w-full py-4 font-medium transition-colors"
-                  :class="canAddToCart 
-                    ? 'bg-black text-white hover:bg-gray-800' 
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'"
-                >
+
+                <button v-else @click="addToCart" :disabled="!canAddToCart"
+                  class="w-full py-4 font-medium transition-colors" :class="canAddToCart
+                    ? 'bg-black text-white hover:bg-gray-800'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'">
                   {{ canAddToCart ? 'Sepete Ekle' : 'Sepete Eklenemez' }}
                 </button>
-                
-                <button
-                  @click="toggleFavorite"
-                  class="w-full border border-gray-300 py-4 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center space-x-2"
-                >
+
+                <button @click="toggleFavorite"
+                  class="w-full border border-gray-300 py-4 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center space-x-2">
                   <span :class="isFavorite ? 'text-red-500' : 'text-gray-600'">♥</span>
                   <span>
                     {{ isFavorite ? 'Favorilerden Çıkar' : 'Favorilere Ekle' }}
@@ -234,7 +198,8 @@
             </div>
           </div>
 
-          <button class="mt-8 text-center w-full py-3 border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+          <button
+            class="mt-8 text-center w-full py-3 border border-gray-300 rounded hover:bg-gray-50 transition-colors">
             Yorum Yaz
           </button>
         </div>
@@ -243,18 +208,11 @@
         <div v-if="similarProducts.length > 0" class="mt-16">
           <h2 class="text-2xl font-bold mb-8">Benzer Ürünler</h2>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <NuxtLink 
-              v-for="similarProduct in similarProducts" 
-              :key="similarProduct.id" 
-              :to="`/products/${similarProduct.id}`"
-              class="group cursor-pointer"
-            >
+            <NuxtLink v-for="similarProduct in similarProducts" :key="similarProduct.id"
+              :to="`/products/${similarProduct.id}`" class="group cursor-pointer">
               <div class="aspect-square overflow-hidden rounded-lg bg-gray-100 mb-3">
-                <img
-                  :src="similarProduct.image"
-                  :alt="similarProduct.title"
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
+                <img :src="similarProduct.image" :alt="similarProduct.title"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <h3 class="font-medium text-sm mb-1">{{ similarProduct.title }}</h3>
               <p class="text-sm text-gray-600 mb-1">{{ similarProduct.description }}</p>
@@ -291,6 +249,7 @@ const currentImage = ref('')
 const selectedColor = ref({ id: '', name: '', class: '', isAvailable: true })
 const selectedSize = ref('')
 const selectedVariant = ref(null)
+const isInitializing = ref(false)
 
 // Computed properties for product data
 const productImages = computed(() => {
@@ -300,7 +259,7 @@ const productImages = computed(() => {
 
 const productColors = computed(() => {
   if (!product.value?.product?.options) return []
-  const colorOption = product.value.product.options.find((opt) => 
+  const colorOption = product.value.product.options.find((opt) =>
     opt.title.toLowerCase() === 'color'
   )
   return colorOption?.values?.map((val) => ({
@@ -313,12 +272,12 @@ const productColors = computed(() => {
 
 const productSizes = computed(() => {
   if (!product.value?.product?.options) return []
-  const sizeOption = product.value.product.options.find((opt) => 
+  const sizeOption = product.value.product.options.find((opt) =>
     opt.title.toLowerCase() === 'size'
   )
   return sizeOption?.values?.map((val) => ({
     value: val.value,
-    isAvailable: selectedColor.value.name ? 
+    isAvailable: selectedColor.value.name ?
       productHelper.getAvailableSizesForColor(product.value?.product, selectedColor.value.name).includes(val.value) :
       productHelper.getAvailableColorsForSize(product.value?.product, val.value).length > 0
   })) || []
@@ -332,11 +291,11 @@ const isProductInStock = computed(() => {
 // Sepetteki mevcut miktar
 const currentQuantityInCart = computed(() => {
   if (!cartStore.cart?.cart?.items || !selectedVariant.value) return 0
-  
+
   const existingItem = cartStore.cart.cart.items.find(
     item => item.variant_id === selectedVariant.value?.id
   )
-  
+
   return existingItem ? existingItem.quantity : 0
 })
 
@@ -348,18 +307,18 @@ const maxAddableQuantity = computed(() => {
 
 // Sepete ekleme butonunun durumu
 const canAddToCart = computed(() => {
-  return selectedVariant.value && 
-         selectedVariant.value.inventory_quantity > 0 && 
-         maxAddableQuantity.value > 0 &&
-         quantity.value <= maxAddableQuantity.value
+  return selectedVariant.value &&
+    selectedVariant.value.inventory_quantity > 0 &&
+    maxAddableQuantity.value > 0 &&
+    quantity.value <= maxAddableQuantity.value
 })
 
 const productPrice = computed(() => {
   if (selectedVariant.value?.calculated_price) {
-    return (selectedVariant.value.calculated_price.calculated_amount ).toFixed(2)
+    return (selectedVariant.value.calculated_price.calculated_amount).toFixed(2)
   }
   if (product.value?.product?.variants?.[0]?.calculated_price) {
-    return (product.value.product.variants[0].calculated_price.calculated_amount ).toFixed(2)
+    return (product.value.product.variants[0].calculated_price.calculated_amount).toFixed(2)
   }
   return '0.00'
 })
@@ -367,7 +326,7 @@ const productPrice = computed(() => {
 const productOriginalPrice = computed(() => {
   if (selectedVariant.value?.calculated_price?.original_amount) {
     const original = selectedVariant.value.calculated_price.original_amount
-    const current = selectedVariant.value.calculated_price.calculated_amount 
+    const current = selectedVariant.value.calculated_price.calculated_amount
     return original > current ? original.toFixed(2) : null
   }
   return null
@@ -407,7 +366,11 @@ const similarProducts = computed(() => {
 })
 
 // Watch for color changes and update available sizes
-watch(selectedColor, (newColor) => {
+// Watch for color changes and update available sizes
+watch(selectedColor, (newColor, oldColor) => {
+  // İlk yükleme sırasında watch'ı tetikleme
+  if (isInitializing.value || (!oldColor.name && newColor.name)) return
+
   if (product.value?.product && newColor.name) {
     // Renk değiştiğinde ilk mevcut bedeni seç
     const firstAvailableSize = productHelper.getFirstAvailableSize(product.value.product, newColor.name)
@@ -420,13 +383,17 @@ watch(selectedColor, (newColor) => {
 })
 
 // Watch for variant selection changes
-watch([selectedColor, selectedSize], ([newColor, newSize]) => {
+// Watch for variant selection changes
+watch([selectedColor, selectedSize], ([newColor, newSize], [oldColor, oldSize]) => {
+  // İlk yükleme sırasında watch'ı tetikleme
+  if (isInitializing.value || ((!oldColor?.name && !oldSize) && (newColor?.name || newSize))) return
+
   if (product.value?.product?.variants) {
     const variant = product.value.product.variants.find((v) => {
-      const colorMatch = !newColor.name || v.options?.some((opt) => 
+      const colorMatch = !newColor.name || v.options?.some((opt) =>
         opt.option.title.toLowerCase() === 'color' && opt.value === newColor.name
       )
-      const sizeMatch = !newSize || v.options?.some((opt) => 
+      const sizeMatch = !newSize || v.options?.some((opt) =>
         opt.option.title.toLowerCase() === 'size' && opt.value === newSize
       )
       return colorMatch && sizeMatch
@@ -443,6 +410,8 @@ watch([selectedColor, selectedSize], ([newColor, newSize]) => {
 
 // Watch quantity changes to ensure it doesn't exceed available stock
 watch(quantity, (newQuantity) => {
+  if (isInitializing.value) return
+  
   if (newQuantity > maxAddableQuantity.value) {
     quantity.value = maxAddableQuantity.value
   }
@@ -454,11 +423,13 @@ watch(quantity, (newQuantity) => {
 // Initialize values
 const initializeProduct = () => {
   if (product.value?.product) {
+    isInitializing.value = true
+    
     // Set first image
     if (productImages.value.length > 0) {
       currentImage.value = productImages.value[0]
     }
-    
+
     // Set first available color
     if (productColors.value.length > 0) {
       const firstAvailableColor = productColors.value.find(color => color.isAvailable)
@@ -474,19 +445,26 @@ const initializeProduct = () => {
         selectedColor.value = productColors.value[0]
       }
     }
-    
+
     // Set initial variant
     if (product.value.product.variants?.length > 0) {
       const availableVariant = product.value.product.variants.find((v) => v.inventory_quantity > 0)
       selectedVariant.value = availableVariant || product.value.product.variants[0]
-      
+
       // Quantity'yi stok miktarına göre ayarla
       if (selectedVariant.value) {
         quantity.value = Math.min(1, selectedVariant.value.inventory_quantity)
       }
     }
+    
+    nextTick(() => {
+      isInitializing.value = false
+    })
   }
 }
+
+
+
 
 // Load product data
 const loadProduct = async () => {
@@ -516,34 +494,34 @@ const addToCart = async () => {
       alert('Lütfen ürün seçeneklerini belirleyin.')
       return
     }
-    
+
     if (selectedVariant.value.inventory_quantity === 0) {
       alert('Bu ürün stokta bulunmamaktadır.')
       return
     }
-    
+
     if (quantity.value > selectedVariant.value.inventory_quantity) {
       alert(`Maksimum ${selectedVariant.value.inventory_quantity} adet sipariş verebilirsiniz.`)
       return
     }
-    
+
     // Get current cart to check existing quantity
     await cartStore.getCart()
     let currentQuantityInCart = 0
-    
+
     if (cartStore.cart?.cart?.items) {
       const existingItem = cartStore.cart.cart.items.find(
         item => item.variant_id === selectedVariant.value?.id
       )
       currentQuantityInCart = existingItem ? existingItem.quantity : 0
     }
-    
+
     // Check if adding new quantity would exceed inventory
     const totalQuantity = currentQuantityInCart + quantity.value
-    
+
     if (totalQuantity > selectedVariant.value.inventory_quantity) {
       const remainingStock = selectedVariant.value.inventory_quantity - currentQuantityInCart
-      
+
       if (remainingStock <= 0) {
         alert('Bu üründen sepetinizde zaten maksimum stok miktarı bulunmaktadır.')
         return
@@ -552,13 +530,13 @@ const addToCart = async () => {
         return
       }
     }
-    
+
     // Add to cart using cart store
     await cartStore.addToCart(selectedVariant.value.id, quantity.value)
     alert(`${quantity.value} adet ${product.value?.product?.title} sepete eklendi!`)
   } catch (err) {
     console.error('Failed to add to cart:', err)
-    
+
     // Handle specific inventory error from API
     if (err.message && err.message.includes('insufficient_inventory')) {
       alert('Stokta yeterli ürün bulunmamaktadır. Sepetinizdeki mevcut miktarla birlikte stok limiti aşılıyor.')

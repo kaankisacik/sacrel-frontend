@@ -5,7 +5,7 @@ import type {
 import { defineStore } from "pinia";
 export const useProductStore = defineStore("productStore", () => {
   const productService = useProducts();
-  const searchQuery = ref<string>('')
+  const searchQuery = ref<string>("");
   const product = ref<StoreProductResponse>({} as StoreProductResponse);
   const products = ref<StoreProductListResponse>(
     {} as StoreProductListResponse
@@ -25,9 +25,11 @@ export const useProductStore = defineStore("productStore", () => {
     try {
       const response = await productService.getProducts({ handle });
       if (response.products && response.products.length > 0) {
-        product.value = { product: response.products[0] } as StoreProductResponse;
+        product.value = {
+          product: response.products[0],
+        } as StoreProductResponse;
       } else {
-        throw new Error('Product not found');
+        throw new Error("Product not found");
       }
     } catch (error) {
       console.error("Failed to getting product by handle:", error);
@@ -51,14 +53,19 @@ export const useProductStore = defineStore("productStore", () => {
     }
   };
 
+
   onNuxtReady(() => {
-    useRegion().getRegions().then((x) => {
-      console.log("Regions loaded successfully", x);
-    }).catch((error) => {
-      console.error("Failed to load regions:", error);
-    });
+    useRegion()
+      .getRegions()
+      .then((x) => {
+        console.log("Regions loaded successfully", x);
+      })
+      .catch((error) => {
+        console.error("Failed to load regions:", error);
+      });
     getProducts();
   });
+
   return {
     product,
     products,

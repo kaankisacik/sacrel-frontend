@@ -90,6 +90,7 @@
             <Icon name="uil:shopping-cart" class="text-sacrel-neutral" />
 
             <span
+              v-if="totalQuantity > 0"
               class="absolute -top-4 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
               {{ totalQuantity }}
             </span>

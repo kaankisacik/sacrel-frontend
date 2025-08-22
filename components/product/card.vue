@@ -2,8 +2,12 @@
     <NuxtLink :to="`/products/${product.handle}`" class="w-full max-w-sm mx-auto overflow-hidden cursor-pointer group">
         <div class="relative h-48 sm:h-64 md:h-80 lg:h-96 xl:h-[500px]  lg:aspect-3-4  overflow-hidden">
             <!-- Main Product Image -->
-            <img :src="product.thumbnail || ''" :alt="product.title"
-                class="absolute h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <img 
+                :src="product.thumbnail || '/images/placeholder.svg'" 
+                :alt="product.title"
+                class="absolute h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                @error="handleImageError"
+            />
 
             <!-- Hover Image -->
             <!-- <img v-if="product.hoverImage" :src="product.hoverImage" :alt="`${product.title} Hover`"
@@ -108,6 +112,12 @@ console.log('Product Card Props1:', props.product);
 const isFavorite = ref(false);
 const toggleFavorite = () => {
     isFavorite.value = !isFavorite.value;
+};
+
+const handleImageError = (event: Event) => {
+  const target = event.target as HTMLImageElement;
+  // Use the SVG placeholder instead of a missing file
+  target.src = '/images/placeholder.svg';
 };
 </script>
 

@@ -60,10 +60,8 @@
                         <div class="mb-6">
                             <h4 class="text-sm font-medium text-gray-900 mb-3">Renkler</h4>
                             <div class="grid grid-cols-4 gap-2">
-                                <button v-for="color in colors" :key="color.value" 
-                                    @click.prevent="toggleColor(color.value)"
-                                    type="button"
-                                    :class="[
+                                <button v-for="color in colors" :key="color.value"
+                                    @click.prevent="toggleColor(color.value)" type="button" :class="[
                                         'w-8 h-8 rounded-full border-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500',
                                         color.class,
                                         selectedColors.includes(color.value) ? 'ring-2 ring-gray-900' : 'border-gray-300'
@@ -222,11 +220,12 @@
                     <div>
                         <h4 class="text-sm font-medium text-gray-900 mb-3">Colors</h4>
                         <div class="grid grid-cols-4 gap-2">
-                            <button v-for="color in colors" :key="color.value" @click.prevent="toggleColor(color.value)" :class="[
-                                'w-8 h-8 rounded-full border-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500',
-                                color.class,
-                                selectedColors.includes(color.value) ? 'ring-2 ring-gray-900' : 'border-gray-300'
-                            ]" :title="color.label" />
+                            <button v-for="color in colors" :key="color.value" @click.prevent="toggleColor(color.value)"
+                                :class="[
+                                    'w-8 h-8 rounded-full border-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500',
+                                    color.class,
+                                    selectedColors.includes(color.value) ? 'ring-2 ring-gray-900' : 'border-gray-300'
+                                ]" :title="color.label" />
                         </div>
                     </div>
                 </div>
@@ -248,7 +247,7 @@
 
 <script setup lang="ts">
 
-const { products, allProductFilters,searchQuery } = storeToRefs(useProductStore())
+const { products, allProductFilters, searchQuery } = storeToRefs(useProductStore())
 
 const selectedCategories = ref<string[]>([])
 const selectedPriceRange = ref<string>('')
@@ -285,24 +284,33 @@ const colors = computed<any[]>(() => {
 // Handle search query from router and sync with URL
 const router = useRouter()
 const route = useRoute()
-
+const isUpdatingFromUrl = ref(false)
 // Check if user came with search query in URL and set it
+// URL'den arama sorgusu geldiğinde bunu ayarla
 onMounted(() => {
     const urlSearchQuery = route.query.search as string
     if (urlSearchQuery) {
+        isUpdatingFromUrl.value = true
         searchQuery.value = urlSearchQuery
+        nextTick(() => {
+            isUpdatingFromUrl.value = false
+        })
     }
 })
 
-// Watch for search query changes and update URL
-watch(searchQuery, (newQuery) => {
-    if (newQuery.trim()) {
-        router.push(`/products?search=${encodeURIComponent(newQuery.trim())}`)
-    } else {
-        router.push('/products')
-    }
-})
+watch(searchQuery, (newQuery, oldQuery) => {
+    // Mevcut URL'deki arama sorgusunu kontrol et
+    const currentUrlQuery = route.query.search as string || ''
 
+    // Eğer yeni sorgu URL'dekinden farklıysa güncelle
+    if (newQuery.trim() !== currentUrlQuery) {
+        if (newQuery.trim()) {
+            router.push(`/products?search=${encodeURIComponent(newQuery.trim())}`)
+        } else {
+            router.push('/products')
+        }
+    }
+}, { flush: 'post' })
 
 // Computed properties
 const filteredItems = computed(() => {
