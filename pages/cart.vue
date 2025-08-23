@@ -108,15 +108,10 @@
                 <span class="text-gray-900">{{ subtotal }} TL</span>
               </div>
 
-              <div class="flex justify-between text-sm">
+              <!-- <div class="flex justify-between text-sm">
                 <span class="text-gray-600">KDV:</span>
                 <span class="text-gray-900">{{ tax }} TL</span>
-              </div>
-
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Kargo:</span>
-                <span class="text-gray-900">{{ shipping }} TL</span>
-              </div>
+              </div> -->
 
               <div class="border-t pt-3">
                 <div class="flex justify-between text-lg font-semibold">
@@ -201,24 +196,14 @@ const subtotal = computed(() => {
   return cartHelper.formatPrice(subtotalAmount.value)
 })
 
-const taxAmount = computed(() => {
-  return cartHelper.calculateTax(subtotalAmount.value)
-})
 
-const tax = computed(() => {
-  return cartHelper.formatPrice(taxAmount.value)
-})
 
-const shippingAmount = computed(() => {
-  return cartHelper.calculateShipping(subtotalAmount.value)
-})
 
-const shipping = computed(() => {
-  return cartHelper.formatPrice(shippingAmount.value)
-})
+
+
 
 const totalAmount = computed(() => {
-  return cartHelper.calculateTotal(subtotalAmount.value, taxAmount.value, shippingAmount.value)
+  return cartHelper.calculateTotal(subtotalAmount.value,0,0)
 })
 
 const total = computed(() => {

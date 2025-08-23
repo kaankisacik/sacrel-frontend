@@ -293,7 +293,7 @@ const isFormValid = computed(() => {
   return true;
 });
 
-// Watchers
+// Watchers - simplified and efficient
 watch(
   () => props.selectedProviderId,
   (newValue) => {

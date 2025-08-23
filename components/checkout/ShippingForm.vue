@@ -4,16 +4,11 @@
       <h2 class="text-lg font-semibold text-gray-900">Teslimat Adresi</h2>
       <div v-if="savedAddresses.length > 0" class="flex items-center space-x-2">
         <span class="text-sm text-gray-600">Yeni adres ekle</span>
-        <button
-          type="button"
-          @click="toggleAddressMode"
+        <button type="button" @click="toggleAddressMode"
           class="relative inline-flex h-5 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-          :class="isAddingNewAddress ? 'bg-black' : 'bg-gray-200'"
-        >
-          <span
-            class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
-            :class="isAddingNewAddress ? 'translate-x-6' : 'translate-x-1'"
-          />
+          :class="isAddingNewAddress ? 'bg-black' : 'bg-gray-200'">
+          <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+            :class="isAddingNewAddress ? 'translate-x-6' : 'translate-x-1'" />
         </button>
       </div>
     </div>
@@ -24,20 +19,11 @@
         Kayıtlı Adresleriniz
       </label>
       <div class="space-y-3">
-        <label
-          v-for="address in savedAddresses"
-          :key="address.id"
+        <label v-for="address in savedAddresses" :key="address.id"
           class="flex items-start p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-          :class="{ 'border-black bg-gray-50': selectedAddressId === address.id }"
-        >
-          <input
-            v-model="selectedAddressId"
-            type="radio"
-            :value="address.id"
-            class="mt-1 text-black focus:ring-black"
-            @change="onAddressSelection"
-            
-          />
+          :class="{ 'border-black bg-gray-50': selectedAddressId === address.id }">
+          <input v-model="selectedAddressId" type="radio" :value="address.id" class="mt-1 text-black focus:ring-black"
+            @change="onAddressSelection" />
           <div class="ml-3 flex-1">
             <div class="text-sm font-medium text-gray-900">
               {{ address.first_name }} {{ address.last_name }}
@@ -61,17 +47,10 @@
           <label for="address" class="block text-sm font-medium text-gray-700 mb-1">
             Adres <span class="text-red-500">*</span>
           </label>
-          <textarea
-            id="address"
-            v-model="localShippingAddress.address_1"
+          <textarea id="address" v-model="localShippingAddress.address_1"
             class="w-full px-3 py-2 border rounded-md focus:ring-black focus:border-black transition-colors resize-none"
-            :class="getFieldClasses('address_1')"
-            rows="3"
-            placeholder="Mahalle, sokak, apartman, daire no"
-            required
-            :disabled="isLoading"
-            @blur="validateField('address_1')"
-          />
+            :class="getFieldClasses('address_1')" rows="3" placeholder="Mahalle, sokak, apartman, daire no" required
+            :disabled="isLoading" @blur="validateField('address_1')" />
           <p v-if="errors.address_1" class="mt-1 text-sm text-red-600">
             {{ errors.address_1 }}
           </p>
@@ -83,16 +62,9 @@
             <label for="city" class="block text-sm font-medium text-gray-700 mb-1">
               İl <span class="text-red-500">*</span>
             </label>
-            <input
-              id="city"
-              v-model="localShippingAddress.city"
-              type="text"
+            <input id="city" v-model="localShippingAddress.city" type="text"
               class="w-full px-3 py-2 border rounded-md focus:ring-black focus:border-black transition-colors"
-              :class="getFieldClasses('city')"
-              required
-              :disabled="isLoading"
-              @blur="validateField('city')"
-            />
+              :class="getFieldClasses('city')" required :disabled="isLoading" @blur="validateField('city')" />
             <p v-if="errors.city" class="mt-1 text-sm text-red-600">
               {{ errors.city }}
             </p>
@@ -102,16 +74,9 @@
             <label for="district" class="block text-sm font-medium text-gray-700 mb-1">
               İlçe <span class="text-red-500">*</span>
             </label>
-            <input
-              id="district"
-              v-model="localShippingAddress.district"
-              type="text"
+            <input id="district" v-model="localShippingAddress.district" type="text"
               class="w-full px-3 py-2 border rounded-md focus:ring-black focus:border-black transition-colors"
-              :class="getFieldClasses('district')"
-              required
-              :disabled="isLoading"
-              @blur="validateField('district')"
-            />
+              :class="getFieldClasses('district')" required :disabled="isLoading" @blur="validateField('district')" />
             <p v-if="errors.district" class="mt-1 text-sm text-red-600">
               {{ errors.district }}
             </p>
@@ -124,18 +89,10 @@
             <label for="postalCode" class="block text-sm font-medium text-gray-700 mb-1">
               Posta Kodu <span class="text-red-500">*</span>
             </label>
-            <input
-              id="postalCode"
-              v-model="localShippingAddress.postalCode"
-              type="text"
-              maxlength="5"
+            <input id="postalCode" v-model="localShippingAddress.postalCode" type="text" maxlength="5"
               class="w-full px-3 py-2 border rounded-md focus:ring-black focus:border-black transition-colors"
-              :class="getFieldClasses('postalCode')"
-              placeholder="34000"
-              required
-              :disabled="isLoading"
-              @blur="validateField('postalCode')"
-            />
+              :class="getFieldClasses('postalCode')" placeholder="34000" required :disabled="isLoading"
+              @blur="validateField('postalCode')" />
             <p v-if="errors.postalCode" class="mt-1 text-sm text-red-600">
               {{ errors.postalCode }}
             </p>
@@ -145,16 +102,10 @@
             <label for="addressPhone" class="block text-sm font-medium text-gray-700 mb-1">
               Telefon
             </label>
-            <input
-              id="addressPhone"
-              v-model="localShippingAddress.phone"
-              type="tel"
+            <input id="addressPhone" v-model="localShippingAddress.phone" type="tel"
               class="w-full px-3 py-2 border rounded-md focus:ring-black focus:border-black transition-colors"
-              :class="getFieldClasses('phone')"
-              placeholder="+90 5XX XXX XX XX"
-              :disabled="isLoading"
-              @blur="validateField('phone')"
-            />
+              :class="getFieldClasses('phone')" placeholder="+90 5XX XXX XX XX" :disabled="isLoading"
+              @blur="validateField('phone')" />
             <p v-if="errors.phone" class="mt-1 text-sm text-red-600">
               {{ errors.phone }}
             </p>
@@ -163,24 +114,24 @@
       </form>
     </div>
 
+    <!-- Address Confirmation Button -->
+    <div v-if="showConfirmButton" class="mt-6 border-t pt-6">
+      <button type="button" @click="confirmAddress" 
+        class="w-full bg-sacrel-accent/80 text-white px-4 py-3 rounded-md hover:bg-sacrel-accent transition duration-300 font-medium">
+        Adresi Onayla
+      </button>
+    </div>
+
     <!-- Shipping Options -->
-    <div v-if="showShippingOptions && shippingOptions.length > 0" class="mt-6 border-t pt-6">
+    <div v-if="showShippingOptions && shippingOptions.length > 0 && (addressConfirmed || (!isAddingNewAddress && selectedAddressId))" class="mt-6 border-t pt-6">
       <h3 class="text-lg font-medium text-gray-900 mb-4">Kargo Seçenekleri</h3>
       <div class="space-y-3">
-        <label
-          v-for="option in shippingOptions"
-          :key="option.id"
+        <label v-for="option in shippingOptions" :key="option.id"
           class="flex items-center justify-between p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-          :class="{ 'border-black bg-gray-50': selectedShippingOptionId === option.id }"
-        >
+          :class="{ 'border-black bg-gray-50': selectedShippingOptionId === option.id }">
           <div class="flex items-center">
-            <input
-              v-model="selectedShippingOptionId"
-              type="radio"
-              :value="option.id"
-              class="text-black focus:ring-black"
-              @change="onShippingOptionChange"
-            />
+            <input v-model="selectedShippingOptionId" type="radio" :value="option.id"
+              class="text-black focus:ring-black" @change="onShippingOptionChange" />
             <div class="ml-3">
               <div class="text-sm font-medium text-gray-900">
                 {{ checkoutHelper.getShippingMethodName(option) }}
@@ -199,20 +150,13 @@
 
     <!-- Navigation Buttons -->
     <div class="flex justify-between pt-6 border-t mt-6">
-      <button
-        type="button"
-        @click="$emit('previous')"
-        class="bg-gray-200 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-300 transition duration-300"
-      >
+      <button type="button" @click="$emit('previous')"
+        class="bg-gray-200 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-300 transition duration-300">
         Geri
       </button>
-      
-      <button
-        type="button"
-        @click="handleNext"
-        :disabled="!isFormValid || isLoading"
-        class="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
+
+      <button type="button" @click="handleNext" :disabled="!isFormValid || isLoading"
+        class="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
         {{ isLoading ? 'Yükleniyor...' : 'Ödeme Yöntemine Geç' }}
       </button>
     </div>
@@ -267,6 +211,7 @@ interface Emits {
   (e: 'previous'): void;
   (e: 'addressSelected', addressId: string): void;
   (e: 'shippingOptionSelected', optionId: string): void;
+  (e: 'loadShippingOptions'): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -289,27 +234,39 @@ const touchedFields = ref<Set<string>>(new Set());
 
 // Computed
 const isFormValid = computed(() => {
-  // If using saved address, only check if address is selected and shipping option (if required)
+  // If using saved address, only check if address is selected and shipping option is selected
   if (!isAddingNewAddress.value && selectedAddressId.value) {
-    // If shipping options are not shown or not required, address selection is enough
-    return !props.showShippingOptions || selectedShippingOptionId.value !== '';
+    // For saved addresses, shipping option must be selected
+    return props.showShippingOptions ? selectedShippingOptionId.value !== '' : true;
   }
-  
-  // If adding new address, validate the form fields
+
+  // If adding new address, validate the form fields first
   const validation = checkoutHelper.validateShippingAddress(localShippingAddress.value);
-  const hasShippingOption = !props.showShippingOptions || selectedShippingOptionId.value !== '';
   
-  return validation.isValid && hasShippingOption;
+  // For manual address entry, user must:
+  // 1. Fill all required fields correctly
+  // 2. Confirm the address (addressConfirmed = true)
+  // 3. Select a shipping option
+  if (isAddingNewAddress.value) {
+    const hasValidAddress = validation.isValid;
+    const hasConfirmedAddress = addressConfirmed.value;
+    const hasShippingOption = !props.showShippingOptions || selectedShippingOptionId.value !== '';
+    
+    return hasValidAddress && hasConfirmedAddress && hasShippingOption;
+  }
+
+  return false;
 });
 
-// Watchers
+// Watchers - optimized but functional
 let isUpdatingFromProps = false;
+
+// Sync props to local state
 watch(
   () => props.shippingAddress,
   (newValue) => {
     isUpdatingFromProps = true;
     localShippingAddress.value = { ...newValue };
-    // Use nextTick to ensure DOM updates are complete before resetting flag
     nextTick(() => {
       isUpdatingFromProps = false;
     });
@@ -317,14 +274,11 @@ watch(
   { deep: true }
 );
 
+// Emit local changes back to parent (only when not updating from props)
 watch(
   localShippingAddress,
-  (newValue, oldValue) => {
-    // Prevent emitting when updating from props to avoid circular updates
-    if (isUpdatingFromProps) return;
-    
-    // Only emit if values actually changed to prevent unnecessary updates
-    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+  (newValue) => {
+    if (!isUpdatingFromProps) {
       emit('update:shippingAddress', newValue);
       checkoutHelper.saveFormData('shipping', newValue);
     }
@@ -332,6 +286,7 @@ watch(
   { deep: true }
 );
 
+// Simple shipping option sync
 watch(
   selectedShippingOptionId,
   (newValue) => {
@@ -339,51 +294,88 @@ watch(
   }
 );
 
+// State for address confirmation
+const addressConfirmed = ref(false);
+const showConfirmButton = computed(() => {
+  // Show confirm button only for manual address entry when form is valid but not yet confirmed
+  if (!isAddingNewAddress.value) return false;
+  
+  const validation = checkoutHelper.validateShippingAddress(localShippingAddress.value);
+  return validation.isValid && !addressConfirmed.value;
+});
+
+// Method to confirm address and load shipping options
+const confirmAddress = () => {
+  const validation = checkoutHelper.validateShippingAddress(localShippingAddress.value);
+  if (validation.isValid) {
+    // Clear any previous shipping option selection
+    selectedShippingOptionId.value = '';
+    addressConfirmed.value = true;
+    emit('loadShippingOptions');
+  }
+};
+
 
 // Methods
 const toggleAddressMode = () => {
   isAddingNewAddress.value = !isAddingNewAddress.value;
+  
+  // Clear shipping option selection when switching modes
+  selectedShippingOptionId.value = '';
+  
   if (!isAddingNewAddress.value) {
     // User switched back to saved addresses - clear selection and reset form
     selectedAddressId.value = '';
-    resetForm();
-  } 
+    addressConfirmed.value = false;
+  } else {
+    // Reset confirmation state when switching to new address mode
+    addressConfirmed.value = false;
+  }
+  resetForm();
 };
 
 const resetForm = () => {
   // Reset form data to initial props values
-  localShippingAddress.value = { 
-    address_1: '', 
+  localShippingAddress.value = {
+    address_1: '',
     city: '',
     district: '',
     postalCode: '',
     countryCode: '',
     phone: '',
-   };
+  };
 
   // Clear all errors and touched fields
   errors.value = {};
   touchedFields.value.clear();
-  
+
+  // Reset address confirmation state
+  addressConfirmed.value = false;
+
   // Clear shipping option selection
   selectedShippingOptionId.value = props.selectedShippingOptionId || '';
 };
 
 const onAddressSelection = () => {
   if (selectedAddressId.value) {
+    // Clear previous shipping option selection when switching addresses
+    selectedShippingOptionId.value = '';
+    // Set address as confirmed since it's a saved address
+    addressConfirmed.value = true;
+    // Emit the address selection event
     emit('addressSelected', selectedAddressId.value);
   }
 };
 
 const onShippingOptionChange = () => {
   console.log('Selected shipping option:', selectedShippingOptionId.value);
-  
+
   emit('shippingOptionSelected', selectedShippingOptionId.value);
 };
 
 const validateField = (fieldName: string) => {
   touchedFields.value.add(fieldName);
-  
+
   switch (fieldName) {
     case 'address_1':
       if (!localShippingAddress.value.address_1) {
@@ -392,7 +384,7 @@ const validateField = (fieldName: string) => {
         delete errors.value.address_1;
       }
       break;
-      
+
     case 'city':
       if (!localShippingAddress.value.city) {
         errors.value.city = 'İl alanı zorunludur';
@@ -400,7 +392,7 @@ const validateField = (fieldName: string) => {
         delete errors.value.city;
       }
       break;
-      
+
     case 'district':
       if (!localShippingAddress.value.district) {
         errors.value.district = 'İlçe alanı zorunludur';
@@ -408,7 +400,7 @@ const validateField = (fieldName: string) => {
         delete errors.value.district;
       }
       break;
-      
+
     case 'postalCode':
       if (!localShippingAddress.value.postalCode) {
         errors.value.postalCode = 'Posta kodu alanı zorunludur';
@@ -418,7 +410,7 @@ const validateField = (fieldName: string) => {
         delete errors.value.postalCode;
       }
       break;
-      
+
     case 'phone':
       if (localShippingAddress.value.phone && !checkoutHelper.validatePhone(localShippingAddress.value.phone)) {
         errors.value.phone = 'Geçerli bir telefon numarası giriniz';
@@ -433,6 +425,7 @@ const validateAllFields = () => {
   if (isAddingNewAddress.value) {
     const fields = ['address_1', 'city', 'district', 'postalCode', 'phone'];
     fields.forEach(field => validateField(field));
+    // User needs to manually confirm address to load shipping options
   }
 };
 
@@ -440,18 +433,18 @@ const getFieldClasses = (fieldName: string) => {
   if (!touchedFields.value.has(fieldName)) {
     return 'border-gray-300';
   }
-  
-  return errors.value[fieldName] 
-    ? 'border-red-300 focus:border-red-500 focus:ring-red-500' 
+
+  return errors.value[fieldName]
+    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
     : 'border-green-300 focus:border-green-500 focus:ring-green-500';
 };
 
 const handleNext = () => {
   // Prevent multiple rapid submissions
   if (props.isLoading) return;
-  
+
   validateAllFields();
-  
+
   if (isFormValid.value) {
     emit('submit', {
       address: localShippingAddress.value,
@@ -466,5 +459,10 @@ onMounted(() => {
   if (savedData) {
     localShippingAddress.value = { ...localShippingAddress.value, ...savedData };
   }
+});
+
+// Cleanup on unmount
+onUnmounted(() => {
+  // Component cleanup is handled by Vue automatically
 });
 </script>

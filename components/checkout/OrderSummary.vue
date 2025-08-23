@@ -80,7 +80,7 @@
       <div class="flex justify-between text-sm">
         <span class="text-gray-600">Kargo:</span>
         <span class="text-gray-900">
-          {{ summary.pricing.shipping > 0 ? checkoutHelper.formatPrice(summary.pricing.shipping) : 'Ücretsiz' }}
+          {{ summary.pricing.shipping > 0 ? checkoutHelper.formatPrice(summary.pricing.shipping) : '-' }}
         </span>
       </div>
       
@@ -185,7 +185,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<Emits>();
-
+onMounted(() => {
+  console.log(props.summary);
+  
+});
 // Computed
 const finalTotal = computed(() => {
   let total = props.summary.pricing.total;

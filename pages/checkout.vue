@@ -90,7 +90,8 @@
                 :shipping-options="shippingOptionsForForm" :is-loading="checkoutState.isLoading"
                 :show-shipping-options="availableShippingOptions.length > 0" @submit="handleShippingSubmit"
                 @previous="previousStep" @address-selected="handleAddressSelection"
-                @shipping-option-selected="handleShippingOptionSelection" />
+                @shipping-option-selected="handleShippingOptionSelection" 
+                @load-shipping-options="handleLoadShippingOptions" />
             </div>
 
             <!-- Payment Method Step -->
@@ -241,6 +242,7 @@ const isEmpty = computed(() => {
 });
 
 const orderSummary = computed((): CheckoutSummary => {
+
   if (!cart.value?.cart) {
     return {
       items: [],
@@ -251,13 +253,6 @@ const orderSummary = computed((): CheckoutSummary => {
 
   return checkoutHelper.calculateCheckoutSummary(cart.value.cart);
 });
-
-
-
-watch(checkoutState, (newStep) => {
-  console.log('Checkout step changed to:', newStep.step);
-}, { deep: true });
-
 
 const showCodFee = computed(() => {
   return selectedPaymentProvider.value === 'cash_on_delivery';
@@ -447,18 +442,12 @@ const handleOrderCompletion = async () => {
 // Event handlers
 const handleAddressSelection = async (addressId: string) => {
   const selectedAddress = savedAddresses.value.find(addr => addr.id === addressId);
-  if (!selectedAddress || isLoadingShippingOptions) return;
+  if (!selectedAddress) return;
 
   try {
-    // Temporarily prevent the watcher from triggering
-    isLoadingShippingOptions = true;
-
-    // Clear any existing debounce timer
-    if (debounceTimer) {
-      clearTimeout(debounceTimer);
-      debounceTimer = null;
-    }
-
+    // Clear previous shipping option selection when selecting a new address
+    selectedShippingOption.value = '';
+    
     // Map saved address to shipping address format
     const newAddress = {
       address_1: selectedAddress.address_1,
@@ -469,25 +458,29 @@ const handleAddressSelection = async (addressId: string) => {
       phone: selectedAddress.phone || '',
     };
 
-    // Update address in one operation
+    // Update address
     Object.assign(shippingAddress.value, newAddress);
-
-    // Update last address key to prevent watcher from firing
-    lastAddressKey = `${newAddress.address_1}|${newAddress.city}|${newAddress.postalCode}`;
-
-    // Load shipping options when address is selected
+    
+    // Load shipping options immediately for saved addresses
     if (cart.value?.cart?.id) {
-      await loadShippingOptions(cart.value.cart.id);
+      await loadShippingOptionsManually(cart.value.cart.id);
     }
   } catch (error) {
     console.error('Failed to handle address selection:', error);
-  } finally {
-    isLoadingShippingOptions = false;
   }
 };
 
 const handleShippingOptionSelection = (optionId: string) => {
   selectedShippingOption.value = optionId;
+};
+
+const handleLoadShippingOptions = async () => {
+  if (!cart.value?.cart?.id) return;
+  
+  // Clear previous shipping option selection when loading new options
+  selectedShippingOption.value = '';
+  
+  await loadShippingOptionsManually(cart.value.cart.id);
 };
 
 const handlePaymentProviderSelection = (providerId: string) => {
@@ -516,58 +509,23 @@ const getCompleteButtonText = (): string => {
   }
 };
 
-// Watchers
+// Watchers and shipping options handling
 let isLoadingShippingOptions = false;
-let lastAddressKey = '';
-let debounceTimer: NodeJS.Timeout | null = null;
 
-// Watch for address changes with proper debouncing to prevent infinite loops
-watch(
-  () => ({
-    address_1: shippingAddress.value.address_1,
-    city: shippingAddress.value.city,
-    postalCode: shippingAddress.value.postalCode,
-    cartId: cart.value?.cart?.id
-  }),
-  (newAddress, oldAddress) => {
-    // Prevent loading if component not fully mounted, already in progress, initializing, or if values haven't actually changed
-    if (!componentMounted.value || isLoadingShippingOptions || isInitializing || pageLoading.value) return;
+// Manual shipping options loading - called when needed
+const loadShippingOptionsManually = async (cartId: string) => {
+  if (isLoadingShippingOptions || isInitializing || !componentMounted.value) return;
 
-    const addressKey = `${newAddress.address_1}|${newAddress.city}|${newAddress.postalCode}`;
-
-    // Skip if address is incomplete or hasn't changed
-    if (
-      addressKey === lastAddressKey ||
-      !newAddress.address_1 ||
-      !newAddress.city ||
-      !newAddress.postalCode ||
-      !newAddress.cartId
-    ) {
-      return;
-    }
-
-    // Clear existing timer
-    if (debounceTimer) {
-      clearTimeout(debounceTimer);
-    }
-
-    // Debounce the shipping options loading
-    debounceTimer = setTimeout(async () => {
-      if (!cart.value?.cart?.id || isLoadingShippingOptions || isInitializing || !componentMounted.value) return;
-
-      try {
-        isLoadingShippingOptions = true;
-        lastAddressKey = addressKey;
-        await loadShippingOptions(cart.value.cart.id);
-      } catch (error) {
-        console.error('Failed to load shipping options:', error);
-      } finally {
-        isLoadingShippingOptions = false;
-      }
-    }, 500);
-  },
-  { deep: false, immediate: false }
-);
+  try {
+    isLoadingShippingOptions = true;
+    console.log('Loading shipping options manually...');
+    await loadShippingOptions(cartId);
+  } catch (error) {
+    console.error('Failed to load shipping options:', error);
+  } finally {
+    isLoadingShippingOptions = false;
+  }
+};
 
 // Initialize on mount with defensive checks
 onMounted(async () => {
@@ -589,12 +547,6 @@ onMounted(async () => {
 onUnmounted(() => {
   console.log('Component unmounting...');
   componentMounted.value = false;
-
-  // Clear debounce timer
-  if (debounceTimer) {
-    clearTimeout(debounceTimer);
-    debounceTimer = null;
-  }
 
   // Reset checkout state
   resetCheckout();

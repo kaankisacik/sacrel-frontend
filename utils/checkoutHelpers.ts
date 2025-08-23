@@ -60,11 +60,12 @@ class CheckoutHelper {
       total: (lineItem.unit_price || 0) * (lineItem.quantity || 0),
       thumbnail: this.getItemThumbnail(lineItem),
     }));
-
+    console.log("cart",cart);
+    
     const pricing: CheckoutPricing = {
       subtotal: cart.subtotal || 0,
       tax: cart.tax_total || 0,
-      shipping: cart.shipping_total || 0,
+      shipping: cart.shipping_subtotal || 0,
       discount: cart.discount_total || 0,
       total: cart.total || 0,
     };

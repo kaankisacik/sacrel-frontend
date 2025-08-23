@@ -109,36 +109,28 @@ const isFormValid = computed(() => {
   return validation.isValid;
 });
 
-// Watchers
+// Watchers - simplified without unnecessary debouncing
+let isUpdatingFromProps = false;
+
 watch(
   () => props.customerInfo,
   (newValue) => {
-    console.log('Props customerInfo changed:', newValue);
-
+    isUpdatingFromProps = true;
     localCustomerInfo.value = { ...newValue };
+    nextTick(() => {
+      isUpdatingFromProps = false;
+    });
   },
   { deep: true }
 );
 
-// Debounced watcher for emitting updates to prevent recursive triggers
-let updateTimer: NodeJS.Timeout | null = null;
 watch(
   localCustomerInfo,
   (newValue) => {
-    // Don't emit updates during initialization
-    if (!isInitialized.value) return;
-
-    // Clear existing timer
-    if (updateTimer) {
-      clearTimeout(updateTimer);
-    }
-
-    // Debounce the emit to prevent rapid updates
-    updateTimer = setTimeout(() => {
+    if (isInitialized.value && !isUpdatingFromProps) {
       emit('update:customerInfo', { ...newValue });
-      // Save to localStorage for persistence
       checkoutHelper.saveFormData('customer', newValue);
-    }, 100);
+    }
   },
   { deep: true }
 );
@@ -260,9 +252,6 @@ onMounted(() => {
 
 // Cleanup on unmount
 onUnmounted(() => {
-  if (updateTimer) {
-    clearTimeout(updateTimer);
-    updateTimer = null;
-  }
+  // Component cleanup is handled by Vue automatically
 });
 </script>
