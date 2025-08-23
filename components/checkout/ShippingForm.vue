@@ -212,6 +212,7 @@ interface Emits {
   (e: 'addressSelected', addressId: string): void;
   (e: 'shippingOptionSelected', optionId: string): void;
   (e: 'loadShippingOptions'): void;
+  (e: 'resetUserSelection'): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -311,6 +312,8 @@ const confirmAddress = () => {
     // Clear any previous shipping option selection
     selectedShippingOptionId.value = '';
     addressConfirmed.value = true;
+    // Reset user selection flag
+    emit('resetUserSelection');
     emit('loadShippingOptions');
   }
 };
@@ -322,6 +325,11 @@ const toggleAddressMode = () => {
   
   // Clear shipping option selection when switching modes
   selectedShippingOptionId.value = '';
+  
+  // Emit the change to parent component to reset the selected shipping option
+  emit('update:selectedShippingOptionId', '');
+  emit('shippingOptionSelected', '');
+  emit('resetUserSelection'); // Reset the user selection flag
   
   if (!isAddingNewAddress.value) {
     // User switched back to saved addresses - clear selection and reset form
@@ -352,8 +360,11 @@ const resetForm = () => {
   // Reset address confirmation state
   addressConfirmed.value = false;
 
-  // Clear shipping option selection
-  selectedShippingOptionId.value = props.selectedShippingOptionId || '';
+  // Clear shipping option selection completely
+  selectedShippingOptionId.value = '';
+  
+  // Emit the reset to parent component
+  emit('update:selectedShippingOptionId', '');
 };
 
 const onAddressSelection = () => {
@@ -362,6 +373,8 @@ const onAddressSelection = () => {
     selectedShippingOptionId.value = '';
     // Set address as confirmed since it's a saved address
     addressConfirmed.value = true;
+    // Reset user selection flag
+    emit('resetUserSelection');
     // Emit the address selection event
     emit('addressSelected', selectedAddressId.value);
   }

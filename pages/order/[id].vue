@@ -34,7 +34,7 @@
             <div>
               <h3 class="text-sm font-medium text-gray-500 mb-2">Durum</h3>
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                {{ getOrderStatus(order.status) }}
+                {{ checkoutHelper.getOrderStatus(order.fulfillment_status) }}
               </span>
             </div>
           </div>
@@ -213,17 +213,7 @@ const formatDate = (dateString: string): string => {
   });
 };
 
-const getOrderStatus = (status: string): string => {
-  const statusMap: Record<string, string> = {
-    pending: 'Beklemede',
-    completed: 'Tamamlandı',
-    shipped: 'Kargoda',
-    delivered: 'Teslim Edildi',
-    canceled: 'İptal Edildi',
-    requires_action: 'İşlem Gerekli'
-  };
-  return statusMap[status] || status;
-};
+
 
 const getItemTitle = (item: any): string => {
   return item.variant?.product?.title || item.title || 'Ürün';

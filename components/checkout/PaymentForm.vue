@@ -34,6 +34,15 @@
 
       <!-- Payment Method Components -->
       <div v-if="selectedProviderId" class="border-t pt-6">
+        <!-- Debug Info -->
+        <div class="mb-4 p-2 bg-yellow-100 border border-yellow-300 rounded text-xs">
+          <p><strong>Debug:</strong> Selected Provider: {{ selectedProviderId }}</p>
+          <p><strong>Payment Method:</strong> {{ localPaymentData.method }}</p>
+          <p><strong>Is Credit Card:</strong> {{ isCreditCardProvider(selectedProviderId) }}</p>
+          <p><strong>Available Providers:</strong> {{ paymentProviders.map(p => p.id).join(', ') }}</p>
+          <p><strong>Form Valid:</strong> {{ isFormValid }}</p>
+        </div>
+        
         <!-- Credit Card Form -->
         <div v-if="isCreditCardProvider(selectedProviderId)" class="space-y-4">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -202,7 +211,7 @@
       <button
         type="button"
         @click="handleNext"
-        :disabled="!isFormValid || isLoading"
+        :disabled="!selectedProviderId || isLoading || !isFormValid"
         class="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {{ isLoading ? 'Yükleniyor...' : 'Sipariş Özetine Geç' }}
@@ -274,22 +283,45 @@ const formattedExpiryDate = computed({
 });
 
 const isFormValid = computed(() => {
-  if (!selectedProviderId.value) return false;
+  console.log('isFormValid check:', {
+    selectedProviderId: selectedProviderId.value,
+    isCreditCard: isCreditCardProvider(selectedProviderId.value),
+    localPaymentData: localPaymentData.value,
+    errorsCount: Object.keys(errors.value).length
+  });
+  
+  if (!selectedProviderId.value) {
+    console.log('No provider selected');
+    return false;
+  }
   
   if (isCreditCardProvider(selectedProviderId.value)) {
-    return Boolean(
+    const isValid = Boolean(
       localPaymentData.value.cardNumber &&
       localPaymentData.value.expiryDate &&
       localPaymentData.value.cvv &&
       localPaymentData.value.cardName &&
       Object.keys(errors.value).length === 0
     );
+    console.log('Credit card validation:', {
+      cardNumber: !!localPaymentData.value.cardNumber,
+      expiryDate: !!localPaymentData.value.expiryDate,
+      cvv: !!localPaymentData.value.cvv,
+      cardName: !!localPaymentData.value.cardName,
+      errorsCount: Object.keys(errors.value).length,
+      isValid
+    });
+    return isValid;
   }
   
   if (selectedProviderId.value === 'cash_on_delivery') {
-    return Boolean(localPaymentData.value.codOption);
+    const isValid = Boolean(localPaymentData.value.codOption);
+    console.log('COD validation:', { codOption: localPaymentData.value.codOption, isValid });
+    return isValid;
   }
   
+  // For other payment methods (bank transfer, etc.)
+  console.log('Other payment method - returning true');
   return true;
 });
 
@@ -314,6 +346,7 @@ watch(
   (newValue) => {
     emit('update:selectedProviderId', newValue);
     localPaymentData.value.provider = newValue;
+    localPaymentData.value.method = newValue;
   }
 );
 
@@ -328,18 +361,39 @@ watch(
 
 // Methods
 const isCreditCardProvider = (providerId: string): boolean => {
-  return ['stripe', 'credit_card', 'card'].includes(providerId);
+  const creditCardProviders = ['stripe', 'credit_card', 'card', 'pp_fake-cc_dev-fake-cc'];
+  const isCreditCard = creditCardProviders.includes(providerId);
+  console.log('isCreditCardProvider check:', { providerId, isCreditCard, creditCardProviders });
+  return isCreditCard;
 };
 
 const onProviderChange = () => {
+  console.log('Provider changed to:', selectedProviderId.value);
   emit('providerSelected', selectedProviderId.value);
   
   // Reset payment data when provider changes
-  localPaymentData.value = {
+  const baseData = {
     provider: selectedProviderId.value,
     method: selectedProviderId.value,
-    codOption: 'cash',
+    data: {},
   };
+  
+  // Set default data based on provider type
+  if (selectedProviderId.value === 'cash_on_delivery') {
+    localPaymentData.value = {
+      ...baseData,
+      codOption: 'cash',
+    };
+  } else if (selectedProviderId.value === 'pp_system_default') {
+    localPaymentData.value = {
+      ...baseData,
+      // No additional fields needed for system default
+    };
+  } else {
+    localPaymentData.value = baseData;
+  }
+  
+  console.log('Payment data reset to:', localPaymentData.value);
   
   errors.value = {};
   touchedFields.value.clear();
@@ -407,17 +461,50 @@ const getFieldClasses = (fieldName: string) => {
 };
 
 const handleNext = () => {
-  validateAllFields();
+  console.log('=== HANDLE NEXT CALLED ===');
+  console.log('Button clicked, starting submission process...');
   
-  if (isFormValid.value) {
-    console.log('Payment Data:', localPaymentData.value);
-    console.log('Selected Provider ID:', selectedProviderId.value);
-    
-    
+  // Validate all fields for credit card
+  if (isCreditCardProvider(selectedProviderId.value)) {
+    console.log('Credit card provider detected, validating fields...');
+    validateAllFields();
+  }
+  
+  console.log('Payment Form Debug:', {
+    selectedProviderId: selectedProviderId.value,
+    localPaymentData: localPaymentData.value,
+    errors: errors.value,
+    isFormValid: isFormValid.value,
+    touchedFields: Array.from(touchedFields.value),
+    isCreditCard: isCreditCardProvider(selectedProviderId.value),
+    cardNumber: localPaymentData.value.cardNumber,
+    expiryDate: localPaymentData.value.expiryDate,
+    cvv: localPaymentData.value.cvv,
+    cardName: localPaymentData.value.cardName,
+  });
+
+  // Always try to submit regardless of form validation
+  console.log('EMITTING SUBMIT EVENT...');
+  console.log('Emit data:', {
+    providerId: selectedProviderId.value,
+    paymentData: localPaymentData.value,
+  });
+  
+  try {
     emit('submit', {
       providerId: selectedProviderId.value,
       paymentData: localPaymentData.value,
     });
+    console.log('✅ SUBMIT EVENT EMITTED SUCCESSFULLY');
+  } catch (error) {
+    console.error('❌ ERROR EMITTING SUBMIT EVENT:', error);
+  }
+  
+  // Additional debug - check if form validation was the issue
+  if (!isFormValid.value) {
+    console.log('⚠️ Form was not valid but we still submitted');
+  } else {
+    console.log('✅ Form was valid');
   }
 };
 
@@ -426,6 +513,12 @@ onMounted(() => {
   const savedData = checkoutHelper.loadFormData('payment');
   if (savedData) {
     localPaymentData.value = { ...localPaymentData.value, ...savedData };
+  }
+  
+  // Ensure method is set if provider is already selected
+  if (selectedProviderId.value && !localPaymentData.value.method) {
+    localPaymentData.value.method = selectedProviderId.value;
+    localPaymentData.value.provider = selectedProviderId.value;
   }
 });
 </script>

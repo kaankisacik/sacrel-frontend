@@ -25,7 +25,6 @@ export const useOrders = () => {
       limit?: number;
       offset?: number;
       fields?: string;
-      expand?: string;
       [key: string]: any;
     }
   ): Promise<PaginatedResponse<{ orders: StoreOrder[] }>> => {

@@ -77,7 +77,6 @@ export const useCheckout = () => {
   // Validation helpers
   const isCustomerInfoValid = computed(() => {
     const { email, firstName, lastName } = customerInfo.value;
-    console.log("Validating customer info:", { email, firstName, lastName });
     
     return Boolean(
       email && firstName && lastName && checkoutHelper.isValidEmail(email)
@@ -90,37 +89,40 @@ export const useCheckout = () => {
   });
 
   const isPaymentDataValid = computed(() => {
-    return Boolean(paymentData.value.method && selectedPaymentProvider.value);
+    const isValid = Boolean(paymentData.value.method && selectedPaymentProvider.value);
+    console.log('isPaymentDataValid check:', {
+      method: paymentData.value.method,
+      provider: selectedPaymentProvider.value,
+      isValid,
+      paymentData: paymentData.value
+    });
+    return isValid;
   });
 
   const canProceedToNextStep = computed(() => {
+    console.log('canProceedToNextStep check for step:', state.value.step);
+    
     switch (state.value.step) {
       case "customer":
-        console.log("Validating customer step:", {
-          isCustomerInfoValid: isCustomerInfoValid.value,
-        });
-
-        return isCustomerInfoValid.value;
+        const customerValid = isCustomerInfoValid.value;
+        console.log('Customer step valid:', customerValid);
+        return customerValid;
       case "shipping":
-        console.log("Validating shipping step:", {
-          isShippingAddressValid: isShippingAddressValid.value,
-          selectedShippingOption: selectedShippingOption.value,
+        const shippingValid = isShippingAddressValid.value && selectedShippingOption.value;
+        console.log('Shipping step valid:', shippingValid, {
+          addressValid: isShippingAddressValid.value,
+          shippingOption: selectedShippingOption.value
         });
-
-        return isShippingAddressValid.value && selectedShippingOption.value;
+        return shippingValid;
       case "payment":
-        console.log("Validating payment step:", {
-          isPaymentDataValid: isPaymentDataValid.value,
-        });
-
-        return isPaymentDataValid.value;
+        const paymentValid = isPaymentDataValid.value;
+        console.log('Payment step valid:', paymentValid);
+        return paymentValid;
       case "review":
-        console.log("Validating review step: always true");
-
+        console.log('Review step - always valid');
         return true;
       default:
         console.log("Unknown step:", state.value.step);
-
         return false;
     }
   });
@@ -261,14 +263,8 @@ export const useCheckout = () => {
       
       availableShippingOptions.value = response.shipping_options || [];
 
-      // Auto-select first option if only one available and no option is currently selected
-      if (
-        availableShippingOptions.value.length === 1 &&
-        availableShippingOptions.value[0] &&
-        !selectedShippingOption.value
-      ) {
-        selectedShippingOption.value = availableShippingOptions.value[0].id;
-      }
+      // Note: Removed auto-selection to ensure user manually selects shipping option
+      // This prevents shipping costs from appearing in order summary until user explicitly selects
     } catch (error) {
       console.error("Failed to load shipping options:", error);
       state.value.error = "Kargo seçenekleri yüklenemedi";

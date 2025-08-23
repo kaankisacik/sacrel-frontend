@@ -44,7 +44,9 @@
 
                         <!-- Price Range Filter -->
                         <div class="mb-6">
-                            <h4 class="text-sm font-medium text-gray-900 mb-3">Price Range</h4>
+                            <h4 class="text-sm font-medium text-gray-900 mb-3">
+                                Fiyat Aralığı
+                            </h4>
                             <div class="space-y-3">
                                 <label v-for="priceRange in priceRanges" :key="priceRange.value"
                                     class="flex items-center cursor-pointer">

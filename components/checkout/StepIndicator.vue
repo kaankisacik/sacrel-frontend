@@ -118,7 +118,7 @@ const getStepTextClasses = (stepKey: string) => {
   
   switch (status) {
     case 'completed':
-      return 'text-white';
+      return 'text-black';
     case 'current':
       return 'text-black';
     case 'upcoming':

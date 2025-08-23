@@ -72,16 +72,21 @@
         <span class="text-green-600">-{{ checkoutHelper.formatPrice(summary.pricing.discount) }}</span>
       </div>
       
-      <div class="flex justify-between text-sm">
+      <!-- <div class="flex justify-between text-sm">
         <span class="text-gray-600">KDV:</span>
         <span class="text-gray-900">{{ checkoutHelper.formatPrice(summary.pricing.tax) }}</span>
       </div>
-      
-      <div class="flex justify-between text-sm">
+       -->
+      <div v-if="selectedShippingMethodName && userSelectedShipping" class="flex justify-between text-sm" >
         <span class="text-gray-600">Kargo:</span>
-        <span class="text-gray-900">
-          {{ summary.pricing.shipping > 0 ? checkoutHelper.formatPrice(summary.pricing.shipping) : '-' }}
-        </span>
+        <div class="text-right">
+          <div class="text-gray-700 text-xs mb-1">
+            {{ selectedShippingMethodName }}
+          </div>
+          <div class="text-gray-900 font-medium">
+            {{ summary.pricing.shipping > 0 ? checkoutHelper.formatPrice(summary.pricing.shipping) : 'Ücretsiz' }}
+          </div>
+        </div>
       </div>
       
       <div v-if="showCodFee" class="flex justify-between text-sm">
@@ -92,7 +97,7 @@
       <div class="border-t pt-2">
         <div class="flex justify-between text-lg font-semibold">
           <span class="text-gray-900">Toplam:</span>
-          <span class="text-gray-900">{{ checkoutHelper.formatPrice(finalTotal) }}</span>
+          <span class="text-gray-900">{{ checkoutHelper.formatPrice(summary.pricing.subtotal + summary.pricing.shipping) }}</span>
         </div>
       </div>
     </div>
@@ -163,6 +168,8 @@ interface Props {
   completeButtonText?: string;
   processingText?: string;
   orderReference?: string;
+  selectedShippingMethodName?: string;
+  userSelectedShipping?: boolean;
 }
 
 interface Emits {
@@ -182,12 +189,14 @@ const props = withDefaults(defineProps<Props>(), {
   completeButtonText: 'Siparişi Tamamla',
   processingText: 'Sipariş Veriliyor...',
   orderReference: '',
+  shippingAvailable: false,
+  selectedShippingMethodName: '',
+  userSelectedShipping: false
 });
 
 const emit = defineEmits<Emits>();
 onMounted(() => {
-  console.log(props.summary);
-  
+  console.log("aa", props.summary);
 });
 // Computed
 const finalTotal = computed(() => {

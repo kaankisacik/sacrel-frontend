@@ -111,10 +111,12 @@ const isFormValid = computed(() => {
 
 // Watchers - simplified without unnecessary debouncing
 let isUpdatingFromProps = false;
+let isUpdatingFromSavedData = false;
 
 watch(
   () => props.customerInfo,
   (newValue) => {
+    if (isUpdatingFromSavedData) return; // Prevent loop from saved data
     isUpdatingFromProps = true;
     localCustomerInfo.value = { ...newValue };
     nextTick(() => {
@@ -127,7 +129,7 @@ watch(
 watch(
   localCustomerInfo,
   (newValue) => {
-    if (isInitialized.value && !isUpdatingFromProps) {
+    if (isInitialized.value && !isUpdatingFromProps && !isUpdatingFromSavedData) {
       emit('update:customerInfo', { ...newValue });
       checkoutHelper.saveFormData('customer', newValue);
     }
@@ -239,14 +241,21 @@ onMounted(() => {
   const savedData = checkoutHelper.loadFormData('customer');
   if (savedData) {
     console.log('Loaded saved customer data:', savedData);
-    //we must update both local state and emit to parent
-    emit('update:customerInfo', savedData as CustomerInfo);
+    // Set flag to prevent watcher loops
+    isUpdatingFromSavedData = true;
     localCustomerInfo.value = { ...localCustomerInfo.value, ...savedData };
   }
 
   // Mark as initialized after loading saved data
   nextTick(() => {
     isInitialized.value = true;
+    // Reset the flag and emit if there was saved data
+    if (savedData) {
+      isUpdatingFromSavedData = false;
+      emit('update:customerInfo', localCustomerInfo.value);
+    } else {
+      isUpdatingFromSavedData = false;
+    }
   });
 });
 

@@ -79,25 +79,38 @@
           <div class="space-y-6">
             <!-- Customer Information Step -->
             <div v-show="checkoutState.step === 'customer'">
-              <CheckoutCustomerInfoForm v-model:customer-info="customerInfo" @update:customerInfo="customerInfo = $event" :is-loading="checkoutState.isLoading"
+              <CheckoutCustomerInfoForm 
+                key="customer-info-form"
+                :customer-info="customerInfo" 
+                @update:customerInfo="handleCustomerInfoUpdate" 
+                :is-loading="checkoutState.isLoading"
                 @submit="handleCustomerInfoSubmit" />
             </div>
 
             <!-- Shipping Address Step -->
             <div v-show="checkoutState.step === 'shipping'">
-              <CheckoutShippingForm v-model:shipping-address="shippingAddress"
-                v-model:selected-shipping-option-id="selectedShippingOption" :saved-addresses="savedAddresses"
+              <CheckoutShippingForm 
+                :shipping-address="shippingAddress"
+                @update:shipping-address="handleShippingAddressUpdate"
+                :selected-shipping-option-id="selectedShippingOption" 
+                @update:selected-shipping-option-id="handleShippingOptionUpdate"
+                :saved-addresses="savedAddresses"
                 :shipping-options="shippingOptionsForForm" :is-loading="checkoutState.isLoading"
                 :show-shipping-options="availableShippingOptions.length > 0" @submit="handleShippingSubmit"
                 @previous="previousStep" @address-selected="handleAddressSelection"
                 @shipping-option-selected="handleShippingOptionSelection" 
-                @load-shipping-options="handleLoadShippingOptions" />
+                @load-shipping-options="handleLoadShippingOptions" 
+                @reset-user-selection="userSelectedShipping = false" />
             </div>
 
             <!-- Payment Method Step -->
             <div v-show="checkoutState.step === 'payment'">
-              <CheckoutPaymentForm v-model:selected-provider-id="selectedPaymentProvider"
-                v-model:payment-data="paymentData" :payment-providers="paymentProvidersForForm"
+              <CheckoutPaymentForm 
+                :selected-provider-id="selectedPaymentProvider"
+                @update:selected-provider-id="handlePaymentProviderUpdate"
+                :payment-data="paymentData" 
+                @update:payment-data="handlePaymentDataUpdate"
+                :payment-providers="paymentProvidersForForm"
                 :order-reference="orderReference" :is-loading="checkoutState.isLoading"
                 :is-loading-providers="loadingPaymentProviders" @submit="handlePaymentSubmit" @previous="previousStep"
                 @provider-selected="handlePaymentProviderSelection" />
@@ -166,7 +179,9 @@
           <!-- Right Column - Order Summary -->
           <div class="lg:col-span-1">
             <CheckoutOrderSummary :summary="orderSummary" :cod-fee="codExtraFee" :show-cod-fee="showCodFee"
-              :show-actions="false" :is-loading="!cart || checkoutState.isLoading" :order-reference="orderReference" />
+              :show-actions="false" :is-loading="!cart || checkoutState.isLoading" :order-reference="orderReference" 
+              :selected-shipping-method-name="selectedShippingOptionName" 
+              :user-selected-shipping="userSelectedShipping" />
           </div>
         </div>
       </div>
@@ -226,13 +241,25 @@ const {
 } = checkout;
 
 // Local state
-const pageLoading = ref<boolean>(true);
+const pageLoading = ref<boolean>(false);
 const pageError = ref<string>('');
 const savedAddresses = ref<any[]>([]);
 const orderReference = ref<string>('');
 const codExtraFee = ref<number>(500); // 5 TL in kuruş
 const loadingPaymentProviders = ref<boolean>(false);
 const componentMounted = ref<boolean>(false);
+
+// Control flags
+const isInitializing = ref<boolean>(false);
+let isSubmittingCustomer = false;
+let isSubmittingShipping = false;
+const userSelectedShipping = ref<boolean>(false);
+
+// Global initialization tracker to prevent multiple instances
+const globalInitialization = {
+  isInProgress: false,
+  promise: null as Promise<void> | null
+};
 
 // Computed properties
 const isEmpty = computed(() => {
@@ -242,7 +269,7 @@ const isEmpty = computed(() => {
 });
 
 const orderSummary = computed((): CheckoutSummary => {
-
+  
   if (!cart.value?.cart) {
     return {
       items: [],
@@ -270,74 +297,79 @@ const shippingOptionsForForm = computed(() => [...availableShippingOptions.value
 const paymentProvidersForForm = computed(() => [...availablePaymentProviders.value]);
 
 // Methods
-let isInitializing = false;
 const initializeCheckout = async () => {
+  // Check if another instance is already initializing
+  if (globalInitialization.isInProgress) {
+    if (globalInitialization.promise) {
+      try {
+        await globalInitialization.promise;
+      } catch (error) {
+        console.error('Waiting for global initialization failed:', error);
+      }
+    }
+    return;
+  }
+
   // Prevent multiple simultaneous initialization calls
-  if (isInitializing) {
-    console.log('Initialization already in progress, skipping...');
+  if (isInitializing.value || pageLoading.value) {
     return;
   }
 
   try {
-    isInitializing = true;
-
-    // Set loading state first, but avoid triggering watchers
-    await nextTick(); // Ensure any pending reactive updates are processed
+    // Set global and local flags
+    globalInitialization.isInProgress = true;
+    isInitializing.value = true;
     pageLoading.value = true;
     pageError.value = '';
 
-    console.log('Starting checkout initialization...');
-
-    // Initialize cart if needed
-    if (!cart.value) {
-      console.log('Initializing cart...');
-      await cartStore.initializeCart();
-      // Wait for cart to be available
-      await nextTick();
-    }
-
-    // Check if cart is empty after initialization
-    if (isEmpty.value) {
-      console.log('Cart is empty, skipping checkout initialization');
-      return;
-    }
-
-    console.log('Cart available, continuing initialization...');
-
-    // Generate order reference
-    orderReference.value = checkoutHelper.generateOrderReference();
-
-    // Load customer addresses if logged in
-    try {
-      console.log('Loading customer addresses...');
-      await customerStore.getCustomerAddresses();
-      savedAddresses.value = customerStore.currentCustomerAddresses.addresses || [];
-    } catch (error) {
-      // User might not be logged in, continue without saved addresses
-      console.log('Could not load customer addresses:', error);
-    }
-
-    // Load payment providers for current region
-    if (cart.value?.cart?.region_id) {
-      console.log('Loading payment providers...');
-      loadingPaymentProviders.value = true;
-      try {
-        await loadPaymentProviders(cart.value.cart.region_id);
-      } catch (error) {
-        console.error('Failed to load payment providers:', error);
-      } finally {
-        loadingPaymentProviders.value = false;
+    // Create a promise for other instances to wait for
+    globalInitialization.promise = (async () => {
+      // Initialize cart if needed
+      if (!cart.value) {
+        await cartStore.initializeCart();
+        await nextTick();
       }
-    }
 
-    console.log('Checkout initialization completed successfully');
+      // Check if cart is empty after initialization
+      if (isEmpty.value) {
+        return;
+      }
+
+      // Generate order reference
+      orderReference.value = checkoutHelper.generateOrderReference();
+
+      // Load customer addresses if logged in
+      try {
+        await customerStore.getCustomerAddresses();
+        savedAddresses.value = customerStore.currentCustomerAddresses.addresses || [];
+      } catch (error) {
+        // User might not be logged in, continue without saved addresses
+      }
+
+      // Load payment providers for current region
+      if (cart.value?.cart?.region_id) {
+        loadingPaymentProviders.value = true;
+        try {
+          await loadPaymentProviders(cart.value.cart.region_id);
+        } catch (error) {
+          console.error('Failed to load payment providers:', error);
+        } finally {
+          loadingPaymentProviders.value = false;
+        }
+      }
+    })();
+
+    await globalInitialization.promise;
 
   } catch (error: any) {
     console.error('Failed to initialize checkout:', error);
     pageError.value = checkoutHelper.formatErrorMessage(error);
   } finally {
+    // Always ensure loading is stopped and flags are reset
     pageLoading.value = false;
-    isInitializing = false;
+    isInitializing.value = false;
+    globalInitialization.isInProgress = false;
+    globalInitialization.promise = null;
   }
 };
 
@@ -345,12 +377,46 @@ const clearError = () => {
   checkoutState.value.error = null;
 };
 
+// Data update handlers
+const handleCustomerInfoUpdate = (newCustomerInfo: any) => {
+  // Prevent recursive updates by checking if the data is actually different
+  if (JSON.stringify(customerInfo.value) !== JSON.stringify(newCustomerInfo)) {
+    customerInfo.value = newCustomerInfo;
+  }
+};
+
+const handleShippingAddressUpdate = (newShippingAddress: any) => {
+  // Prevent recursive updates by checking if the data is actually different
+  if (JSON.stringify(shippingAddress.value) !== JSON.stringify(newShippingAddress)) {
+    shippingAddress.value = newShippingAddress;
+  }
+};
+
+const handleShippingOptionUpdate = (newShippingOption: string) => {
+  // Prevent recursive updates by checking if the data is actually different
+  if (selectedShippingOption.value !== newShippingOption) {
+    selectedShippingOption.value = newShippingOption;
+  }
+};
+
+const handlePaymentProviderUpdate = (newPaymentProvider: string) => {
+  // Prevent recursive updates by checking if the data is actually different
+  if (selectedPaymentProvider.value !== newPaymentProvider) {
+    selectedPaymentProvider.value = newPaymentProvider;
+  }
+};
+
+const handlePaymentDataUpdate = (newPaymentData: any) => {
+  // Prevent recursive updates by checking if the data is actually different
+  if (JSON.stringify(paymentData.value) !== JSON.stringify(newPaymentData)) {
+    paymentData.value = newPaymentData;
+  }
+};
+
 // Step handlers
-let isSubmittingCustomer = false;
-let isSubmittingShipping = false;
 const handleCustomerInfoSubmit = async (customerData: any) => {
   // Prevent multiple simultaneous submissions
-  if (isSubmittingCustomer) return;
+  if (isSubmittingCustomer || checkoutState.value.isLoading) return;
 
   try {
     isSubmittingCustomer = true;
@@ -409,15 +475,48 @@ const handleShippingSubmit = async (data: { address: any; shippingOptionId: stri
 };
 
 const handlePaymentSubmit = async (data: { providerId: string; paymentData: any }) => {
+  console.log('=== HANDLE PAYMENT SUBMIT CALLED ===');
+  console.log('Received data:', data);
+  
   try {
-    if (!cart.value) return;
+    if (!cart.value) {
+      console.log('❌ No cart available');
+      return;
+    }
+
+    console.log('Current checkout state before submit:', {
+      step: checkoutState.value.step,
+      selectedPaymentProvider: selectedPaymentProvider.value,
+      paymentData: paymentData.value,
+      canProceedToNextStep: canProceedToNextStep.value
+    });
+
+    // Update payment data first
+    console.log('Updating payment data...');
+    paymentData.value = {
+      method: data.providerId,
+      provider: data.providerId,
+      data: data.paymentData
+    };
+    
+    selectedPaymentProvider.value = data.providerId;
+    
+    console.log('Updated checkout state:', {
+      selectedPaymentProvider: selectedPaymentProvider.value,
+      paymentData: paymentData.value,
+      canProceedToNextStep: canProceedToNextStep.value
+    });
 
     // Initialize payment sessions
+    console.log('Initializing payment sessions...');
     await initializePaymentSessions(cart.value);
 
+    console.log('Calling nextStep...');
     nextStep();
+    
+    console.log('✅ Payment submit completed successfully');
   } catch (error: any) {
-    console.error('Payment submit error:', error);
+    console.error('❌ Payment submit error:', error);
   }
 };
 
@@ -447,6 +546,7 @@ const handleAddressSelection = async (addressId: string) => {
   try {
     // Clear previous shipping option selection when selecting a new address
     selectedShippingOption.value = '';
+    userSelectedShipping.value = false; // Reset user selection flag
     
     // Map saved address to shipping address format
     const newAddress = {
@@ -472,6 +572,7 @@ const handleAddressSelection = async (addressId: string) => {
 
 const handleShippingOptionSelection = (optionId: string) => {
   selectedShippingOption.value = optionId;
+  userSelectedShipping.value = true; // Mark as user-selected
 };
 
 const handleLoadShippingOptions = async () => {
@@ -479,6 +580,7 @@ const handleLoadShippingOptions = async () => {
   
   // Clear previous shipping option selection when loading new options
   selectedShippingOption.value = '';
+  userSelectedShipping.value = false; // Reset user selection flag
   
   await loadShippingOptionsManually(cart.value.cart.id);
 };
@@ -514,7 +616,7 @@ let isLoadingShippingOptions = false;
 
 // Manual shipping options loading - called when needed
 const loadShippingOptionsManually = async (cartId: string) => {
-  if (isLoadingShippingOptions || isInitializing || !componentMounted.value) return;
+  if (isLoadingShippingOptions || isInitializing.value || !componentMounted.value) return;
 
   try {
     isLoadingShippingOptions = true;
@@ -528,27 +630,33 @@ const loadShippingOptionsManually = async (cartId: string) => {
 };
 
 // Initialize on mount with defensive checks
-onMounted(async () => {
-  console.log('Component mounting...');
+const initializationId = ref(Math.random().toString(36).substring(7));
 
+onMounted(async () => {
   // Use nextTick to ensure component is fully mounted
   await nextTick();
   componentMounted.value = true;
 
-  console.log('Component mounted, starting initialization...');
+  // If cart is already available and empty, don't show loading
+  if (cart.value && isEmpty.value) {
+    pageLoading.value = false;
+    return;
+  }
 
   // Only initialize if not already initializing and component is still mounted
-  if (!isInitializing && componentMounted.value) {
+  if (!isInitializing.value && componentMounted.value) {
     await initializeCheckout();
   }
 });
 
 // Cleanup on unmount
 onUnmounted(() => {
-  console.log('Component unmounting...');
   componentMounted.value = false;
 
   // Reset checkout state
   resetCheckout();
+  
+  // Reset user selection flag
+  userSelectedShipping.value = false;
 });
 </script>

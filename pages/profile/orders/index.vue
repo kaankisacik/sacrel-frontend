@@ -54,10 +54,10 @@
                   :class="getStatusClass(order.status)"
                   class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                 >
-                  {{ getOrderStatus(order.status) }}
+                  {{ checkoutHelper.getOrderStatus(order.fulfillment_status) }}
                 </span>
                 <p class="text-lg font-semibold text-gray-900">
-                  {{ formatPrice(order.total) }}
+                  {{ checkoutHelper.formatPrice(order.total || order.subtotal || 0) }}
                 </p>
               </div>
             </div>
@@ -84,7 +84,7 @@
                   <p class="text-sm text-gray-600">Adet: {{ item.quantity }}</p>
                 </div>
                 <div class="text-sm font-medium text-gray-900">
-                  {{ formatPrice(item.total) }}
+                  {{ checkoutHelper.formatPrice(item.total || (item.unit_price * item.quantity) || 0) }}
                 </div>
               </div>
               
@@ -230,8 +230,8 @@
 </template>
 
 <script setup lang="ts">
-import { checkoutHelper } from '~/utils/checkoutHelpers';
 
+import { checkoutHelper } from '~/utils/checkoutHelpers';
 // SEO
 useHead({
   title: 'Siparişlerim - Sacrel',
@@ -263,16 +263,36 @@ const isCancelling = ref<boolean>(false);
 const loadOrders = async (page: number = 1) => {
   try {
     isLoading.value = true;
-    const limit = 10;
+    const limit = 1;
     const offset = (page - 1) * limit;
     
     const response = await orderService.getOrders({
       limit,
-      offset,
-      expand: 'items,items.variant,items.variant.product,shipping_address,billing_address'
+      offset
+    });
+    console.log('Orders loaded:', response);
+    
+    // Process orders to ensure data consistency
+    const processedOrders = (response.orders || []).map((order: any) => {
+      // Ensure total is properly set
+      if (!order.total && order.subtotal) {
+        order.total = order.subtotal;
+      }
+      
+      // Process items to ensure price data
+      if (order.items && Array.isArray(order.items)) {
+        order.items = order.items.map((item: any) => {
+          if (!item.total && item.unit_price && item.quantity) {
+            item.total = item.unit_price * item.quantity;
+          }
+          return item;
+        });
+      }
+      
+      return order;
     });
     
-    orders.value = response.orders || [];
+    orders.value = processedOrders;
     currentPage.value = page;
     totalPages.value = Math.ceil((response.count || 0) / limit);
   } catch (error) {
@@ -283,30 +303,31 @@ const loadOrders = async (page: number = 1) => {
   }
 };
 
-const formatPrice = (amount: number): string => {
-  return checkoutHelper.formatPrice(amount);
-};
+
 
 const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('tr-TR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+  if (!dateString) return 'Bilinmeyen Tarih';
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return 'Geçersiz Tarih';
+    }
+    
+    return date.toLocaleDateString('tr-TR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (error) {
+    console.error('Date formatting error:', error);
+    return 'Tarih Hatası';
+  }
 };
 
-const getOrderStatus = (status: string): string => {
-  const statusMap: Record<string, string> = {
-    pending: 'Beklemede',
-    completed: 'Tamamlandı',
-    shipped: 'Kargoda',
-    delivered: 'Teslim Edildi',
-    canceled: 'İptal Edildi',
-    requires_action: 'İşlem Gerekli'
-  };
-  return statusMap[status] || status;
-};
+
 
 const getStatusClass = (status: string): string => {
   const statusClasses: Record<string, string> = {
@@ -321,28 +342,82 @@ const getStatusClass = (status: string): string => {
 };
 
 const getItemTitle = (item: any): string => {
-  return item.variant?.product?.title || item.title || 'Ürün';
+  // Try different property paths for product title
+  if (item.variant?.product?.title) {
+    return item.variant.product.title;
+  }
+  if (item.product?.title) {
+    return item.product.title;
+  }
+  if (item.title) {
+    return item.title;
+  }
+  if (item.variant?.title) {
+    return item.variant.title;
+  }
+  return 'Ürün';
 };
 
 const getItemVariant = (item: any): string => {
   const variant = item.variant;
-  if (!variant?.options || !Array.isArray(variant.options)) return '';
+  if (!variant) return '';
   
-  return variant.options
-    .map((option: any) => option.value)
-    .filter(Boolean)
-    .join(' - ');
+  // Try to get variant title first
+  if (variant.title && variant.title !== 'Default Title') {
+    return variant.title;
+  }
+  
+  // If no title, try to build from options
+  if (variant.options && Array.isArray(variant.options)) {
+    const optionValues = variant.options
+      .map((option: any) => option.value || option.option_value)
+      .filter(Boolean);
+    
+    if (optionValues.length > 0) {
+      return optionValues.join(' - ');
+    }
+  }
+  
+  // Try alternative option format
+  if (variant.option_values && Array.isArray(variant.option_values)) {
+    const optionValues = variant.option_values
+      .map((optionValue: any) => optionValue.value)
+      .filter(Boolean);
+    
+    if (optionValues.length > 0) {
+      return optionValues.join(' - ');
+    }
+  }
+  
+  return '';
 };
 
 const getItemImage = (item: any): string => {
-  const product = item.variant?.product;
+  // Try multiple paths for getting the product image
+  const product = item.variant?.product || item.product;
   
   if (product?.thumbnail) {
     return product.thumbnail;
   }
   
   if (product?.images && Array.isArray(product.images) && product.images.length > 0) {
-    return product.images[0].url || product.images[0];
+    const firstImage = product.images[0];
+    if (typeof firstImage === 'string') {
+      return firstImage;
+    }
+    if (firstImage?.url) {
+      return firstImage.url;
+    }
+  }
+  
+  // Try item-level thumbnail
+  if (item.thumbnail) {
+    return item.thumbnail;
+  }
+  
+  // Try variant-level image
+  if (item.variant?.image) {
+    return item.variant.image;
   }
   
   // Return the SVG placeholder to avoid 404 requests
