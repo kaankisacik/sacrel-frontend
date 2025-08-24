@@ -388,9 +388,16 @@ watch([selectedColor, selectedSize], ([newColor, newSize], [oldColor, oldSize]) 
   // İlk yükleme sırasında watch'ı tetikleme
   if (isInitializing.value || ((!oldColor?.name && !oldSize) && (newColor?.name || newSize))) return
 
+  console.log('Variant selection changed:', { 
+    newColor: newColor?.name, 
+    newSize, 
+    oldColor: oldColor?.name, 
+    oldSize 
+  })
+
   if (product.value?.product?.variants) {
     const variant = product.value.product.variants.find((v) => {
-      const colorMatch = !newColor.name || v.options?.some((opt) =>
+      const colorMatch = !newColor?.name || v.options?.some((opt) =>
         opt.option.title.toLowerCase() === 'color' && opt.value === newColor.name
       )
       const sizeMatch = !newSize || v.options?.some((opt) =>
@@ -398,6 +405,9 @@ watch([selectedColor, selectedSize], ([newColor, newSize], [oldColor, oldSize]) 
       )
       return colorMatch && sizeMatch
     })
+    
+    console.log('Found variant:', variant)
+    
     if (variant) {
       selectedVariant.value = variant
       // Eğer mevcut quantity stoktan fazlaysa, stoktaki maksimum değere ayarla
@@ -425,37 +435,93 @@ const initializeProduct = () => {
   if (product.value?.product) {
     isInitializing.value = true
     
+    console.log('Initializing product:', product.value.product.title)
+    console.log('Available variants:', product.value.product.variants)
+    
     // Set first image
     if (productImages.value.length > 0) {
       currentImage.value = productImages.value[0]
     }
 
-    // Set first available color
-    if (productColors.value.length > 0) {
-      const firstAvailableColor = productColors.value.find(color => color.isAvailable)
-      if (firstAvailableColor) {
-        selectedColor.value = firstAvailableColor
-        // İlk mevcut renk için ilk mevcut bedeni seç
-        const firstSize = productHelper.getFirstAvailableSize(product.value.product, firstAvailableColor.name)
-        if (firstSize) {
-          selectedSize.value = firstSize
-        }
-      } else {
-        // Hiçbir renk mevcut değilse ilk rengi seç ama disabled olacak
-        selectedColor.value = productColors.value[0]
-      }
-    }
-
-    // Set initial variant
+    // İlk stokta olan varyantı bul
     if (product.value.product.variants?.length > 0) {
       const availableVariant = product.value.product.variants.find((v) => v.inventory_quantity > 0)
-      selectedVariant.value = availableVariant || product.value.product.variants[0]
-
-      // Quantity'yi stok miktarına göre ayarla
-      if (selectedVariant.value) {
-        quantity.value = Math.min(1, selectedVariant.value.inventory_quantity)
+      
+      console.log('First available variant:', availableVariant)
+      
+      if (availableVariant) {
+        selectedVariant.value = availableVariant
+        
+        // Bu varyantın renk ve beden bilgilerini al
+        const colorOption = availableVariant.options?.find((opt) => 
+          opt.option.title.toLowerCase() === 'color'
+        )
+        const sizeOption = availableVariant.options?.find((opt) => 
+          opt.option.title.toLowerCase() === 'size'
+        )
+        
+        console.log('Color option:', colorOption)
+        console.log('Size option:', sizeOption)
+        
+        // Rengi ayarla
+        if (colorOption && productColors.value.length > 0) {
+          const matchingColor = productColors.value.find(color => color.name === colorOption.value)
+          if (matchingColor) {
+            selectedColor.value = matchingColor
+            console.log('Selected color:', matchingColor)
+          }
+        }
+        
+        // Bedeni ayarla
+        if (sizeOption) {
+          selectedSize.value = sizeOption.value
+          console.log('Selected size:', sizeOption.value)
+        }
+        
+        // Quantity'yi stok miktarına göre ayarla
+        quantity.value = Math.min(1, availableVariant.inventory_quantity)
+      } else {
+        // Hiçbir varyant stokta değilse ilk varyantı seç
+        selectedVariant.value = product.value.product.variants[0]
+        
+        console.log('No available variant, using first:', selectedVariant.value)
+        
+        // İlk varyantın renk ve beden bilgilerini al
+        const colorOption = selectedVariant.value.options?.find((opt) => 
+          opt.option.title.toLowerCase() === 'color'
+        )
+        const sizeOption = selectedVariant.value.options?.find((opt) => 
+          opt.option.title.toLowerCase() === 'size'
+        )
+        
+        if (colorOption && productColors.value.length > 0) {
+          const matchingColor = productColors.value.find(color => color.name === colorOption.value)
+          if (matchingColor) {
+            selectedColor.value = matchingColor
+          }
+        }
+        
+        if (sizeOption) {
+          selectedSize.value = sizeOption.value
+        }
+        
+        quantity.value = 1
       }
     }
+    
+    // Fallback: Eğer hiç varyant yoksa sadece renkleri ayarla
+    if (!selectedColor.value.name && productColors.value.length > 0) {
+      const firstAvailableColor = productColors.value.find(color => color.isAvailable)
+      selectedColor.value = firstAvailableColor || productColors.value[0]
+      console.log('Fallback color selection:', selectedColor.value)
+    }
+    
+    console.log('Final selections:', {
+      variant: selectedVariant.value,
+      color: selectedColor.value,
+      size: selectedSize.value,
+      quantity: quantity.value
+    })
     
     nextTick(() => {
       isInitializing.value = false

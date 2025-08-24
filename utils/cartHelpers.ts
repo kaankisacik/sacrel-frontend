@@ -1,5 +1,4 @@
 interface ICartHelper {
-  formatPrice(amount: number): string;
   calculateItemTotal(unitPrice: number, quantity: number): number;
   calculateSubtotal(items: any[]): number;
   calculateTax(subtotal: number, taxRate?: number): number;
@@ -20,9 +19,6 @@ interface ICartHelper {
 }
 
 class CartHelper implements ICartHelper {
-  formatPrice(amount: number): string {
-    return amount.toFixed(2);
-  }
 
   calculateItemTotal(unitPrice: number, quantity: number): number {
     return unitPrice * quantity;
@@ -64,9 +60,9 @@ class CartHelper implements ICartHelper {
       id: lineItem.id,
       title: product?.title || "Ürün",
       variant: this.getVariantTitle(lineItem),
-      price: this.formatPrice(lineItem.unit_price || 0),
+      price: checkoutHelper.formatPrice(lineItem.unit_price || 0),
       quantity: lineItem.quantity || 0,
-      total: this.formatPrice(
+      total: checkoutHelper.formatPrice(
         this.calculateItemTotal(
           lineItem.unit_price || 0,
           lineItem.quantity || 0

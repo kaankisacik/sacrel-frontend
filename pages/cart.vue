@@ -67,7 +67,7 @@
                 <div class="flex-1 min-w-0">
                   <h3 class="text-lg font-medium text-gray-900 mb-1">{{ item.lineItem.product_title }}</h3>
                   <p class="text-sm text-gray-600 mb-2">{{ item.lineItem.variant_title }}</p>
-                  <p class="text-lg font-semibold text-gray-900">{{ item.price }} TL</p>
+                  <p class="text-lg font-semibold text-gray-900">{{ item.price }}</p>
                 </div>
 
                 <!-- Quantity Controls -->
@@ -86,7 +86,7 @@
 
                 <!-- Item Total -->
                 <div class="text-right">
-                  <p class="text-lg font-semibold text-gray-900">{{ item.total }} TL</p>
+                  <p class="text-lg font-semibold text-gray-900">{{ item.total }}</p>
                   <button @click="removeItem(item)" :disabled="isLoading"
                     class="text-sm text-red-600 hover:text-red-800 disabled:opacity-50">
                     Kaldır
@@ -105,7 +105,7 @@
             <div class="space-y-3 mb-6">
               <div class="flex justify-between text-sm">
                 <span class="text-gray-600">Ara Toplam:</span>
-                <span class="text-gray-900">{{ subtotal }} TL</span>
+                <span class="text-gray-900">{{ subtotal }}</span>
               </div>
 
               <!-- <div class="flex justify-between text-sm">
@@ -116,7 +116,7 @@
               <div class="border-t pt-3">
                 <div class="flex justify-between text-lg font-semibold">
                   <span class="text-gray-900">Toplam:</span>
-                  <span class="text-gray-900">{{ total }} TL</span>
+                  <span class="text-gray-900">{{ total }}</span>
                 </div>
               </div>
             </div>
@@ -193,7 +193,7 @@ const subtotalAmount = computed(() => {
 })
 
 const subtotal = computed(() => {
-  return cartHelper.formatPrice(subtotalAmount.value)
+  return checkoutHelper.formatPrice(subtotalAmount.value)
 })
 
 
@@ -207,7 +207,7 @@ const totalAmount = computed(() => {
 })
 
 const total = computed(() => {
-  return cartHelper.formatPrice(totalAmount.value)
+  return checkoutHelper.formatPrice(totalAmount.value)
 })
 
 // Methods

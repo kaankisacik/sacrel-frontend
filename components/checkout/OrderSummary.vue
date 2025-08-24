@@ -97,7 +97,7 @@
       <div class="border-t pt-2">
         <div class="flex justify-between text-lg font-semibold">
           <span class="text-gray-900">Toplam:</span>
-          <span class="text-gray-900">{{ checkoutHelper.formatPrice(summary.pricing.subtotal + summary.pricing.shipping) }}</span>
+          <span class="text-gray-900">{{ checkoutHelper.formatPrice(summary.pricing.total + (userSelectedShipping ? summary.pricing.shipping : 0)) }}</span>
         </div>
       </div>
     </div>

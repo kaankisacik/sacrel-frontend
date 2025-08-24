@@ -65,15 +65,17 @@ class CheckoutHelper {
       total: (lineItem.unit_price || 0) * (lineItem.quantity || 0),
       thumbnail: this.getItemThumbnail(lineItem),
     }));
-    console.log("cart", cart);
+    console.log("calculateCheckoutSummary2", items);
 
     const pricing: CheckoutPricing = {
-      subtotal: cart.subtotal || 0,
-      tax: cart.tax_total || 0,
-      shipping: cart.shipping_subtotal || 0,
+      subtotal: cart.original_item_subtotal || 0,
+      tax: cart.item_tax_total || 0,
+      shipping: cart.original_shipping_subtotal || 0,
       discount: cart.discount_total || 0,
-      total: cart.total || 0,
+      total: cart.original_item_total || 0,
     };
+
+    console.log("calculateCheckoutSummary3", pricing);
 
     const itemCount = items.reduce((count, item) => count + item.quantity, 0);
 

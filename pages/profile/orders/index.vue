@@ -263,12 +263,13 @@ const isCancelling = ref<boolean>(false);
 const loadOrders = async (page: number = 1) => {
   try {
     isLoading.value = true;
-    const limit = 1;
+    const limit = 3;
     const offset = (page - 1) * limit;
     
     const response = await orderService.getOrders({
       limit,
-      offset
+      offset,
+      fields:'fulfillments',
     });
     console.log('Orders loaded:', response);
     
