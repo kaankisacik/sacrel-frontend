@@ -5,7 +5,7 @@
       <div class="flex justify-center items-center min-h-[400px]">
         <div class="text-center">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
-          <p class="text-gray-600">Loading product...</p>
+          <p class="text-gray-600">Ürün yükleniyor...</p>
         </div>
       </div>
     </div>
@@ -13,10 +13,10 @@
     <!-- Error State -->
     <div v-else-if="error" class="container mx-auto px-4 py-12">
       <div class="text-center">
-        <h1 class="text-2xl font-bold text-gray-900 mb-4">Error Occurred</h1>
+        <h1 class="text-2xl font-bold text-gray-900 mb-4">Hata oluştu</h1>
         <p class="text-gray-600 mb-6">{{ error }}</p>
         <NuxtLink to="/products" class="bg-black text-white px-6 py-3 rounded hover:bg-gray-800 transition-colors">
-          Back to Products
+          Ürünlere Geri Dön
         </NuxtLink>
       </div>
     </div>

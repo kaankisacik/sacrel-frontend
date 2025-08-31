@@ -3,7 +3,6 @@ import { defineStore } from "pinia";
 
 export const useCartStore = defineStore("cartStore", () => {
   const cartService = useCart();
-  const regionService = useRegion();
   const cart = ref<StoreCartResponse | null>(null);
   const isLoading = ref(false);
   const error = ref("");
@@ -23,14 +22,8 @@ export const useCartStore = defineStore("cartStore", () => {
       isLoading.value = true;
       error.value = "";
 
-      const regionId = await regionService.getTRRegionID();
-      if (!regionId) {
-        throw new Error("No region available for cart creation");
-      }
-
-      cart.value = await cartService.createNewCart({
-        region_id: regionId,
-      });
+   
+      cart.value = await cartService.createNewCart();
     } catch (err) {
       console.error("Failed to create cart:", err);
       error.value = "Failed to create cart";

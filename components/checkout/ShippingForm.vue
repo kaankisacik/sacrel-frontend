@@ -237,26 +237,29 @@ const touchedFields = ref<Set<string>>(new Set());
 const isFormValid = computed(() => {
   // If using saved address, only check if address is selected and shipping option is selected
   if (!isAddingNewAddress.value && selectedAddressId.value) {
-    // For saved addresses, shipping option must be selected
-    return props.showShippingOptions ? selectedShippingOptionId.value !== '' : true;
+    const isValid = props.showShippingOptions ? selectedShippingOptionId.value !== '' : true;
+    console.log('Saved address form valid:', isValid, {
+      showShippingOptions: props.showShippingOptions,
+      selectedShippingOptionId: selectedShippingOptionId.value,
+      selectedAddressId: selectedAddressId.value
+    });
+    return isValid;
   }
 
-  // If adding new address, validate the form fields first
+  // For manual address entry
   const validation = checkoutHelper.validateShippingAddress(localShippingAddress.value);
+  const hasValidAddress = validation.isValid;
+  const hasConfirmedAddress = addressConfirmed.value;
+  const hasShippingOption = !props.showShippingOptions || selectedShippingOptionId.value !== '';
   
-  // For manual address entry, user must:
-  // 1. Fill all required fields correctly
-  // 2. Confirm the address (addressConfirmed = true)
-  // 3. Select a shipping option
-  if (isAddingNewAddress.value) {
-    const hasValidAddress = validation.isValid;
-    const hasConfirmedAddress = addressConfirmed.value;
-    const hasShippingOption = !props.showShippingOptions || selectedShippingOptionId.value !== '';
-    
-    return hasValidAddress && hasConfirmedAddress && hasShippingOption;
-  }
-
-  return false;
+  const isValid = hasValidAddress && hasConfirmedAddress && hasShippingOption;
+  console.log('Manual address form valid:', isValid, {
+    hasValidAddress,
+    hasConfirmedAddress, 
+    hasShippingOption,
+    selectedShippingOptionId: selectedShippingOptionId.value
+  });
+  return isValid;
 });
 
 // Watchers - optimized but functional
@@ -459,6 +462,9 @@ const handleNext = () => {
   validateAllFields();
 
   if (isFormValid.value) {
+    console.log("girdi222");
+    console.log("localshippingadress:",localShippingAddress.value);
+    
     emit('submit', {
       address: localShippingAddress.value,
       shippingOptionId: selectedShippingOptionId.value,

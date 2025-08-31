@@ -39,7 +39,7 @@ export const useProductStore = defineStore("productStore", () => {
 
   const getProducts = async (queryParams?: any) => {
     try {
-      const getProducts = await productService.getProducts(queryParams);
+      const getProducts = await productService.getProducts({...queryParams});
       products.value = getProducts;
 
       allProductFilters.value = productHelper.extractAllProductFilters(
@@ -54,17 +54,9 @@ export const useProductStore = defineStore("productStore", () => {
   };
 
 
-  onNuxtReady(() => {
-    useRegion()
-      .getRegions()
-      .then((x) => {
-        console.log("Regions loaded successfully", x);
-      })
-      .catch((error) => {
-        console.error("Failed to load regions:", error);
-      });
-    getProducts();
-  });
+ 
+    
+  
 
   return {
     product,
@@ -72,6 +64,7 @@ export const useProductStore = defineStore("productStore", () => {
     allProductFilters,
     searchQuery,
     getProduct,
+    getProducts,
     getProductByHandle,
   };
 });

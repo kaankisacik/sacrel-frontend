@@ -119,7 +119,7 @@
                 Kargo Takip
               </button>
 
-              <button
+              <!-- <button
                 v-if="canCancelOrder(order.status)"
                 @click="openCancelModal(order)"
                 class="inline-flex items-center justify-center px-4 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 transition duration-300"
@@ -128,7 +128,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
                 İptal Et
-              </button>
+              </button> -->
 
               <button
                 v-if="canReorder(order.status)"
@@ -269,7 +269,7 @@ const loadOrders = async (page: number = 1) => {
     const response = await orderService.getOrders({
       limit,
       offset,
-      fields:'fulfillments',
+      fields:'fulfillments,id,display_id,status,fulfillment_status,total,subtotal,created_at,currency,items',
     });
     console.log('Orders loaded:', response);
     
@@ -429,10 +429,6 @@ const canTrackOrder = (status: string): boolean => {
   return ['shipped', 'completed'].includes(status);
 };
 
-const canCancelOrder = (status: string): boolean => {
-  return ['pending', 'requires_action'].includes(status);
-};
-
 const canReorder = (status: string): boolean => {
   return ['completed', 'delivered', 'canceled'].includes(status);
 };
@@ -451,32 +447,59 @@ const openCancelModal = (order: any) => {
   cancelReason.value = '';
 };
 
+// ...existing code...
+
 const confirmCancelOrder = async () => {
   if (!selectedOrder.value) return;
   
   try {
     isCancelling.value = true;
     
-    // Call cancel API (if available in Medusa v2)
-    // await orderService.cancelOrder(selectedOrder.value.id, cancelReason.value);
+    // useOrders composable'ından cancelOrder fonksiyonunu kullan
+    await orderService.declineOrderTransfer(selectedOrder.value.id, cancelReason.value);
     
-    // For now, just update local state
+    // Başarılı iptal - local state'i güncelle
     const orderIndex = orders.value.findIndex(o => o.id === selectedOrder.value.id);
     if (orderIndex !== -1) {
       orders.value[orderIndex].status = 'canceled';
+      orders.value[orderIndex].fulfillment_status = 'canceled';
     }
     
     showCancelModal.value = false;
     selectedOrder.value = null;
+    cancelReason.value = '';
     
-    // Show success message
-    alert('Sipariş başarıyla iptal edildi.');
-  } catch (error) {
+    // Başarı mesajı
+    if (process.client) {
+      alert('Sipariş başarıyla iptal edildi.');
+    }
+    
+  } catch (error: any) {
     console.error('Failed to cancel order:', error);
-    alert('Sipariş iptal edilemedi. Lütfen tekrar deneyin.');
+    
+    let errorMessage = 'Sipariş iptal edilemedi. Lütfen müşteri hizmetleri ile iletişime geçin.';
+    
+    if (error.status === 400) {
+      errorMessage = 'Bu sipariş durumunda iptal işlemi yapılamaz.';
+    } else if (error.status === 404) {
+      errorMessage = 'Sipariş bulunamadı.';
+    } else if (error.status === 403) {
+      errorMessage = 'Bu işlem için yetkiniz bulunmuyor.';
+    }
+    
+    if (process.client) {
+      alert(errorMessage);
+    }
   } finally {
     isCancelling.value = false;
   }
+};
+
+// canCancelOrder fonksiyonunu orderService'den kullan
+const canCancelOrder = (status: string): boolean => {
+  // Basit status kontrolü
+  const cancellableStatuses = ['pending', 'requires_action', 'payment_required'];
+  return cancellableStatuses.includes(status);
 };
 
 const reorderItems = async (order: any) => {

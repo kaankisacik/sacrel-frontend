@@ -5,8 +5,9 @@
 </template>
 
 <script setup>
-onNuxtReady(() => {
+onNuxtReady(async () => {
   useAuthStore();
-  useProductStore();
+  await useProductStore().getProducts()
+  useContact();
 });
 </script>

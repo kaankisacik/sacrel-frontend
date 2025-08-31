@@ -77,7 +77,7 @@ export const useCheckout = () => {
   // Validation helpers
   const isCustomerInfoValid = computed(() => {
     const { email, firstName, lastName } = customerInfo.value;
-    
+
     return Boolean(
       email && firstName && lastName && checkoutHelper.isValidEmail(email)
     );
@@ -85,41 +85,51 @@ export const useCheckout = () => {
 
   const isShippingAddressValid = computed(() => {
     const { address_1, city, district, postalCode } = shippingAddress.value;
-    return Boolean(address_1 && city && district && postalCode);
+    const isValid = Boolean(address_1 && city && district && postalCode);
+    console.log("isShippingAddressValid:", isValid, {
+      address_1: Boolean(address_1),
+      city: Boolean(city),
+      district: Boolean(district),
+      postalCode: Boolean(postalCode),
+    });
+    return isValid;
   });
 
   const isPaymentDataValid = computed(() => {
-    const isValid = Boolean(paymentData.value.method && selectedPaymentProvider.value);
-    console.log('isPaymentDataValid check:', {
+    const isValid = Boolean(
+      paymentData.value.method && selectedPaymentProvider.value
+    );
+    console.log("isPaymentDataValid check:", {
       method: paymentData.value.method,
       provider: selectedPaymentProvider.value,
       isValid,
-      paymentData: paymentData.value
+      paymentData: paymentData.value,
     });
     return isValid;
   });
 
   const canProceedToNextStep = computed(() => {
-    console.log('canProceedToNextStep check for step:', state.value.step);
-    
+    console.log("canProceedToNextStep check for step:", state.value.step);
+
     switch (state.value.step) {
       case "customer":
         const customerValid = isCustomerInfoValid.value;
-        console.log('Customer step valid:', customerValid);
+        console.log("Customer step valid:", customerValid);
         return customerValid;
       case "shipping":
-        const shippingValid = isShippingAddressValid.value && selectedShippingOption.value;
-        console.log('Shipping step valid:', shippingValid, {
+        const shippingValid =
+          isShippingAddressValid.value && selectedShippingOption.value;
+        console.log("Shipping step valid:", shippingValid, {
           addressValid: isShippingAddressValid.value,
-          shippingOption: selectedShippingOption.value
+          shippingOption: selectedShippingOption.value,
         });
         return shippingValid;
       case "payment":
         const paymentValid = isPaymentDataValid.value;
-        console.log('Payment step valid:', paymentValid);
+        console.log("Payment step valid:", paymentValid);
         return paymentValid;
       case "review":
-        console.log('Review step - always valid');
+        console.log("Review step - always valid");
         return true;
       default:
         console.log("Unknown step:", state.value.step);
@@ -231,25 +241,54 @@ export const useCheckout = () => {
   };
 
   const addCheckoutShippingMethod = async (
-    cartId: string,
-    shippingOptionId: string
-  ) => {
-    try {
-      state.value.isLoading = true;
+  cartId: string,
+  shippingOptionId: string
+) => {
+  try {
+    state.value.isLoading = true;
 
-      const shippingMethodData: StoreAddCartShippingMethods = {
-        option_id: shippingOptionId,
-      };
+    // First, verify the shipping option exists
+    const shippingOption = availableShippingOptions.value.find(
+      (option) => option.id === shippingOptionId
+    );
 
-      await cartService.addShippingMethod(cartId, shippingMethodData);
-    } catch (error) {
-      console.error("Failed to add shipping method:", error);
-      state.value.error = "Kargo yöntemi eklenemedi";
-      throw error;
-    } finally {
-      state.value.isLoading = false;
+    if (!shippingOption) {
+      throw new Error(`Shipping option ${shippingOptionId} not found`);
     }
-  };
+
+    // Get current cart to check existing shipping methods
+    const currentCart = await cartService.getCurrentCart();
+    
+    // Remove existing shipping methods if any
+    if (currentCart?.cart?.shipping_methods && currentCart.cart.shipping_methods.length > 0) {
+      console.log("Found existing shipping methods:", currentCart?.cart.shipping_methods);
+      // Note: Medusa v2 might automatically replace shipping methods
+      // or you might need to implement a removal method if available
+    }
+
+    const shippingMethodData: StoreAddCartShippingMethods = {
+      option_id: shippingOptionId,
+    };
+
+    console.log("cartId:", cartId);
+    console.log("Selected shipping option:", shippingOption);
+    console.log("Adding shipping method with data:", shippingMethodData);
+
+    const result = await cartService.addShippingMethod(
+      cartId,
+      shippingMethodData
+    );
+    console.log("Shipping method added successfully:", result);
+
+    return result;
+  } catch (error) {
+    console.error("Failed to add shipping method:", error);
+    state.value.error = "Kargo yöntemi eklenemedi";
+    throw error;
+  } finally {
+    state.value.isLoading = false;
+  }
+};
 
   // Load shipping options
   const loadShippingOptions = async (cartId: string) => {
@@ -260,7 +299,7 @@ export const useCheckout = () => {
         cart_id: cartId,
       });
       console.log("Fetched shipping options:", response);
-      
+
       availableShippingOptions.value = response.shipping_options || [];
 
       // Note: Removed auto-selection to ensure user manually selects shipping option
@@ -319,32 +358,53 @@ export const useCheckout = () => {
   };
 
   // Complete checkout flow
-  const completeCheckout = async (cartId: string): Promise<any> => {
-    try {
-      state.value.isLoading = true;
-      state.value.error = null;
+ const completeCheckout = async (cartId: string): Promise<any> => {
+  try {
+    state.value.isLoading = true;
+    state.value.error = null;
 
-      const response = await cartService.completeCart(cartId);
+    // Get current cart to validate shipping methods
+    const currentCart = await cartService.getCurrentCart();
+    console.log("Cart before completion:", currentCart);
 
-      // Clear cart after successful completion
-      cartService.clearCurrentCart();
-
-      return response;
-    } catch (error: any) {
-      console.error("Failed to complete checkout:", error);
-
-      if (error.response?.data?.message) {
-        state.value.error = error.response.data.message;
-      } else {
-        state.value.error = "Sipariş tamamlanamadı. Lütfen tekrar deneyin.";
-      }
-
-      throw error;
-    } finally {
-      state.value.isLoading = false;
+    if (!currentCart?.cart?.shipping_methods || currentCart.cart.shipping_methods.length === 0) {
+      throw new Error("No shipping methods found on cart");
     }
-  };
 
+    // Validate shipping methods against cart items
+    const cartItems = currentCart.cart.items || [];
+    const shippingMethods = currentCart.cart.shipping_methods;
+    
+    console.log("Cart items:", cartItems);
+    console.log("Cart shipping methods:", shippingMethods);
+
+    // Note: Shipping profile validation removed due to type constraints
+    // This validation would need to be handled on the backend or with proper type extensions
+
+    const response = await cartService.completeCart(cartId);
+
+    // Clear cart after successful completion
+    cartService.clearCurrentCart();
+
+    return response;
+  } catch (error: any) {
+    console.error("Failed to complete checkout:", error);
+
+    if (error.response?.data?.message) {
+      state.value.error = error.response.data.message;
+    } else if (error.message?.includes("shipping profiles") || error.message?.includes("incompatible")) {
+      state.value.error = "Kargo yöntemi ile ürünler uyumlu değil. Lütfen farklı bir kargo seçeneği deneyin.";
+    } else if (error.message?.includes("shipping methods")) {
+      state.value.error = "Kargo yöntemi bulunamadı. Lütfen kargo seçimi yapın.";
+    } else {
+      state.value.error = "Sipariş tamamlanamadı. Lütfen tekrar deneyin.";
+    }
+
+    throw error;
+  } finally {
+    state.value.isLoading = false;
+  }
+};
   // Utility functions for checkout steps
   const formatStepTitle = (step: CheckoutState["step"]): string => {
     const titles = {

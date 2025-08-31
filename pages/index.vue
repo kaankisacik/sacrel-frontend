@@ -4,7 +4,7 @@
          <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8"> 
              <!-- <HomeShowCase />  -->
             
-             
+<!--              
              <section class="mt-16 md:mt-20 lg:my-32">
                 <div class="text-center mb-12">
                     <h2 class="text-3xl font-bold text-gray-900 mb-4">Öne Çıkan Ürünler</h2>
@@ -42,7 +42,7 @@
                         Tüm Ürünleri Görüntüle
                     </NuxtLink>
                 </div>
-            </section> 
+            </section>  -->
             
             
          </div> 

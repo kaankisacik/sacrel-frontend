@@ -7,6 +7,7 @@ import type {
 
 export const useProducts = () => {
   const medusa = useMedusaClient();
+  const regionService = useRegion();
 
   const getProduct = async (
     productId: string,
@@ -28,10 +29,13 @@ export const useProducts = () => {
     queryParams?: StoreProductListParams
   ): Promise<StoreProductListResponse> => {
     try {
+      console.log("getProducts queryParams",queryParams);
+      
       const response = await medusa.store.product.list({
         ...queryParams,
         fields:
           "*categories,*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags",
+          region_id:(await regionService.getTRRegion()).id
       });
       return response;
     } catch (error) {

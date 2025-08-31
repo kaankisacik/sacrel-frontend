@@ -13,6 +13,7 @@ import type {
 
 export const useCart = () => {
   const medusa = useMedusaClient();
+  const regionService = useRegion();
 
   // Cart ID Management (following useAuth pattern)
   const getCartId = (): string | null => {
@@ -178,9 +179,9 @@ export const useCart = () => {
     }
   };
 
-  const createNewCart = async (cartData: StoreCreateCart): Promise<StoreCartResponse> => {
+  const createNewCart = async (cartData?: StoreCreateCart): Promise<StoreCartResponse> => {
     try {
-      const response = await createCart(cartData);
+      const response = await createCart({...cartData,region_id:(await regionService.getTRRegion()).id});
       setCartId(response.cart.id);
       return response;
     } catch (error) {

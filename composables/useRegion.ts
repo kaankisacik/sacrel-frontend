@@ -1,6 +1,7 @@
 import type {
   FindParams,
   SelectParams,
+  StoreRegion,
   StoreRegionFilters,
   StoreRegionListResponse,
   StoreRegionResponse,
@@ -25,7 +26,7 @@ export const useRegion = () => {
     }
   };
 
-  const getTRRegionID = async (queryParams?: SelectParams): Promise<string> => {
+  const getTRRegion = async (queryParams?: SelectParams): Promise<StoreRegion> => {
     try {
       const res = await getRegions();
       const region = res.regions.find(
@@ -42,7 +43,9 @@ export const useRegion = () => {
       if (!region) {
         throw new Error("Türkiye region not found");
       }
-      return region.id;
+      console.log("Turkey Region Id:",region.id);
+      
+      return region;
     } catch (error) {
       console.error("Region retrieval failed:", error);
       throw error;
@@ -66,6 +69,6 @@ export const useRegion = () => {
   return {
     getRegion,
     getRegions,
-    getTRRegionID,
+    getTRRegion,
   };
 };
