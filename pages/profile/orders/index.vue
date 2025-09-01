@@ -119,7 +119,7 @@
                 Kargo Takip
               </button>
 
-              <!-- <button
+              <button
                 v-if="canCancelOrder(order.status)"
                 @click="openCancelModal(order)"
                 class="inline-flex items-center justify-center px-4 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 transition duration-300"
@@ -127,8 +127,8 @@
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
-                İptal Et
-              </button> -->
+                İptal Talebi Oluştur
+              </button>
 
               <button
                 v-if="canReorder(order.status)"
@@ -232,6 +232,13 @@
 <script setup lang="ts">
 
 import { checkoutHelper } from '~/utils/checkoutHelpers';
+import { useContact, type ContactData } from '@/composables/useContact';
+
+const { createContactMessage } = useContact();
+
+const customerStore = useCustomerStore();
+const { currentCustomer } = storeToRefs(customerStore);
+
 // SEO
 useHead({
   title: 'Siparişlerim - Sacrel',
@@ -442,59 +449,111 @@ const trackOrder = async (orderId: string) => {
 };
 
 const openCancelModal = (order: any) => {
+  // Check if customer data is available
+  const customer = (currentCustomer.value as any)?.customer;
+  if (!customer?.email) {
+    alert('Müşteri bilgileri yüklenemedi. Lütfen sayfayı yenileyin ve tekrar deneyin.');
+    return;
+  }
+  
   selectedOrder.value = order;
   showCancelModal.value = true;
   cancelReason.value = '';
 };
 
-// ...existing code...
+
+
+
 
 const confirmCancelOrder = async () => {
-  if (!selectedOrder.value) return;
-  
+  if (!selectedOrder.value) {
+    console.error('No order selected for cancellation');
+    return;
+  }
+
   try {
     isCancelling.value = true;
     
-    // useOrders composable'ından cancelOrder fonksiyonunu kullan
-    await orderService.declineOrderTransfer(selectedOrder.value.id, cancelReason.value);
+    // Create a contact message for cancel request since there's no direct cancel API
+    const customer = (currentCustomer.value as any)?.customer || {};
     
-    // Başarılı iptal - local state'i güncelle
-    const orderIndex = orders.value.findIndex(o => o.id === selectedOrder.value.id);
-    if (orderIndex !== -1) {
-      orders.value[orderIndex].status = 'canceled';
-      orders.value[orderIndex].fulfillment_status = 'canceled';
+    // Validate required fields
+    const customerEmail = customer?.email?.trim();
+    if (!customerEmail) {
+      alert('Müşteri e-posta adresi bulunamadı. Lütfen profil ayarlarınızdan e-posta adresinizi güncelleyin.');
+      return;
     }
     
+    const orderDisplayId = selectedOrder.value?.display_id || selectedOrder.value?.id;
+    if (!orderDisplayId) {
+      alert('Sipariş bilgisi eksik. Lütfen sayfayı yenileyin ve tekrar deneyin.');
+      return;
+    }
+    
+    const message = `Sayın Yetkili,
+
+#${orderDisplayId} numaralı siparişimin iptal edilmesini talep ediyorum.
+
+Müşteri Bilgileri:
+- Ad Soyad: ${customer?.first_name || ''} ${customer?.last_name || ''}
+- E-posta: ${customerEmail}
+- Telefon: ${customer?.phone || 'Belirtilmemiş'}
+
+İptal Nedeni: ${cancelReason.value?.trim() || 'Belirtilmemiş'}
+
+Lütfen siparişimi iptal etmenizi rica ederim.
+
+Teşekkürler.`;
+    
+    const contactData: ContactData = {
+      name: `${customer?.first_name || ''} ${customer?.last_name || ''}`.trim() || 'Müşteri',
+      email: customerEmail,
+      phone: customer?.phone || '',
+      subject: `Sipariş İptal Talebi - #${orderDisplayId}`,
+      message: message,
+      order_id: orderDisplayId,
+    };
+
+    // Validate the final contact data
+    if (!contactData.email || !contactData.message) {
+      console.error('Validation failed:', {
+        email: contactData.email,
+        emailLength: contactData.email?.length,
+        message: contactData.message,
+        messageLength: contactData.message?.length,
+        fullContactData: contactData
+      });
+      alert('Gerekli bilgiler eksik. Lütfen profil bilgilerinizi kontrol edin.');
+      return;
+    }
+
+    console.log('Sending contact data:', contactData);
+
+    await createContactMessage(contactData);
+    
+    // Close modal and reset state
     showCancelModal.value = false;
     selectedOrder.value = null;
     cancelReason.value = '';
     
-    // Başarı mesajı
-    if (process.client) {
-      alert('Sipariş başarıyla iptal edildi.');
-    }
+    alert('İptal talebiniz başarıyla gönderildi! En kısa sürede size dönüş yapılacaktır.');
     
-  } catch (error: any) {
-    console.error('Failed to cancel order:', error);
+    // Reload orders to get updated status
+    await loadOrders(currentPage.value);
     
-    let errorMessage = 'Sipariş iptal edilemedi. Lütfen müşteri hizmetleri ile iletişime geçin.';
+  } catch (error) {
+    console.error('Sipariş iptal talebi gönderilirken hata oluştu:', error);
     
-    if (error.status === 400) {
-      errorMessage = 'Bu sipariş durumunda iptal işlemi yapılamaz.';
-    } else if (error.status === 404) {
-      errorMessage = 'Sipariş bulunamadı.';
-    } else if (error.status === 403) {
-      errorMessage = 'Bu işlem için yetkiniz bulunmuyor.';
-    }
-    
-    if (process.client) {
-      alert(errorMessage);
+    // Check if it's a validation error
+    if (error instanceof Error && error.message.includes('Validation error')) {
+      alert('Gerekli bilgiler eksik veya hatalı. Lütfen profil bilgilerinizi kontrol edin ve tekrar deneyin.');
+    } else {
+      alert('İptal talebi gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
     }
   } finally {
     isCancelling.value = false;
   }
 };
-
 // canCancelOrder fonksiyonunu orderService'den kullan
 const canCancelOrder = (status: string): boolean => {
   // Basit status kontrolü
@@ -530,7 +589,16 @@ const reorderItems = async (order: any) => {
 };
 
 // Load orders on mount
-onMounted(() => {
+onMounted(async () => {
+  // Ensure customer data is loaded
+  if (!currentCustomer.value) {
+    try {
+      await customerStore.getCustomer();
+    } catch (error) {
+      console.error('Failed to load customer data:', error);
+    }
+  }
+  
   loadOrders();
 });
 </script>

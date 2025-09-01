@@ -8,6 +8,5 @@
 onNuxtReady(async () => {
   useAuthStore();
   await useProductStore().getProducts()
-  useContact();
 });
 </script>

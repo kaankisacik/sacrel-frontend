@@ -1,14 +1,23 @@
+export interface ContactData {
+    name: string;
+    email: string; // Required
+    phone?: string;
+    subject?: string;
+    message: string; // Required
+    order_id?: string; // Optional
+}
+
 export const useContact = () => {
   const config = useRuntimeConfig();
   
   // Contact Form Submission
-  const createContactMessage = async (contactData: any) => {
+  const createContactMessage = async (contactData: ContactData) => {
     try {
       const response = await fetch(`${config.public.medusaUrl}/store/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-publishable-api-key": process.env.NUXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "",
+          "x-publishable-api-key": config.public.medusaPublishableKey || "",
         },
         body: JSON.stringify(contactData),
       });
@@ -28,17 +37,7 @@ export const useContact = () => {
     }
   };
 
-  // Usage example
-  const contactData = {
-    name: "John Doe",
-    email: "john@example.com", // Required
-    phone: "+90 555 123 4567",
-    subject: "Product Question",
-    message: "I have a question about your products...", // Required
-    order_id: "order_12345", // Optional
-  };
 
-  createContactMessage(contactData);
 
-  return {};
+  return { createContactMessage };
 };

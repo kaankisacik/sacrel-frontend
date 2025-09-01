@@ -11,32 +11,50 @@
         <div class="grid lg:grid-cols-2 gap-12">
             <div class="bg-white p-8 rounded-lg shadow-lg">
                 <h2 class="sacrel-heading-lg text-sacrel-primary mb-6">Mesaj Gönderin</h2>
-                <form class="space-y-6">
+                <form class="space-y-6" @submit.prevent="handleSubmit">
                     <div>
-                        <label htmlFor="name"
+                        <label for="name"
                             class="block sacrel-body font-accent text-sacrel-primary mb-2">Adınız</label>
-                        <input type="text" id="name" name="name"
+                        <input 
+                            type="text" 
+                            id="name" 
+                            name="name"
+                            v-model="form.name"
                             class="w-full px-4 py-3 border border-sacrel-secondary rounded-md focus:outline-none focus:ring-2 focus:ring-sacrel-accent focus:border-transparent"
                             placeholder="Adınız ve soyadınız" />
                     </div>
                     <div>
-                        <label htmlFor="email"
-                            class="block sacrel-body font-accent text-sacrel-primary mb-2">E-posta</label>
-                        <input type="email" id="email" name="email"
+                        <label for="email"
+                            class="block sacrel-body font-accent text-sacrel-primary mb-2">E-posta *</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email"
+                            v-model="form.email"
+                            required
                             class="w-full px-4 py-3 border border-sacrel-secondary rounded-md focus:outline-none focus:ring-2 focus:ring-sacrel-accent focus:border-transparent"
                             placeholder="eposta@ornek.com" />
                     </div>
                     <div>
-                        <label htmlFor="phone"
+                        <label for="phone"
                             class="block sacrel-body font-accent text-sacrel-primary mb-2">Telefon</label>
-                        <input type="tel" id="phone" name="phone"
+                        <input 
+                            type="tel" 
+                            id="phone" 
+                            name="phone"
+                            v-model="form.phone"
                             class="w-full px-4 py-3 border border-sacrel-secondary rounded-md focus:outline-none focus:ring-2 focus:ring-sacrel-accent focus:border-transparent"
                             placeholder="(555) 123-4567" />
                     </div>
                     <div>
-                        <label htmlFor="message"
-                            class="block sacrel-body font-accent text-sacrel-primary mb-2">Mesajınız</label>
-                        <textarea id="message" name="message" rows={5}
+                        <label for="message"
+                            class="block sacrel-body font-accent text-sacrel-primary mb-2">Mesajınız *</label>
+                        <textarea 
+                            id="message" 
+                            name="message" 
+                            rows="5"
+                            v-model="form.message"
+                            required
                             class="w-full px-4 py-3 border border-sacrel-secondary rounded-md focus:outline-none focus:ring-2 focus:ring-sacrel-accent focus:border-transparent resize-none"
                             placeholder="Mesajınızı buraya yazın..."></textarea>
                     </div>
@@ -94,3 +112,47 @@
         </div>
     </div>
 </template>
+
+<script setup lang="ts">
+import { useContact, type ContactData } from '@/composables/useContact';
+
+const { createContactMessage } = useContact();
+
+const form = ref<ContactData>({
+  name: '',
+  email: '',
+  phone: '',
+  subject: '',
+  message: '',
+  order_id: '',
+});
+
+const handleSubmit = async () => {
+  // Validate required fields
+  if (!form.value.email?.trim()) {
+    alert('E-posta adresi zorunludur.');
+    return;
+  }
+  
+  if (!form.value.message?.trim()) {
+    alert('Mesaj alanı zorunludur.');
+    return;
+  }
+
+  try {
+    await createContactMessage(form.value);
+    alert('Mesajınız başarıyla gönderildi!');
+    form.value = {
+      name: '',
+      email: '',
+      phone: '',
+      subject: '',
+      message: '',
+      order_id: '',
+    };
+  } catch (error) {
+    console.error('Mesaj gönderilirken hata oluştu:', error);
+    alert('Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
+  }
+};
+</script>
