@@ -351,7 +351,7 @@
               </h4>
               <p class="text-gray-700 mb-3">{{ review.comment }}</p>
 
-              <div class="flex items-center space-x-4 text-sm">
+              <!-- <div class="flex items-center space-x-4 text-sm">
                 <button
                   @click="toggleHelpful(review.id)"
                   class="text-gray-600 hover:text-black flex items-center space-x-1"
@@ -359,7 +359,7 @@
                   <span>👍</span>
                   <span>Faydalı ({{ review.helpful_count || 0 }})</span>
                 </button>
-              </div>
+              </div> -->
             </div>
           </div>
 

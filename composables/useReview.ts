@@ -64,6 +64,7 @@ export const useReview = () => {
       const result = await response.json();
 
       if (response.ok) {
+        console.log("Fetched reviews successfully:", result);
         return result.reviews || [];
       } else {
         console.error("Error fetching reviews:", result.error);

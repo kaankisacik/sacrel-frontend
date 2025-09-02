@@ -21,7 +21,7 @@ module.exports = {
           brown: '#3f2115',
           clay: '#8c5643',
           sand: '#d9bba0',
-          sage: '#627b5d',
+          sage: '#627b5d',       // Muted green
           white: '#f2f2f0',
         },
         // Legacy support

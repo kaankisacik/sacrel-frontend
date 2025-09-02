@@ -103,10 +103,10 @@
                     <p class="sacrel-body text-sacrel-neutral mb-4">
                         Özel stil danışmanlığı ve kişisel alışveriş deneyimi için randevu alabilirsiniz.
                     </p>
-                    <button
+                    <!-- <button
                         class="bg-sacrel-accent text-white py-2 px-6 rounded-md hover:bg-sacrel-primary transition duration-300 font-accent uppercase tracking-wider">
                         Randevu Al
-                    </button>
+                    </button> -->
                 </div>
             </div>
         </div>

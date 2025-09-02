@@ -41,7 +41,7 @@
         
        
         <div class="border-t border-sacrel-neutral pt-6 text-center">
-          <p class="sacrel-caption text-sacrel-neutral">&copy; 2025 SACREL. Tüm hakları saklıdır.</p>
+          <p class="sacrel-caption text-sacrel-neutral">&copy; 2025 <a href="https://www.bonafidayazilim.com" target="_blank">BONAFIDA YAZILIM</a>. Tüm hakları saklıdır.</p>
         </div>
       </div>
     </footer>

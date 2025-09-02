@@ -23,7 +23,7 @@
                             <p class="mt-1 max-w-2xl text-sm text-gray-500">Temel profil bilgileriniz</p>
                         </div>
                         <button @click="showEditProfile = !showEditProfile"
-                            class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-500">
                             <Icon name="heroicons:pencil" class="h-4 w-4 mr-2" />
                             Düzenle
                         </button>
@@ -101,7 +101,7 @@
                             <p class="mt-1 max-w-2xl text-sm text-gray-500">Kayıtlı teslimat adresleriniz</p>
                         </div>
                         <button @click="showAddAddress = true"
-                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-neutral-600 hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             <Icon name="heroicons:plus" class="h-4 w-4 mr-2" />
                             Yeni Adres
                         </button>
@@ -132,7 +132,7 @@
                                     </div>
                                     <div class="flex flex-shrink-0 space-x-2 ml-4">
                                         <button @click="editAddress(address)"
-                                            class="text-indigo-600 hover:text-indigo-500 text-sm">
+                                            class="text-neutral-600 hover:text-neutral-500 text-sm">
                                             Düzenle
                                         </button>
                                         <button @click="deleteAddressConfirm(address.id)"
@@ -258,7 +258,7 @@
                                 İptal
                             </button>
                             <button type="submit" :disabled="isLoading"
-                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50">
+                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-neutral-600 hover:bg-neutral-700 disabled:opacity-50">
                                 Kaydet
                             </button>
                         </div>
