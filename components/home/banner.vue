@@ -38,35 +38,46 @@
 <script setup lang="ts">
 const {getUiCarouselMedias} = useUiMedia();
 
-const {items} = await getUiCarouselMedias();
-console.log("Carousel medias:", items);
+// Safely fetch carousel medias with error handling
+let items: any[] = [];
+try {
+    const result = await getUiCarouselMedias();
+    items = result?.items || result || [];
+    console.log("Carousel medias:", items);
+} catch (error) {
+    console.error("Failed to fetch carousel medias:", error);
+    items = []; // Fallback to empty array
+}
 
 // Reactive current image index
 const currentIndex = ref(0);
 
 // Create pairs of images
 const imagePairs = computed(() => {
-    if (items.length >= 2) {
+    // Ensure items is an array and handle undefined/null cases
+    const validItems = Array.isArray(items) ? items : [];
+    
+    if (validItems.length >= 2) {
         const pairs = [];
-        for (let i = 0; i < items.length; i += 2) {
-            if (i + 1 < items.length) {
-                pairs.push([items[i].image_url, items[i + 1].image_url]);
+        for (let i = 0; i < validItems.length; i += 2) {
+            if (i + 1 < validItems.length) {
+                pairs.push([validItems[i].image_url, validItems[i + 1].image_url]);
             } else {
                 // If odd number of images, pair the last one with the first
-                pairs.push([items[i].image_url, items[0].image_url]);
+                pairs.push([validItems[i].image_url, validItems[0].image_url]);
             }
         }
         return pairs;
-    } else if (items.length === 1) {
-        return [[items[0].image_url, items[0].image_url]];
+    } else if (validItems.length === 1) {
+        return [[validItems[0].image_url, validItems[0].image_url]];
     } else {
-        return [['/images/girl11.jpg', '/images/girl22.webp']];
+        return [['/images/girl.webp', '/images/girl2.webp']];
     }
 });
 
 // Current images based on index
 const currentImages = computed(() => {
-    return imagePairs.value[currentIndex.value] || ['/images/girl11.jpg', '/images/girl22.webp'];
+    return imagePairs.value[currentIndex.value] || ['/images/girl.webp', '/images/girl2.webp'];
 });
 
 // Auto-cycle through image pairs

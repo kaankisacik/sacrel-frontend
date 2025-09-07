@@ -1,11 +1,11 @@
 <template>
-    <NuxtLink :to="`/products/${product.handle}`" class="w-full max-w-sm mx-auto overflow-hidden cursor-pointer group">
+    <NuxtLink :to="`/products/${product.handle}`" class="w-full max-w-sm mx-auto overflow-hidden cursor-pointer group border-4 border-black">
         <div class="relative h-48 sm:h-64 md:h-80 lg:h-96 xl:h-[500px]  lg:aspect-3-4  overflow-hidden">
             <!-- Main Product Image -->
             <img 
                 :src="product.thumbnail || '/images/placeholder.svg'" 
                 :alt="product.title"
-                class="absolute h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                class="absolute h-full w-full p-4 object-cover  " 
                 @error="handleImageError"
             />
 
@@ -43,16 +43,16 @@
 
         <!-- Product Info -->
         <div class="block">
-            <div class="p-3 sm:p-4 lg:p-6 xl:p-8">
+            <div class="p-4">
                 <h2 class="text-sm sm:text-base lg:text-lg font-medium text-black truncate mb-1 sm:mb-2">
                     {{ product.title }}
                 </h2>
 
-                <p class="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2 line-clamp-2">
+                <!-- <p class="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2 line-clamp-2">
                     {{ product.description }}
-                </p>
+                </p> -->
 
-                <div class="flex justify-between items-center mt-3 sm:mt-4 lg:mt-6">
+                <div class="flex justify-between items-center mt-3 sm:mt-4 lg:mt-0">
                     <div class="flex items-center space-x-2">
                         <span class="text-sm sm:text-base lg:text-lg font-semibold text-black whitespace-nowrap">
                             {{ prices[0] }} TL

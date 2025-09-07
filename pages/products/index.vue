@@ -1,7 +1,7 @@
 <template>
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen ">
         <!-- Header Section -->
-        <div class="bg-white shadow-sm">
+        <!-- <div class="bg-white shadow-sm">
             <div class="container mx-auto px-4 py-8">
                 <div class="text-center">
                     <h1 class="text-3xl font-bold text-gray-900 mb-4">Ürünler</h1>
@@ -12,25 +12,25 @@
                     </p>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <div class="container mx-auto px-4 py-8">
             <!-- Filters and Content Layout -->
             <div class="lg:grid lg:grid-cols-4 lg:gap-x-8">
                 <!-- Filters Sidebar -->
-                <div class="hidden lg:block">
+                <!-- <div class="hidden lg:block">
                     <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-6">Filtreler</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-6">Filtreler</h3> -->
 
                         <!-- Search Filter -->
-                        <div class="mb-6">
+                        <!-- <div class="mb-6">
                             <h4 class="text-sm font-medium text-gray-900 mb-3">Arama</h4>
                             <input v-model="searchQuery" type="text" placeholder="Arama..."
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500" />
-                        </div>
+                        </div> -->
 
                         <!-- Categories Filter -->
-                        <div class="mb-6" v-if="categories.length">
+                        <!-- <div class="mb-6" v-if="categories.length">
                             <h4 class="text-sm font-medium text-gray-900 mb-3">Kategoriler</h4>
                             <div class="space-y-3">
                                 <label v-for="(category, index) in categories" :key="index"
@@ -40,10 +40,10 @@
                                     <span class="ml-3 text-sm text-gray-600">{{ category }}</span>
                                 </label>
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- Price Range Filter -->
-                        <div class="mb-6">
+                        <!-- <div class="mb-6">
                             <h4 class="text-sm font-medium text-gray-900 mb-3">
                                 Fiyat Aralığı
                             </h4>
@@ -56,10 +56,10 @@
                                     <span class="ml-3 text-sm text-gray-600">{{ priceRange.label }}</span>
                                 </label>
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- Colors Filter -->
-                        <div class="mb-6">
+                        <!-- <div class="mb-6">
                             <h4 class="text-sm font-medium text-gray-900 mb-3">Renkler</h4>
                             <div class="grid grid-cols-4 gap-2">
                                 <button v-for="color in colors" :key="color.value"
@@ -69,18 +69,18 @@
                                         selectedColors.includes(color.value) ? 'ring-2 ring-gray-900' : 'border-gray-300'
                                     ]" :title="color.label" />
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- Clear Filters -->
-                        <button @click="clearFilters"
+                        <!-- <button @click="clearFilters"
                             class="w-full text-sm text-gray-600 hover:text-gray-900 border border-gray-300 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-300">
                             Filtreleri Temizle
-                        </button>
-                    </div>
-                </div>
+                        </button> -->
+                    <!-- </div>
+                </div> -->
 
                 <!-- Main Content -->
-                <div class="lg:col-span-3">
+                <div class="lg:col-span-6">
                     <!-- Mobile Filter Toggle & Sort -->
                     <div class="flex items-center justify-between mb-6 lg:hidden">
                         <button @click="showMobileFilters = !showMobileFilters"
@@ -102,12 +102,9 @@
                             <label for="sort" class="text-sm text-gray-600">Sırala:</label>
                             <select id="sort" v-model="sortBy"
                                 class="text-sm border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500">
-                                <option value="default">Varsayılan</option>
+                                <option value="newest">Varsayılan</option>
                                 <option value="price-low">Fiyat: Düşükten Yükseğe</option>
                                 <option value="price-high">Fiyat: Yüksekten Düşüğe</option>
-                                <option value="name-asc">İsim: A-Z</option>
-                                <option value="name-desc">İsim: Z-A</option>
-                                <option value="newest">En Yeni</option>
                             </select>
                         </div>
                     </div>
@@ -152,7 +149,7 @@
                     </div>
 
                     <!-- Items Grid -->
-                    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-24 gap-y-12">
                         <!-- Replace with your item component -->
                         <ProductCard v-for="item in filteredItems" :key="item.id" :product="item" />
                     </div>
@@ -254,7 +251,7 @@ const { products, allProductFilters, searchQuery } = storeToRefs(useProductStore
 const selectedCategories = ref<string[]>([])
 const selectedPriceRange = ref<string>('')
 const selectedColors = ref<string[]>([])
-const sortBy = ref<string>('default')
+const sortBy = ref<string>('newest')
 const showMobileFilters = ref<boolean>(false)
 const isLoading = ref<boolean>(true)
 const hasError = ref<boolean>(false)
@@ -372,10 +369,19 @@ const filteredItems = computed(() => {
     switch (sortBy.value) {
         case 'price-low':
             // Implement price sorting
+            filtered.sort((a, b) => {
+                const priceA = productHelper.extractProductFilters(a)['prices']?.[0] || 0
+                const priceB = productHelper.extractProductFilters(b)['prices']?.[0] || 0
+                return priceA - priceB
+            })
             break
         case 'price-high':
             // Implement price sorting
-
+            filtered.sort((a, b) => {
+                const priceA = productHelper.extractProductFilters(a)['prices']?.[0] || 0
+                const priceB = productHelper.extractProductFilters(b)['prices']?.[0] || 0
+                return priceB - priceA
+            })
             break
         case 'name-asc':
             filtered.sort((a, b) => a.title?.localeCompare(b.title) || 0)
@@ -384,7 +390,8 @@ const filteredItems = computed(() => {
             filtered.sort((a, b) => b.title?.localeCompare(a.title) || 0)
             break
         case 'newest':
-            // Implement date sorting
+        case 'default':
+            filtered.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
             break
     }
 
@@ -406,7 +413,7 @@ const clearFilters = (): void => {
     selectedCategories.value = []
     selectedPriceRange.value = ''
     selectedColors.value = []
-    sortBy.value = 'default'
+    sortBy.value = 'newest'
 }
 
 const loadData = async (): Promise<void> => {
