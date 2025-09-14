@@ -22,29 +22,37 @@ export const useAuthStore = defineStore("authStore", () => {
   async function register(userData: {
     email: string;
     password: string;
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
     phone?: string;
     metadata?: Record<string, any>;
   }) {
     const customerData = {
       email: userData.email,
-      first_name: userData.firstName,
-      last_name: userData.lastName,
+      first_name: userData.first_name,
+      last_name: userData.last_name,
       phone: userData.phone,
       metadata: userData.metadata,
     };
 
+    console.log("Registering user with data:", userData, customerData);
+
     try {
+      console.log("Attempting to register user...");
       await authService.register({
         email: userData.email,
         password: userData.password,
       });
-
+      console.log("User registered successfully, creating customer...");
       await customerService.createCustomer(customerData);
+      console.log("Customer created successfully.");
       isUserAuthenticated.value = true;
     } catch (error) {
-      if ((error as any).message.includes("Identity with email already exists")) {
+      console.log("Registration failed:", error);
+
+      if (
+        (error as any).message.includes("Identity with email already exists")
+      ) {
         try {
           await authService.login(userData.email, userData.password);
           await customerService.createCustomer(customerData);
@@ -59,7 +67,9 @@ export const useAuthStore = defineStore("authStore", () => {
             isUserAuthenticated.value = true;
             return navigateTo("/");
           }
-          if ((loginError as any).message.includes("Invalid email or password")) {
+          if (
+            (loginError as any).message.includes("Invalid email or password")
+          ) {
             throw new Error(
               "Daha önce kayıt olurken kullandığınız e-posta adresi veya şifre yanlış."
             );

@@ -12,7 +12,7 @@
                 Ürün bulunamadı.
             </div>
         </template>
-        <ProductCard v-for="(product, index) in displayProducts" :key="index" :product="product" />
+        <ProductCard v-for="(product, index) in displayProducts" :key="index" :product="product" class="scale-90 transition-transform duration-200" />
 
 
 

@@ -137,6 +137,7 @@ export const useFavorites = () => {
 
   return {
     getFavoriteIds,
+    setFavoriteIds,
     addToFavorites,
     removeFromFavorites,
     clearAllFavorites,
