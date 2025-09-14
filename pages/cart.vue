@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen ">
     <!-- Header -->
-    <div class="bg-white shadow-sm">
+    <div class=" shadow-sm">
       <div class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold text-gray-900">Sepetim</h1>
       </div>

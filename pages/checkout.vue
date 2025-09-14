@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen ">
     <!-- Header -->
-    <div class="bg-white shadow-sm">
+    <div class=" shadow-sm">
       <div class="container mx-auto px-4 py-6">
         <div class="flex items-center space-x-4">
           <NuxtLink to="/cart" class="text-gray-600 hover:text-black">

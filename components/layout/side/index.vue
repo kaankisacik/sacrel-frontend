@@ -3,27 +3,44 @@
         <div class="sticky top-48">
             <ul class=" font-medium text-xl font-accent">
                 <li>
-                    <NuxtLink to="#" class="block p-2 hover:text-sacrel-accent text-2xl font-semibold underline underline-offset-8">▼ TÜM ÜRÜNLER</NuxtLink>
+                    <NuxtLink to="/products" @click="clearCategoryQuery"
+                        class="block p-2 hover:text-sacrel-accent text-2xl font-semibold underline underline-offset-8">▼
+                        TÜM ÜRÜNLER</NuxtLink>
                 </li>
-                <li>
-                    <NuxtLink to="#" class="block p-2 hover:text-sacrel-accent">▲ TAKIMLAR</NuxtLink>
-                </li>
-                <li>
-                    <NuxtLink to="#" class="block p-2 hover:text-sacrel-accent">▲ ELBİSE</NuxtLink>
-                </li>
-                <li>
-                    <NuxtLink to="#" class="block p-2 hover:text-sacrel-accent">▲ DIŞ GİYİM</NuxtLink>
-                </li>
-                <li>
-                    <NuxtLink to="#" class="block p-2 hover:text-sacrel-accent">▲ ALT GİYİM</NuxtLink>
-                </li>
-                <li>
-                    <NuxtLink to="#" class="block p-2 hover:text-sacrel-accent">▲ ÜST GİYİM</NuxtLink>
-                </li>
-                <li>
-                    <NuxtLink to="#" class="block p-2 hover:text-sacrel-accent">▲ SALE</NuxtLink>
+                <li v-for="(category, index) in categories" :key="index">
+                    <div @click="goToProductsByCategory(category.handle)"
+                        class="block p-2 hover:text-sacrel-accent cursor-pointer">▲
+                        {{
+                            category.name }}</div>
                 </li>
             </ul>
         </div>
     </aside>
 </template>
+
+<script setup lang="ts">
+import type { StoreProductCategory } from '@medusajs/types';
+
+
+const { getCategories } = useCategories()
+const { categoryQuery } = storeToRefs(useProductStore())
+const router = useRouter()
+const categories = ref<StoreProductCategory[]>([])
+
+const fetchCategories = async () => {
+    categories.value = (await getCategories()).product_categories
+}
+
+function goToProductsByCategory(categoryHandle: string) {
+    router.push({ path: '/products', query: { category: categoryHandle } });
+    categoryQuery.value = categoryHandle;
+}
+
+function clearCategoryQuery() {
+    categoryQuery.value = '';
+}
+onMounted(() => {
+    fetchCategories()
+})
+
+</script>

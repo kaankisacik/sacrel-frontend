@@ -146,6 +146,21 @@
                     </div>
                 </div>
 
+                <!-- Orders Section -->
+                <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                    <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Siparişlerim</h3>
+                            <p class="mt-1 max-w-2xl text-sm text-gray-500">Geçmiş siparişlerinizi görüntüleyin.</p>
+                        </div>
+                        <NuxtLink to="/profile/orders"
+                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-neutral-600 hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <Icon name="mdi:truck-cargo-container" class="h-4 w-4 mr-2" />
+                            Tüm Siparişler
+                        </NuxtLink>
+                    </div>
+                </div>
+
                 <!-- Logout Section -->
                 <div class="bg-white shadow overflow-hidden sm:rounded-lg">
                     <div class="px-4 py-5 sm:px-6">

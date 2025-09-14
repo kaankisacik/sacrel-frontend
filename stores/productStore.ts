@@ -6,6 +6,7 @@ import { defineStore } from "pinia";
 export const useProductStore = defineStore("productStore", () => {
   const productService = useProducts();
   const searchQuery = ref<string>("");
+  const categoryQuery = ref<string>("");
   const product = ref<StoreProductResponse>({} as StoreProductResponse);
   const products = ref<StoreProductListResponse>(
     {} as StoreProductListResponse
@@ -63,6 +64,7 @@ export const useProductStore = defineStore("productStore", () => {
     products,
     allProductFilters,
     searchQuery,
+    categoryQuery,
     getProduct,
     getProducts,
     getProductByHandle,

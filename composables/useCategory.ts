@@ -30,6 +30,8 @@ export const useCategories = () => {
   ): Promise<StoreProductCategoryListResponse> => {
     try {
       const response = await medusa.store.category.list(queryParams);
+      console.log("Categories retrieved:", response);
+      
       return response;
     } catch (error) {
       console.error("Categories retrieval failed:", error);

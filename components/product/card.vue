@@ -19,14 +19,14 @@
             </div> -->
 
             <!-- Favorite Button -->
-            <!-- <button @click.prevent="toggleFavorite"
+            <button @click.prevent="toggleFavorite"
                 class="absolute top-3 right-3 w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all duration-300 opacity-0 group-hover:opacity-100"
                 :class="{ 'text-red-500': isFavorite, 'text-gray-400': !isFavorite }">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path
                         d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
-            </button> -->
+            </button>
 
             <!-- Quick Add to Cart (on hover) -->
             <!-- <div class="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
@@ -108,10 +108,18 @@ const prices = (productHelper.extractProductFilters(props.product)['prices']).ma
 
 console.log('Product Card Props1:', props.product);
 
-//mock methods
-const isFavorite = ref(false);
+// Favorites functionality
+const favoritesService = useFavorites();
+const isFavorite = computed(() => favoritesService.isInFavorites(props.product.id));
+
 const toggleFavorite = () => {
-    isFavorite.value = !isFavorite.value;
+    try {
+        const wasAdded = favoritesService.toggleFavorite(props.product.id);
+        // You could add a toast notification here if needed
+        console.log(wasAdded ? 'Added to favorites' : 'Removed from favorites');
+    } catch (error) {
+        console.error('Error toggling favorite:', error);
+    }
 };
 
 const handleImageError = (event: Event) => {

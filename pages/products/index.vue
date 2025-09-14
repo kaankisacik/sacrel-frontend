@@ -22,15 +22,15 @@
                     <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
                         <h3 class="text-lg font-semibold text-gray-900 mb-6">Filtreler</h3> -->
 
-                        <!-- Search Filter -->
-                        <!-- <div class="mb-6">
+                <!-- Search Filter -->
+                <!-- <div class="mb-6">
                             <h4 class="text-sm font-medium text-gray-900 mb-3">Arama</h4>
                             <input v-model="searchQuery" type="text" placeholder="Arama..."
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500" />
                         </div> -->
 
-                        <!-- Categories Filter -->
-                        <!-- <div class="mb-6" v-if="categories.length">
+                <!-- Categories Filter -->
+                <!-- <div class="mb-6" v-if="categories.length">
                             <h4 class="text-sm font-medium text-gray-900 mb-3">Kategoriler</h4>
                             <div class="space-y-3">
                                 <label v-for="(category, index) in categories" :key="index"
@@ -42,8 +42,8 @@
                             </div>
                         </div> -->
 
-                        <!-- Price Range Filter -->
-                        <!-- <div class="mb-6">
+                <!-- Price Range Filter -->
+                <!-- <div class="mb-6">
                             <h4 class="text-sm font-medium text-gray-900 mb-3">
                                 Fiyat Aralığı
                             </h4>
@@ -58,8 +58,8 @@
                             </div>
                         </div> -->
 
-                        <!-- Colors Filter -->
-                        <!-- <div class="mb-6">
+                <!-- Colors Filter -->
+                <!-- <div class="mb-6">
                             <h4 class="text-sm font-medium text-gray-900 mb-3">Renkler</h4>
                             <div class="grid grid-cols-4 gap-2">
                                 <button v-for="color in colors" :key="color.value"
@@ -71,12 +71,12 @@
                             </div>
                         </div> -->
 
-                        <!-- Clear Filters -->
-                        <!-- <button @click="clearFilters"
+                <!-- Clear Filters -->
+                <!-- <button @click="clearFilters"
                             class="w-full text-sm text-gray-600 hover:text-gray-900 border border-gray-300 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-300">
                             Filtreleri Temizle
                         </button> -->
-                    <!-- </div>
+                <!-- </div>
                 </div> -->
 
                 <!-- Main Content -->
@@ -165,88 +165,15 @@
             </div>
         </div>
 
-        <!-- Mobile Filters Modal -->
-        <div v-if="showMobileFilters" class="fixed inset-0 z-50 lg:hidden">
-            <div class="fixed inset-0 bg-black bg-opacity-50" @click="showMobileFilters = false"></div>
-            <div class="fixed right-0 top-0 h-full w-80 bg-white shadow-xl p-6 overflow-y-auto">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-semibold text-gray-900">Filtreler</h3>
-                    <button @click="showMobileFilters = false" class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
 
-                <!-- Mobile filter content -->
-                <div class="space-y-6">
-                    <!-- Search -->
-                    <div>
-                        <h4 class="text-sm font-medium text-gray-900 mb-3">Arama</h4>
-                        <input v-model="searchQuery" type="text" placeholder="Arama..."
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500" />
-                    </div>
-
-                    <!-- Categories -->
-                    <div v-if="categories.length">
-                        <h4 class="text-sm font-medium text-gray-900 mb-3">Kategoriler</h4>
-                        <div class="space-y-3">
-                            <label v-for="(category, index) in categories" :key="index"
-                                class="flex items-center cursor-pointer">
-                                <input v-model="selectedCategories" :value="index" type="checkbox"
-                                    class="h-4 w-4 text-gray-600 focus:ring-gray-500 border-gray-300 rounded" />
-                                <span class="ml-3 text-sm text-gray-600">{{ category }}</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Price Range -->
-                    <div>
-                        <h4 class="text-sm font-medium text-gray-900 mb-3">Fiyat Aralığı</h4>
-                        <div class="space-y-3">
-                            <label v-for="priceRange in priceRanges" :key="priceRange.value"
-                                class="flex items-center cursor-pointer">
-                                <input v-model="selectedPriceRange" :value="priceRange.value" type="radio"
-                                    name="priceRange"
-                                    class="h-4 w-4 text-gray-600 focus:ring-gray-500 border-gray-300" />
-                                <span class="ml-3 text-sm text-gray-600">{{ priceRange.label }}</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Colors -->
-                    <div>
-                        <h4 class="text-sm font-medium text-gray-900 mb-3">Colors</h4>
-                        <div class="grid grid-cols-4 gap-2">
-                            <button v-for="color in colors" :key="color.value" @click.prevent="toggleColor(color.value)"
-                                :class="[
-                                    'w-8 h-8 rounded-full border-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500',
-                                    color.class,
-                                    selectedColors.includes(color.value) ? 'ring-2 ring-gray-900' : 'border-gray-300'
-                                ]" :title="color.label" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8 space-y-3">
-                    <button @click="clearFilters"
-                        class="w-full text-sm text-gray-600 hover:text-gray-900 border border-gray-300 py-2 px-4 rounded-md hover:bg-gray-50 transition duration-300">
-                        Filtreleri Temizle
-                    </button>
-                    <button @click="showMobileFilters = false"
-                        class="w-full bg-gray-900 text-white py-2 px-4 rounded-md hover:bg-gray-800 transition duration-300">
-                        Filtreleri Uygula
-                    </button>
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import type { StoreProductCategory } from '@medusajs/types'
 
-const { products, allProductFilters, searchQuery } = storeToRefs(useProductStore())
+
+const { products, allProductFilters, searchQuery, categoryQuery } = storeToRefs(useProductStore())
 
 const selectedCategories = ref<string[]>([])
 const selectedPriceRange = ref<string>('')
@@ -262,12 +189,7 @@ const hasMore = ref<boolean>(true)
 // Data arrays - replace with your actual data
 const items = computed(() => products.value.products || [])
 const categories = computed(() => Object.keys(allProductFilters.value?.categories || {}) || [])
-const priceRanges: any[] = [
-    { value: '0-1000', label: '1000 TL Altı' },
-    { value: '1000-2000', label: '1000 TL - 2000 TL' },
-    { value: '2000-3000', label: '2000 TL - 3000 TL' },
-    { value: '3000-∞', label: '3000 TL Üstü' }
-]
+
 const colors = computed<any[]>(() => {
     const colors: any[] = []
     Object.keys(allProductFilters.value?.colors || {}).forEach(color => {
@@ -284,9 +206,11 @@ const colors = computed<any[]>(() => {
 const router = useRouter()
 const route = useRoute()
 const isUpdatingFromUrl = ref(false)
+
+var categoriesArray = computed(() => (useCategories().getCategories()) || []);
 // Check if user came with search query in URL and set it
 // URL'den arama sorgusu geldiğinde bunu ayarla
-onMounted(() => {
+onMounted(async () => {
     const urlSearchQuery = route.query.search as string
     if (urlSearchQuery) {
         isUpdatingFromUrl.value = true
@@ -295,7 +219,23 @@ onMounted(() => {
             isUpdatingFromUrl.value = false
         })
     }
+    const urlCategoryQuery = route.query.category as string
+    if (urlCategoryQuery) {
+        isUpdatingFromUrl.value = true;
+        console.log("Categories Array:", categoriesArray.value);
+        console.log("URL Category Query:", urlCategoryQuery);
+
+        const filteredCategory = ((await categoriesArray.value).product_categories.find((cat: StoreProductCategory) => utils.searchQueryHelper.normalizeSearchQuery(cat.handle) === utils.searchQueryHelper.normalizeSearchQuery(urlCategoryQuery)))?.name || '';
+        console.log("Filtered Category:", filteredCategory);
+
+        selectedCategories.value = [filteredCategory]
+        nextTick(() => {
+            isUpdatingFromUrl.value = false;
+        })
+    }
 })
+
+
 
 watch(searchQuery, (newQuery, oldQuery) => {
     // Mevcut URL'deki arama sorgusunu kontrol et
@@ -310,6 +250,28 @@ watch(searchQuery, (newQuery, oldQuery) => {
         }
     }
 }, { flush: 'post' })
+
+watch(categoryQuery, async (newQuery, oldQuery) => {
+    // Eğer yeni sorgu URL'dekinden farklıysa güncelle
+    const filteredCategory = ((await categoriesArray.value).product_categories.find((cat: StoreProductCategory) => utils.searchQueryHelper.normalizeSearchQuery(cat.handle) === utils.searchQueryHelper.normalizeSearchQuery(newQuery)))?.name || '';
+    console.log("Filtered Category:", filteredCategory);
+
+    selectedCategories.value = [filteredCategory]
+}, { flush: 'post' })
+
+// Watch for route changes to clear filters when navigating to /products without query params
+watch(() => route.query, (newQuery, oldQuery) => {
+    if (isUpdatingFromUrl.value) return;
+    
+    // If there are no search or category queries, clear all filters
+    if (!newQuery.search && !newQuery.category) {
+        searchQuery.value = '';
+        categoryQuery.value = '';
+        selectedCategories.value = [];
+        selectedPriceRange.value = '';
+        selectedColors.value = [];
+    }
+}, { deep: true })
 
 // Computed properties
 const filteredItems = computed(() => {
@@ -398,22 +360,17 @@ const filteredItems = computed(() => {
     return filtered
 })
 
-// Methods
-const toggleColor = (colorValue: string): void => {
-    const index = selectedColors.value.indexOf(colorValue)
-    if (index > -1) {
-        selectedColors.value.splice(index, 1)
-    } else {
-        selectedColors.value.push(colorValue)
-    }
-}
+
 
 const clearFilters = (): void => {
     searchQuery.value = ''
+    categoryQuery.value = ''
     selectedCategories.value = []
     selectedPriceRange.value = ''
     selectedColors.value = []
     sortBy.value = 'newest'
+    // Also clear URL query parameters
+    router.push('/products')
 }
 
 const loadData = async (): Promise<void> => {
@@ -421,13 +378,14 @@ const loadData = async (): Promise<void> => {
         isLoading.value = true
         hasError.value = false
 
-        // Implement your data loading logic here
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
+        // Load products from the store
+        const productStore = useProductStore();
+        await productStore.getProducts();
 
     } catch (error) {
         hasError.value = true
         errorMessage.value = 'An error occurred while loading data.'
+        console.error('Error loading products:', error);
     } finally {
         isLoading.value = false
     }
