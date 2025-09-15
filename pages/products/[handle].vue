@@ -27,7 +27,7 @@
     </div>
 
     <!-- Product Content -->
-    <div v-else-if="product?.product" class="min-h-screen">
+    <div v-else-if="product && product.product" class="min-h-screen">
       <!-- Breadcrumb -->
       <div class="container mx-auto px-4 py-4">
         <nav class="text-sm text-gray-600">
@@ -35,7 +35,7 @@
           <span class="mx-2">/</span>
           <NuxtLink to="/products" class="hover:text-black">Ürünler</NuxtLink>
           <span class="mx-2">/</span>
-          <span class="text-black">{{ product?.product?.title }}</span>
+          <span class="text-black">{{ product.product.title }}</span>
         </nav>
       </div>
 
@@ -48,15 +48,15 @@
             <div class="aspect-square overflow-hidden rounded-lg bg-gray-100">
               <img
                 :src="currentImage"
-                :alt="product?.product?.title"
+                :alt="product.product.title"
                 class="w-full h-full object-cover"
               />
             </div>
 
             <!-- Thumbnail Images -->
             <div
-              class="flex space-x-3 overflow-x-auto"
               v-if="productImages.length > 1"
+              class="flex space-x-3 overflow-x-auto"
             >
               <button
                 v-for="(image, index) in productImages"
@@ -71,7 +71,7 @@
               >
                 <img
                   :src="image"
-                  :alt="`${product?.product?.title} ${index + 1}`"
+                  :alt="`${product.product.title} ${index + 1}`"
                   class="w-full h-full object-cover"
                 />
               </button>
@@ -83,18 +83,16 @@
             <!-- Product Title and Brand -->
             <div>
               <h1 class="text-3xl font-bold text-black mb-2">
-                {{ product?.product?.title }}
+                {{ product.product.title }}
               </h1>
               <p class="text-gray-600 uppercase text-sm tracking-wide">
-                {{ product?.product?.subtitle || "SACREL" }}
+                {{ product.product.subtitle || "SACREL" }}
               </p>
             </div>
 
             <!-- Price -->
             <div class="flex items-center space-x-3">
-              <span class="text-3xl font-bold text-black"
-                >{{ productPrice }} TL</span
-              >
+              <span class="text-3xl font-bold text-black">{{ productPrice }} TL</span>
               <span
                 v-if="productOriginalPrice"
                 class="text-lg text-gray-400 line-through"
@@ -152,7 +150,7 @@
             <!-- Product Description -->
             <div class="space-y-2">
               <p class="text-gray-600 text-sm leading-relaxed">
-                {{ product?.product?.description }}
+                {{ product.product.description }}
               </p>
             </div>
 
@@ -185,6 +183,7 @@
                   <div>(Stok: {{ selectedVariant.inventory_quantity }})</div>
                 </div>
               </div>
+              
               <button
                 @click="toggleFavorite"
                 class="w-full border border-gray-300 py-3 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center space-x-2"
@@ -196,6 +195,7 @@
                   {{ isFavorite ? "Favorilerden Çıkar" : "Favorilere Ekle" }}
                 </span>
               </button>
+
               <!-- Action Buttons -->
               <div class="space-y-3">
                 <!-- Farklı durumlar için mesajlar -->
@@ -669,8 +669,18 @@ const maxAddableQuantity = computed(() => {
     selectedVariant.value.inventory_quantity - currentQuantityInCart.value
   );
 });
+
 const sizeGuideVisible = ref(false);
+
 const showSizes = () => {
+  // if product available sizes just 1, select it and add to cart
+  console.log("Available sizes:", productSizes.value);
+  const availableSizes = productSizes.value.filter((s) => s.isAvailable);
+  if (availableSizes.length === 1) {
+    selectedSize.value = availableSizes[0].value;
+    addToCart();
+    return;
+  }
   sizeGuideVisible.value = true;
 };
 
@@ -745,7 +755,6 @@ const loadSameCategoryProducts = async () => {
 };
 
 // Watch for color changes and update available sizes
-// Watch for color changes and update available sizes
 watch(selectedColor, (newColor, oldColor) => {
   // İlk yükleme sırasında watch'ı tetikleme
   if (isInitializing.value || (!oldColor.name && newColor.name)) return;
@@ -764,7 +773,6 @@ watch(selectedColor, (newColor, oldColor) => {
   }
 });
 
-// Watch for variant selection changes
 // Watch for variant selection changes
 watch(
   [selectedColor, selectedSize],

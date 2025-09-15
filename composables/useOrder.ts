@@ -3,7 +3,7 @@ import type {
   PaginatedResponse,
   StoreOrder,
   StoreAcceptOrderTransfer,
-  StoreRequestOrderTransfer
+  StoreRequestOrderTransfer,
 } from "@medusajs/types";
 
 export const useOrders = () => {
@@ -12,7 +12,14 @@ export const useOrders = () => {
   // Order Retrieval
   const getOrder = async (orderId: string): Promise<StoreOrderResponse> => {
     try {
-      const response = await medusa.store.order.retrieve(orderId);
+      const response = await medusa.store.order.retrieve(orderId, {
+        fields:
+          "fulfillments,id,display_id,status,fulfillment_status,total,fulfillments.labels.tracking_number,fulfillments.shipping_option.*,fulfillments.shipping_option.shipping_profile.*,fulfillments.labels.tracking_url,subtotal,created_at,currency,items,shipping_address,shipping_address.*,billing_address.*,metadata",
+      });
+
+      // const response = await medusa.store.order.retrieve(orderId);
+      console.log("getOrder response", response);
+      
       return response;
     } catch (error) {
       console.error("Order retrieval failed:", error);
@@ -20,14 +27,12 @@ export const useOrders = () => {
     }
   };
 
-  const getOrders = async (
-    queryParams?: {
-      limit?: number;
-      offset?: number;
-      fields?: string;
-      [key: string]: any;
-    }
-  ): Promise<PaginatedResponse<{ orders: StoreOrder[] }>> => {
+  const getOrders = async (queryParams?: {
+    limit?: number;
+    offset?: number;
+    fields?: string;
+    [key: string]: any;
+  }): Promise<PaginatedResponse<{ orders: StoreOrder[] }>> => {
     try {
       const response = await medusa.store.order.list(queryParams);
       return response;
@@ -40,10 +45,13 @@ export const useOrders = () => {
   // Order Transfer - Accept
   const acceptOrderTransfer = async (
     orderId: string,
-    transferData: StoreAcceptOrderTransfer 
+    transferData: StoreAcceptOrderTransfer
   ): Promise<StoreOrderResponse> => {
     try {
-      const response = await medusa.store.order.acceptTransfer(orderId, transferData);
+      const response = await medusa.store.order.acceptTransfer(
+        orderId,
+        transferData
+      );
       return response;
     } catch (error) {
       console.error("Order transfer acceptance failed:", error);
@@ -70,7 +78,10 @@ export const useOrders = () => {
     transferData: StoreAcceptOrderTransfer
   ): Promise<StoreOrderResponse> => {
     try {
-      const response = await medusa.store.order.declineTransfer(orderId, transferData);
+      const response = await medusa.store.order.declineTransfer(
+        orderId,
+        transferData
+      );
       return response;
     } catch (error) {
       console.error("Order transfer decline failed:", error);
@@ -84,7 +95,10 @@ export const useOrders = () => {
     transferData: StoreRequestOrderTransfer
   ): Promise<StoreOrderResponse> => {
     try {
-      const response = await medusa.store.order.requestTransfer(orderId, transferData);
+      const response = await medusa.store.order.requestTransfer(
+        orderId,
+        transferData
+      );
       return response;
     } catch (error) {
       console.error("Order transfer request failed:", error);
@@ -97,16 +111,17 @@ export const useOrders = () => {
     try {
       // Since retrieveByCartId doesn't exist in Medusa v2, we'll filter orders by cart_id
       const response = await medusa.store.order.list({
-        fields: '*',
-        expand: 'items,items.variant,items.variant.product,shipping_address,billing_address',
-        cart_id: cartId
+        fields: "*",
+        expand:
+          "items,items.variant,items.variant.product,shipping_address,billing_address",
+        cart_id: cartId,
       } as any);
-      
+
       if (response.orders && response.orders.length > 0) {
         return { order: response.orders[0] };
       }
-      
-      throw new Error('Order not found');
+
+      throw new Error("Order not found");
     } catch (error) {
       console.error("Order retrieval by cart ID failed:", error);
       throw error;
@@ -117,27 +132,29 @@ export const useOrders = () => {
     try {
       // Mock tracking data - integrate with actual shipping provider APIs
       return {
-        tracking_number: 'TRK123456789',
-        status: 'in_transit',
-        estimated_delivery: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-        tracking_url: '#',
+        tracking_number: "TRK123456789",
+        status: "in_transit",
+        estimated_delivery: new Date(
+          Date.now() + 2 * 24 * 60 * 60 * 1000
+        ).toISOString(),
+        tracking_url: "#",
         events: [
           {
-            status: 'picked_up',
-            description: 'Sipariş kargo şirketine teslim edildi',
+            status: "picked_up",
+            description: "Sipariş kargo şirketine teslim edildi",
             timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-            location: 'İstanbul Depo'
+            location: "İstanbul Depo",
           },
           {
-            status: 'in_transit',
-            description: 'Sipariş transfer merkezinde',
+            status: "in_transit",
+            description: "Sipariş transfer merkezinde",
             timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-            location: 'Ankara Transfer Merkezi'
-          }
-        ]
+            location: "Ankara Transfer Merkezi",
+          },
+        ],
       };
     } catch (error: any) {
-      console.error('Failed to track order:', error);
+      console.error("Failed to track order:", error);
       throw error;
     }
   };
@@ -146,12 +163,12 @@ export const useOrders = () => {
     try {
       // Mock invoice download - integrate with actual invoice generation
       const response = await fetch(`/api/orders/${orderId}/invoice`);
-      if (!response.ok) throw new Error('Failed to download invoice');
-      
+      if (!response.ok) throw new Error("Failed to download invoice");
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
+      const a = document.createElement("a");
+      a.style.display = "none";
       a.href = url;
       a.download = `invoice-${orderId}.pdf`;
       document.body.appendChild(a);
@@ -159,7 +176,7 @@ export const useOrders = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error: any) {
-      console.error('Failed to download invoice:', error);
+      console.error("Failed to download invoice:", error);
       throw error;
     }
   };

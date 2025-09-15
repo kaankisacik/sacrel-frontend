@@ -50,12 +50,15 @@
                 </p>
               </div>
               <div class="flex flex-col sm:items-end space-y-2">
-                <span
-                  :class="getStatusClass(order.status)"
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                >
-                  {{ checkoutHelper.getOrderStatus(order.fulfillment_status) }}
-                </span>
+                <div class="flex flex-col sm:items-end space-y-2">
+                  <span
+                    :class="getStatusClass(order.status)"
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
+                  >
+                    {{ checkoutHelper.getOrderStatus(order.fulfillment_status) }}
+                  </span>
+                  
+                </div>
                 <p class="text-lg font-semibold text-gray-900">
                   {{ checkoutHelper.formatPrice(order.total || order.subtotal || 0) }}
                 </p>
@@ -276,7 +279,7 @@ const loadOrders = async (page: number = 1) => {
     const response = await orderService.getOrders({
       limit,
       offset,
-      fields:'fulfillments,id,display_id,status,fulfillment_status,total,subtotal,created_at,currency,items',
+      fields:'fulfillments,id,display_id,status,fulfillment_status,total,fulfillments.labels.tracking_number,fulfillments.labels.tracking_url,subtotal,created_at,currency,items',
     });
     console.log('Orders loaded:', response);
     
