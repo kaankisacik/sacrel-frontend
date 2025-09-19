@@ -1,11 +1,18 @@
 <template>
-  <div class="sticky top-0 z-50 ">
+  <div class="sticky top-0 z-[50] bg-[#FEFCF7]">
     <div class="px-4 ">
       <nav class="flex items-center justify-between py-8 relative">
         <div class="flex items-center space-x-8">
           <div class="hidden lg:flex items-center space-x-6">
+            <img
+              src="/images/sacrel_logo.png"
+              alt="SACREL Logo"
+              width="120.6575"
+              height="123.5475"
+              class="cursor-pointer hover:opacity-80 transition duration-300 ease-in-out"
+            />
             <NuxtLink href="/"
-              class="text-8xl font-secondary text-sacrel-primary hover:text-sacrel-accent transition duration-300 ease-in-out">
+              class="text-8xl font-secondary text-sacrel-primary transition duration-300 ease-in-out">
               SACREL
             </NuxtLink>
 

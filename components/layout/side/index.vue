@@ -1,6 +1,6 @@
 <template>
     <aside class=" hidden lg:block lg:w-1/4">
-        <div class="sticky top-48">
+        <div class="sticky top-56">
             <ul class=" font-medium text-xl font-accent">
                 <li>
                     <NuxtLink to="/products" @click="clearCategoryQuery"
