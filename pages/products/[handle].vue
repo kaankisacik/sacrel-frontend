@@ -286,8 +286,8 @@
 
         <!-- Müşteri Yorumları Section -->
         <div class="mt-16 border-t pt-12">
-          <div class="flex items-center justify-between mb-8">
-            <h2 class="text-2xl font-bold">Müşteri Yorumları</h2>
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8">
+            <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-0">Müşteri Yorumları</h2>
             <div class="flex items-center space-x-2 text-sm text-gray-600">
               <span class="flex items-center">
                 <span class="text-yellow-400 mr-1">★</span>
@@ -317,14 +317,14 @@
           </div>
 
           <!-- Reviews list -->
-          <div v-else class="space-y-6">
+          <div v-else class="space-y-4 sm:space-y-6">
             <div
               v-for="review in reviews"
               :key="review.id"
-              class="border-b pb-6 last:border-b-0"
+              class="border-b pb-4 sm:pb-6 last:border-b-0"
             >
-              <div class="flex items-start justify-between mb-3">
-                <div class="flex items-center space-x-3">
+              <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 space-y-2 sm:space-y-0">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-2 sm:space-y-0">
                   <div class="flex text-yellow-400">
                     <span
                       v-for="i in 5"
@@ -336,25 +336,27 @@
                       ★
                     </span>
                   </div>
-                  <span class="font-medium">{{
-                    review.customer_name || "Anonim"
-                  }}</span>
-                  <span
-                    v-if="review.is_verified_purchase"
-                    class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded"
-                  >
-                    Satın Alındı
-                  </span>
+                  <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-3">
+                    <span class="font-medium">{{
+                      review.customer_name || "Anonim"
+                    }}</span>
+                    <span
+                      v-if="review.is_verified_purchase"
+                      class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded w-fit"
+                    >
+                      Satın Alındı
+                    </span>
+                  </div>
                 </div>
-                <span class="text-sm text-gray-500">{{
+                <span class="text-sm text-gray-500 sm:mt-0">{{
                   formatDate(review.created_at)
                 }}</span>
               </div>
 
-              <h4 v-if="review.title" class="font-medium text-gray-900 mb-2">
+              <h4 v-if="review.title" class="font-medium text-gray-900 mb-2 text-sm sm:text-base">
                 {{ review.title }}
               </h4>
-              <p class="text-gray-700 mb-3">{{ review.comment }}</p>
+              <p class="text-gray-700 mb-3 text-sm sm:text-base leading-relaxed">{{ review.comment }}</p>
 
               <!-- <div class="flex items-center space-x-4 text-sm">
                 <button
@@ -369,7 +371,7 @@
           </div>
 
           <!-- Review Form -->
-          <div class="mt-8 bg-gray-50 rounded-lg p-6">
+          <div class="mt-8 bg-gray-50 rounded-lg p-4 sm:p-6">
             <h3 class="text-lg font-medium mb-4">Yorum Yaz</h3>
 
             <form @submit.prevent="submitReview" class="space-y-4">
@@ -382,7 +384,7 @@
                     :key="star"
                     type="button"
                     @click="newReview.rating = star"
-                    class="text-2xl transition-colors"
+                    class="text-xl sm:text-2xl transition-colors"
                     :class="
                       star <= newReview.rating
                         ? 'text-yellow-400'
@@ -404,7 +406,7 @@
                   v-model="newReview.title"
                   type="text"
                   placeholder="Yorumunuza kısa bir başlık ekleyin"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm sm:text-base"
                 />
               </div>
 
@@ -421,7 +423,7 @@
                   rows="4"
                   placeholder="Ürün hakkındaki deneyiminizi paylaşın"
                   required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm sm:text-base"
                 ></textarea>
               </div>
 
@@ -434,7 +436,7 @@
                     !newReview.comment ||
                     isSubmittingReview
                   "
-                  class="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  class="px-4 sm:px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm sm:text-base w-full sm:w-auto"
                 >
                   {{ isSubmittingReview ? "Gönderiliyor..." : "Yorum Gönder" }}
                 </button>
@@ -446,14 +448,14 @@
         <!-- Aynı Kategori Ürünleri -->
         <div v-if="sameCategoryProducts.length > 0" class="mt-16">
           <h2
-            class="underline underline-offset-[24px] text-center text-6xl tracking-[0.2em] mb-24"
+            class="underline underline-offset-[24px] text-center text-3xl lg:text-6xl tracking-[0.2em] mb-24"
           >
             ▲ SANA ÖZEL ▼
           </h2>
           <ProductSlider
             :products="sameCategoryProducts"
             :slides-to-show="3"
-            :show-dots="true"
+            :show-dots="false"
             :autoplay="false"
           />
         </div>

@@ -1,7 +1,7 @@
 <template>
-  <footer class="bg-sacrel-primary py-12 px-6">
-    <div class="max-w-4xl mx-auto">
-      <div class="text-center mb-8">
+  <footer class="bg-sacrel-primary py-12 px-6 w-full">
+    <div class="w-full  ">
+      <div class="max-w-4xl mx-auto text-center mb-8 ">
         <h2 class="sacrel-heading-xl text-sacrel-light mb-4">SACREL</h2>
         <p class="sacrel-body text-sacrel-neutral max-w-xl mx-auto">
           Modern kadın için butik moda. Sadelik ve zarafeti buluşturan özel
@@ -9,7 +9,7 @@
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mb-8">
+      <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center mb-8 ">
         <div>
           <h4 class="sacrel-heading-sm text-sacrel-light mb-4">Menü</h4>
           <ul class="space-y-2">
@@ -65,13 +65,31 @@
         </div>
       </div>
 
-      <div class="border-t border-sacrel-neutral pt-6 text-center">
-        <p class="sacrel-caption text-sacrel-neutral">
+      <div class=" max-w-4xl mx-auto border-t border-sacrel-neutral pt-6 text-center">
+        <div class="flex justify-center space-x-4 ">
+          <img
+            src="/images/iyzico.png"
+            alt="Bonafida Logo"
+            class=" h-8 "
+          />
+          <img
+            src="/images/mastercard.png"
+            alt="Bonafida Logo"
+            class=" h-8 "
+          />
+          <img
+            src="/images/visa.png"
+            alt="Bonafida Logo"
+            class=" h-8 "
+          />
+        </div>
+        <p class="sacrel-caption text-sacrel-neutral  mt-4">
           &copy; 2025
           <a href="https://www.bonafidayazilim.com" target="_blank"
             >BONAFIDA YAZILIM</a
           >. Tüm hakları saklıdır.
         </p>
+        
       </div>
     </div>
   </footer>

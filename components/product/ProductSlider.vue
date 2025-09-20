@@ -7,14 +7,25 @@
             ▲
         </button>
         <!-- Slider Container -->
-         <template v-if="displayProducts.length === 0">
-            <div class="text-center text-gray-500 col-span-3 py-10">
-                Ürün bulunamadı.
+        <div class="flex-1 overflow-hidden mx-4">
+            <template v-if="displayProducts.length === 0">
+                <div class="text-center text-gray-500 col-span-3 py-10">
+                    Ürün bulunamadı.
+                </div>
+            </template>
+            <div 
+                v-else
+                class="grid gap-6 transition-transform duration-300"
+                :class="gridClasses"
+            >
+                <ProductCard 
+                    v-for="(product, index) in visibleProducts" 
+                    :key="index" 
+                    :product="product" 
+                    class="transition-transform duration-200" 
+                />
             </div>
-        </template>
-        <ProductCard v-for="(product, index) in displayProducts" :key="index" :product="product" class="scale-90 transition-transform duration-200" />
-
-
+        </div>
 
         <button @click="nextSlide"
             class=" top-1/2 -translate-y-1/2       transition-all duration-200 z-20 -rotate-90 text-6xl"
@@ -38,6 +49,7 @@ import type { StoreProduct } from '@medusajs/types';
 interface Props {
     products: StoreProduct[];
     slidesToShow?: number;
+    showCard?: number;
     showDots?: boolean;
     autoplay?: boolean;
     autoplayDelay?: number;
@@ -45,6 +57,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
     slidesToShow: 3,
+    showCard: 3,
     showDots: true,
     autoplay: false,
     autoplayDelay: 3000
@@ -64,6 +77,30 @@ const slideWidth = computed(() => {
     const totalGapWidth = (currentSlidesToShow.value - 1) * 24; // gap-6 = 24px
     const availableWidth = containerWidth.value - totalGapWidth;
     return Math.max(0, availableWidth / currentSlidesToShow.value);
+});
+
+const gridClasses = computed(() => {
+    const cols = currentSlidesToShow.value;
+    switch (cols) {
+        case 1:
+            return 'grid-cols-1';
+        case 2:
+            return 'grid-cols-1 sm:grid-cols-2';
+        case 3:
+            return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
+        case 4:
+            return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
+        case 5:
+            return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5';
+        default:
+            return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5';
+    }
+});
+
+const visibleProducts = computed(() => {
+    const start = currentSlide.value;
+    const end = start + currentSlidesToShow.value;
+    return displayProducts.value.slice(start, end);
 });
 
 const totalSlides = computed(() => {
@@ -148,11 +185,11 @@ const updateSlidesToShow = () => {
         const width = window.innerWidth;
 
         if (width < 640) { // sm
-            currentSlidesToShow.value = 1;
+            currentSlidesToShow.value = Math.min(1, props.showCard);
         } else if (width < 768) { // md
-            currentSlidesToShow.value = 2;
+            currentSlidesToShow.value = Math.min(2, props.showCard);
         } else { // lg and above
-            currentSlidesToShow.value = Math.min(3, props.slidesToShow); // Max 3 products
+            currentSlidesToShow.value = Math.min(props.showCard, props.slidesToShow); // Use showCard prop
         }
 
         // Update container width based on new slides to show

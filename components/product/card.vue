@@ -4,7 +4,7 @@
     class="w-full max-w-sm mx-auto overflow-hidden cursor-pointer group border-4 border-black"
   >
     <div
-      class="relative h-48 sm:h-64 md:h-80 lg:h-96 xl:h-[500px] lg:aspect-3-4 overflow-hidden"
+      class="relative h-[30rem] xl:h-[500px] lg:aspect-3-4 overflow-hidden"
     >
       <!-- Main Product Image -->
       <img
