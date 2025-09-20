@@ -7,22 +7,84 @@ module.exports = {
     './plugins/**/*.{js,ts}',
     './app.vue',
   ],
+  darkMode: 'class', // Dark mode'u class ile aktif et
   theme: {
     extend: {
       colors: {
-        // SACREL Brand Colors
+        // SACREL Brand Colors - Light & Dark Mode Support
         sacrel: {
-          primary: '#1a1a1a',      // Deep charcoal black
-          secondary: '#f8f6f0',    // Warm off-white
-          accent: '#c9a876',       // Luxury gold
-          neutral: '#8b8680',      // Sophisticated gray
-          light: '#fefcf8',        // Pure white with warmth
-          dark: '#0f0f0f',         // Pure black,
-          brown: '#3f2115',
-          clay: '#8c5643',
-          sand: '#d9bba0',
-          sage: '#627b5d',       // Muted green
-          white: '#f2f2f0',
+          // Primary colors
+          primary: {
+            DEFAULT: '#1a1a1a',      // Deep charcoal black
+            dark: '#1a1a1a',         // Light mode primary becomes dark mode light
+          },
+          secondary: {
+            DEFAULT: '#f8f6f0',      // Warm off-white
+            dark: '#f8f6f0',         // Light mode secondary becomes dark mode dark
+          },
+          accent: {
+            DEFAULT: '#c9a876',      // Luxury gold
+            dark: '#c9a876',         // Slightly lighter gold for dark mode
+          },
+          neutral: {
+            DEFAULT: '#8b8680',      // Sophisticated gray
+            dark: '#8b8680',         // Lighter gray for dark mode
+          },
+          light: {
+            DEFAULT: '#fefcf8',      // Pure white with warmth
+            dark: '#fefcf8',         // Pure black for dark mode
+          },
+          dark: {
+            DEFAULT: '#0f0f0f',      // Pure black
+            dark: '#0f0f0f',         // Pure white for dark mode
+          },
+          brown: {
+            DEFAULT: '#3f2115',
+            dark: '#3f2115',         // Lighter brown for dark mode
+          },
+          clay: {
+            DEFAULT: '#8c5643',
+            dark: '#8c5643',         // Lighter clay for dark mode
+          },
+          sand: {
+            DEFAULT: '#d9bba0',
+            dark: '#d9bba0',         // Darker sand for dark mode
+          },
+          sage: {
+            DEFAULT: '#627b5d',      // Muted green
+            dark: '#627b5d',         // Lighter sage for dark mode
+          },
+          white: {
+            DEFAULT: '#f2f2f0',
+            dark: '#f2f2f0',         // Dark background for dark mode
+          },
+        },
+        // Enhanced system colors for dark mode
+        background: {
+          DEFAULT: '#ffffff',
+          dark: '#ffffff',
+        },
+        surface: {
+          DEFAULT: '#f8f6f0',
+          dark: '#f8f6f0',
+        },
+        text: {
+          primary: {
+            DEFAULT: '#1a1a1a',
+            dark: '#1a1a1a',
+          },
+          secondary: {
+            DEFAULT: '#8b8680',
+            dark: '#8b8680',
+          },
+          muted: {
+            DEFAULT: '#6b7280',
+            dark: '#6b7280',
+          },
+        },
+        border: {
+          DEFAULT: '#e5e7eb',
+          dark: '#e5e7eb',
         },
         // Legacy support
         beige: '#f8f6f0',
