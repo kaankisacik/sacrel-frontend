@@ -106,18 +106,8 @@
       </ClientOnly>
     </div>
 
-    <!-- Success/Error Messages -->
-    <div
-      v-if="message"
-      :class="
-        messageType === 'success'
-          ? 'bg-green-50 border-green-200 text-green-800'
-          : 'bg-red-50 border-red-200 text-red-800'
-      "
-      class="fixed bottom-4 right-4 p-4 border rounded-md shadow-lg z-50"
-    >
-      {{ message }}
-    </div>
+ 
+    
   </div>
 </template>
 
@@ -135,19 +125,13 @@ const router = useRouter();
 const { favorites, favoriteProducts, isLoading, error, isInitialized } = storeToRefs(favoritesStore);
 const { favoriteCount } = favoritesStore;
 
-// Local reactive state
-const message = ref("");
-const messageType = ref<"success" | "error">("success");
-
 // Methods
 const clearAllFavorites = async () => {
   if (confirm('Tüm favori ürünlerinizi silmek istediğinizden emin misiniz?')) {
     try {
       await favoritesStore.clearAllFavorites();
-      showMessage("Tüm favoriler temizlendi", "success");
     } catch (error) {
       console.error('Failed to clear favorites:', error);
-      showMessage("Favoriler temizlenirken bir hata oluştu", "error");
     }
   }
 };
@@ -156,15 +140,7 @@ const navigateToProducts = () => {
   router.push('/products');
 };
 
-const showMessage = (msg: string, type: "success" | "error" = "success") => {
-  message.value = msg;
-  messageType.value = type;
 
-  // Auto-hide message after 3 seconds
-  setTimeout(() => {
-    message.value = "";
-  }, 3000);
-};
 
 // Initialize favorites on client-side only
 onMounted(async () => {
@@ -173,7 +149,6 @@ onMounted(async () => {
       await favoritesStore.initializeFavorites();
     } catch (error) {
       console.error('Failed to initialize favorites:', error);
-      showMessage("Favoriler yüklenirken bir hata oluştu", "error");
     }
   }
 });
