@@ -1,19 +1,19 @@
 <template>
   <div class="sticky top-0 z-[50] bg-[#FEFCF7]">
     <div class="px-4 ">
-      <nav class="flex items-center justify-between py-8 relative">
-        <div class="flex items-center space-x-8">
+      <nav class="w-full flex items-center justify-between py-4 lg:pl-16 lg:pr-8 relative">
+        <div class="w-full flex items-center ">
           <!-- Desktop Logo -->
-          <div class="hidden lg:flex items-center space-x-6">
-            <NuxtLink href="/" class="flex items-center space-x-6">
+          <div class="hidden lg:flex items-center space-x-6 ">
+            <NuxtLink href="/" class="flex items-center space-x-2 scale-125">
               <img
                 src="/images/sacrel_logo.png"
                 alt="SACREL Logo"
-                width="120.6575"
-                height="123.5475"
+                width="54.1411859"
+                height="55.4379808"
                 class="cursor-pointer hover:opacity-80 transition duration-300 ease-in-out"
               />
-              <span class="text-8xl font-secondary text-sacrel-primary transition duration-300 ease-in-out">
+              <span class="text-6xl font-normal text-sacrel-primary transition duration-300 ease-in-out tracking-wider">
                 SACREL
               </span>
             </NuxtLink>

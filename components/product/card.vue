@@ -1,10 +1,10 @@
 <template>
   <NuxtLink
     :to="`/products/${product.handle}`"
-    class="w-full max-w-sm mx-auto overflow-hidden cursor-pointer group border-4 border-black"
+    class="w-full max-w-xs mx-auto overflow-hidden cursor-pointer group border-4 border-black "
   >
     <div
-      class="relative h-[30rem] xl:h-[500px] lg:aspect-3-4 overflow-hidden"
+      class="relative h-[25rem] md:h-[20rem] xl:h-[400px] lg:aspect-3-4 overflow-hidden"
     >
       <!-- Main Product Image -->
       <img
@@ -27,7 +27,7 @@
       <button
         @click.prevent="toggleFavorite"
         :disabled="favoritesStore.isLoading"
-        class="absolute top-3 right-3 w-[3.75rem] h-[4.75rem] bg-white rounded-[25px] flex items-center justify-center transition-all duration-300 disabled:cursor-not-allowed"
+        class="absolute top-5 right-5 w-[3.75rem] h-[4.75rem] bg-white rounded-[25px] flex items-center justify-center transition-all duration-300 disabled:cursor-not-allowed"
         :class="{
           'text-sacrel-accent': isFavorite,
           'text-gray-400': !isFavorite,
@@ -49,7 +49,7 @@
           v-else-if="isFavorite && !favoritesStore.isLoading"
           src="/images/sacrel_logo_accent.png"
           alt="sacrel logo"
-          class="w-12 h-[3.25rem]"
+          class="w-12 h-[3.25rem] "
         />
 
         <!-- Loading spinner -->

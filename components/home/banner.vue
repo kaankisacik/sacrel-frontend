@@ -1,17 +1,17 @@
 <template>
-    <div class="w-full flex flex-col md:flex-row relative z-10 min-h-screen">
+    <div class="w-full flex flex-col md:flex-row relative z-10 min-h-[50vh] md:min-h-[100vh]">
         <Transition name="fade" mode="out-in">
             <div 
                 :key="`left-${currentIndex}`"
-                class="w-full md:w-1/2 bg-cover bg-center transition-all duration-1000 z-0 min-h-[50vh] md:min-h-screen"
-                :style="{ backgroundImage: `url(${currentImages[0]})`, backgroundSize: 'cover', backgroundPosition: 'center' }">
+                class="w-full md:w-1/2 bg-cover bg-center transition-all duration-1000 z-0 "
+                :style="{ backgroundImage: `url(${currentImages[0]})` }">
             </div>
         </Transition>
         <Transition name="fade" mode="out-in">
             <div 
                 :key="`right-${currentIndex}`"
-                class="w-full md:w-1/2 bg-cover bg-center transition-all duration-1000 z-0 min-h-[50vh] md:min-h-screen"
-                :style="{ backgroundImage: `url(${currentImages[1]})`, backgroundSize: 'cover', backgroundPosition: 'center' }">
+                class="w-full md:w-1/2 bg-cover bg-center  transition-all duration-1000 z-0 "
+                :style="{ backgroundImage: `url(${currentImages[1]})`}">
             </div>
         </Transition>
 
