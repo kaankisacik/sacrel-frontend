@@ -90,9 +90,19 @@ module.exports = {
         beige: '#f8f6f0',
       },
       fontFamily: {
-        'primary': ['Montserrat', 'sans-serif'],
-        'secondary': ['Playfair Display', 'serif'],
-        'accent': ['Inter', 'sans-serif'],
+        'primary': ['Avenir Next', 'Avenir', 'sans-serif'],
+        'secondary': ['Avenir Next', 'Avenir', 'serif'],
+        'accent': ['Avenir Next', 'Avenir', 'sans-serif'],
+      },
+      fontWeight: {
+        'thin': '100',
+        'light': '200',
+        'normal': '300',
+        'medium': '400',
+        'semibold': '500',
+        'bold': '600',
+        'extrabold': '700',
+        'black': '800',
       },
       fontSize: {
         'sacrel-display': ['4rem', { lineHeight: '0.9', letterSpacing: '-0.02em' }],
