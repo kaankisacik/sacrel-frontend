@@ -361,7 +361,7 @@ watch(
 
 // Methods
 const isCreditCardProvider = (providerId: string): boolean => {
-  const creditCardProviders = ['stripe', 'credit_card', 'card', 'pp_fake-cc_dev-fake-cc'];
+  const creditCardProviders = ['stripe', 'credit_card', 'card', 'pp_fake-cc_dev-fake-cc', 'pp_iyzico_iyzico'];
   const isCreditCard = creditCardProviders.includes(providerId);
   console.log('isCreditCardProvider check:', { providerId, isCreditCard, creditCardProviders });
   return isCreditCard;
