@@ -1,15 +1,13 @@
 <template>
   <div class="space-y-4">
     <button @click="start()" class="btn btn-primary w-full">test et</button>
-    <button @click="finish()" class="btn btn-primary w-full">
-      test et finish
-    </button>
 
-    <div v-if="html" class="mt-4 border rounded overflow-hidden">
-      <iframe
-        :srcdoc="html"
-        style="width: 100%; height: 560px; border: 0"
-      ></iframe>
+    <div v-if="html" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white rounded-lg shadow-lg p-0 relative w-full max-w-2xl flex flex-col items-center">
+        <button @click="html = ''"
+          class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
+        <iframe :srcdoc="html" style="width: 100%; height: 560px; border: 0" class="rounded-b-lg"></iframe>
+      </div>
     </div>
   </div>
 </template>
@@ -17,9 +15,43 @@
 <script setup>
 const config = useRuntimeConfig();
 const html = ref("");
-const paymentId = ref("");
-const conversationId = ref("ajskfha2131");
+const paymentId = ref("213213123213");
+const conversationId = ref("convers41241221ationId213");
 const conversationData = ref("");
+
+// PostMessage listener ekle
+onMounted(() => {
+  window.addEventListener('message', handleMessage);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('message', handleMessage);
+});
+
+function handleMessage(event) {
+  console.log('Received message:', event.data);
+  
+  if (event.data.type === 'payment_completed') {
+    console.log('Payment completed:', event.data);
+    
+    // Modal'ı kapat
+    html.value = '';
+    
+    // Ödeme sonucuna göre işlem yap
+    if (event.data.status === 'success') {
+      // Başarılı ödeme işlemleri
+      console.log('Ödeme başarıyla tamamlandı!');
+      // Sayfayı yenile veya başka işlemler yapabilirsiniz
+    } else if (event.data.status === 'failure') {
+      // Başarısız ödeme işlemleri
+      console.log('Ödeme başarısız oldu.');
+    }
+  } else if (event.data.type === 'close_modal') {
+    // Modal'ı kapat
+    console.log('Closing modal');
+    html.value = '';
+  }
+}
 // Nuxt tarafında:
 async function start() {
   const initRes = await $fetch(
@@ -29,13 +61,12 @@ async function start() {
       headers: {
         "Content-Type": "application/json",
         "x-publishable-api-key": config.public.medusaPublishableKey || "",
-        Authorization: `Bearer ${
-          localStorage.getItem("medusa_auth_token") || ""
-        }`,
+        Authorization: `Bearer ${localStorage.getItem("medusa_auth_token") || ""
+          }`,
       },
       body: {
         locale: "tr",
-        conversationId: "convers41241221ationId213",
+        conversationId: conversationId.value,
         price: 0.3,
         paidPrice: 0.3,
         currency: "TRY",
@@ -43,7 +74,7 @@ async function start() {
         paymentChannel: "WEB",
         basketId: "basketId",
         paymentGroup: "PRODUCT",
-        callbackUrl: "https://www.sacrel.com.tr/payment/callback",
+        callbackUrl: "http://localhost:3000/payment/callback/q?conversationId=" + conversationId.value + "&paymentId=" + paymentId.value,
         paymentCard: {
           cardHolderName: "John Doe",
           cardNumber: "5528790000000008",
@@ -98,33 +129,18 @@ async function start() {
     }
   );
 
+
   // threeDSHtmlContent base64 HTML
   if (initRes?.status === "success" && initRes?.threeDSHtmlContent) {
+    console.log(" initRes: start -> ");
+
     paymentId.value = initRes.paymentId;
-    //conversationId.value = initRes.conversationId;
+    conversationId.value = initRes.conversationId;
     conversationData.value = initRes.conversationData;
     html.value = atob(initRes.threeDSHtmlContent);
+
+    console.log(" initRes: end -> ");
   }
 }
-async function finish() {
-  const authRes = await $fetch(
-    `${config.public.medusaUrl}/store/iyzico/auth3ds`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-publishable-api-key": config.public.medusaPublishableKey || "",
-        Authorization: `Bearer ${
-          localStorage.getItem("medusa_auth_token") || ""
-        }`,
-      },
-      body: {
-        locale: "tr",
-        paymentId: paymentId.value,
-        conversationId: conversationId.value,
-        conversationData: conversationData.value,
-      },
-    }
-  );
-}
+
 </script>
