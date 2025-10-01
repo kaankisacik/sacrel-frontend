@@ -34,7 +34,6 @@ const fullUrl = ref('');
 const debugMode = ref(true);
 const isProcessing = ref(true);
 
-
 // iyzico callback parametreleri
 const callbackData = ref({
   status: '',
@@ -217,7 +216,7 @@ function validatePaymentParameters(authResponse, callbackData) {
     }
 
     // mdStatus kontrolü (3DS için)
-    if (authResponse.mdStatus !== 1 && authResponse.mdStatus !== "1") {
+    if (String(authResponse.mdStatus) !== "1") {
       console.log("mdStatus is not 1:", authResponse.mdStatus);
       return false;
     }
@@ -248,6 +247,8 @@ function getMdStatusMessage(mdStatus) {
 }
 
 function handlePaymentFailure() {
+  isProcessing.value = false;
+  
   // Parent window'a başarısızlık mesajı gönder
   if (window.parent && window.parent !== window) {
     window.parent.postMessage({ 
@@ -259,7 +260,7 @@ function handlePaymentFailure() {
     }, '*');
   }
 
-  setTimeout(() => closeWindow(), 2000);
+  setTimeout(() => closeWindow(), 3000);
 }
 
 function closeWindow() {
@@ -269,66 +270,4 @@ function closeWindow() {
     setTimeout(() => window.close(), 1000);
   }
 }
-
-onMounted(async () => {
-  // Set the full URL for display
-  fullUrl.value = window.location.href;
-
-  // Log mount information
-  console.log('=== CALLBACK PAGE MOUNTED ===');
-  console.log('Current URL:', window.location.href);
-  console.log('Search params:', window.location.search);
-  console.log('Route query on mount:', route.query);
-  console.log('Route params on mount:', route.params);
-  
-  // İyzico callback verilerini yakala (URL parameters'den)
-  if (process.client) {
-    const urlParams = new URLSearchParams(window.location.search);
-    console.log('URL Parameters:');
-    for (const [key, value] of urlParams.entries()) {
-      console.log(`${key}: ${value}`);
-    }
-    
-    // URL parametrelerinden verileri al
-    const urlCallbackData = {
-      status: route.query.status || urlParams.get('status') || '',
-      paymentId: route.query.paymentId || urlParams.get('paymentId') || '',
-      conversationData: route.query.conversationData || urlParams.get('conversationData') || '',
-      conversationId: route.query.conversationId || urlParams.get('conversationId') || '',
-      mdStatus: route.query.mdStatus || urlParams.get('mdStatus') || ''
-    };
-    
-    // Eğer URL'de veriler varsa bunları kullan
-    if (urlCallbackData.status || urlCallbackData.paymentId || urlCallbackData.conversationId) {
-      console.log('Using URL parameters for callback data');
-      callbackData.value = urlCallbackData;
-      postDataReceived.value = false;
-      
-      // Kısa bir gecikme ile finish fonksiyonunu çağır
-      await new Promise(resolve => setTimeout(resolve, 300));
-      finish();
-    } else {
-      // URL'de veri yoksa, POST için bekle
-      console.log('No URL parameters found, waiting for potential POST data...');
-      status.value = 'POST verilerini bekleniyor...';
-      
-      // POST verilerini kontrol etmek için document body'yi dinle
-      setTimeout(() => {
-        // Eğer hala veri gelmemişse manuel kontrol et
-        if (!postDataReceived.value && !callbackData.value.status) {
-          console.log('No POST data received, checking alternative methods...');
-          
-          // Document.referrer veya window.name kontrol et
-          if (document.referrer) {
-            console.log('Referrer:', document.referrer);
-          }
-          
-          // Manual finish çağrısı yap
-          status.value = 'Veri bulunamadı, varsayılan işlem yapılıyor...';
-          finish();
-        }
-      }, 2000);
-    }
-  }
-});
 </script>

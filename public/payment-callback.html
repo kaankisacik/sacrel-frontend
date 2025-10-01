@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İyzico Ödeme Callback</title>
+</head>
+<body>
+    <div id="status">Ödeme işleniyor...</div>
+
+    <script>
+        console.log('=== IYZICO CALLBACK HANDLER ===');
+        
+        // URL parametrelerini kontrol et (GET durumu için)
+        const urlParams = new URLSearchParams(window.location.search);
+        console.log('URL Parameters:');
+        
+        const callbackData = {
+            status: urlParams.get('status') || '',
+            paymentId: urlParams.get('paymentId') || '',
+            conversationData: urlParams.get('conversationData') || '',
+            conversationId: urlParams.get('conversationId') || '',
+            mdStatus: urlParams.get('mdStatus') || ''
+        };
+        
+        for (const [key, value] of urlParams.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+        
+        // POST form verilerini kontrol et
+        if (window.location.hash) {
+            console.log('Hash params:', window.location.hash);
+        }
+        
+        // Form submission'dan gelen veriler için
+        document.addEventListener('DOMContentLoaded', function() {
+            // Eğer bu sayfa bir form submission sonucu yüklendiyse
+            const forms = document.querySelectorAll('form');
+            if (forms.length > 0) {
+                console.log('Forms found:', forms.length);
+            }
+            
+            // Referrer kontrol et
+            console.log('Document referrer:', document.referrer);
+            
+            // Callback verilerini Nuxt sayfasına yönlendir
+            const redirectUrl = `/payment/callback/result?status=${encodeURIComponent(callbackData.status)}&paymentId=${encodeURIComponent(callbackData.paymentId)}&conversationData=${encodeURIComponent(callbackData.conversationData)}&conversationId=${encodeURIComponent(callbackData.conversationId)}&mdStatus=${encodeURIComponent(callbackData.mdStatus)}`;
+            
+            console.log('Redirecting to:', redirectUrl);
+            
+            // Kısa bir gecikme ile yönlendir
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 500);
+        });
+        
+        // POST verilerini yakalamak için alternatif yöntem
+        // Bu sayfa bir form target'ı olarak kullanılacaksa
+        window.addEventListener('load', function() {
+            console.log('Page loaded, checking for POST data...');
+            
+            // Performance API ile navigation type kontrol et
+            if (performance.navigation && performance.navigation.type === performance.navigation.TYPE_RELOAD) {
+                console.log('Page was reloaded');
+            }
+            
+            // Document body'de form veri varsa kontrol et
+            const bodyText = document.body.textContent || document.body.innerText || '';
+            if (bodyText && bodyText.trim()) {
+                console.log('Body content:', bodyText);
+            }
+        });
+    </script>
+</body>
+</html>
