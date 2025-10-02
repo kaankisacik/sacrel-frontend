@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen ">
+  <div class="min-h-screen">
     <!-- Header Section -->
     <!-- <div class="bg-white shadow-sm">
             <div class="container mx-auto px-4 py-8">
@@ -14,18 +14,20 @@
             </div>
         </div> -->
 
-    <div class="container mx-auto px-4 py-8 ">
+    <div class="container mx-auto px-4 py-8">
       <!-- Filters and Content Layout -->
       <div class="lg:grid lg:grid-cols-4 lg:gap-x-8">
         <!-- Main Content -->
         <div class="lg:col-span-6">
           <!-- Sort Options -->
-          <div class="w-full flex items-center justify-between mb-6  2xl:px-8">
+          <div class="w-full flex items-center justify-between mb-6 2xl:px-8">
             <p class="text-sm text-gray-600">
               {{ filteredItems.length }} ürün bulundu
             </p>
             <div class="flex flex-col md:flex-row md:items-center md:space-x-4">
-              <label for="sort" class="hidden md:block text-sm text-gray-600">Sırala:</label>
+              <label for="sort" class="hidden md:block text-sm text-gray-600"
+                >Sırala:</label
+              >
               <select
                 id="sort"
                 v-model="sortBy"
@@ -146,14 +148,17 @@
 <script setup lang="ts">
 import type { StoreProductCategory } from "@medusajs/types";
 
-const { products, allProductFilters, searchQuery, categoryQuery } = storeToRefs(
-  useProductStore()
-);
+const {
+  products,
+  allProductFilters,
+  searchQuery,
+  categoryQuery,
+  selectedCategories,
+  selectedPriceRange,
+  selectedColors,
+  sortBy,
+} = storeToRefs(useProductStore());
 
-const selectedCategories = ref<string[]>([]);
-const selectedPriceRange = ref<string>("");
-const selectedColors = ref<string[]>([]);
-const sortBy = ref<string>("newest");
 const showMobileFilters = ref<boolean>(false);
 const isLoading = ref<boolean>(true);
 const hasError = ref<boolean>(false);

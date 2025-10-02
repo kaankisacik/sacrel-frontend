@@ -7,6 +7,10 @@ export const useProductStore = defineStore("productStore", () => {
   const productService = useProducts();
   const searchQuery = ref<string>("");
   const categoryQuery = ref<string>("");
+  const sortBy = ref<string>("newest");
+  const selectedColors = ref<string[]>([]);
+  const selectedPriceRange = ref<string>("");
+  const selectedCategories = ref<string[]>([]);
   const product = ref<StoreProductResponse>({} as StoreProductResponse);
   const products = ref<StoreProductListResponse>(
     {} as StoreProductListResponse
@@ -62,6 +66,10 @@ export const useProductStore = defineStore("productStore", () => {
   return {
     product,
     products,
+    selectedCategories,
+    selectedPriceRange,
+    selectedColors,
+    sortBy,
     allProductFilters,
     searchQuery,
     categoryQuery,
