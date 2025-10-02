@@ -57,6 +57,15 @@ function goToProductsByCategory(categoryHandle: string) {
   router.push({ path: "/products", query: { category: categoryHandle } });
   categoryQuery.value = categoryHandle;
 }
+//if page path not includes products, clear categoryQuery
+watchEffect(() => {
+  if (!router.currentRoute.value.path.includes("/products")) {
+    clearCategoryQuery();
+    isOpen.value = false;
+  } else {
+    isOpen.value = true;
+  }
+});
 
 function clearCategoryQuery() {
   categoryQuery.value = "";
@@ -64,8 +73,7 @@ function clearCategoryQuery() {
   selectedPriceRange.value = "";
   selectedColors.value = [];
   sortBy.value = "newest";
-
-  isOpen.value = !isOpen.value;
+  isOpen.value = true;
 }
 onMounted(() => {
   fetchCategories();
