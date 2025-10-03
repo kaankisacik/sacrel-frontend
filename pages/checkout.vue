@@ -184,6 +184,9 @@
                 @update:payment-data="handlePaymentDataUpdate"
                 :payment-providers="paymentProvidersForForm"
                 :order-reference="orderReference"
+                :order-total="orderSummary.pricing.total"
+                :order-summary="orderSummary"
+                :user-selected-shipping="userSelectedShipping"
                 :is-loading="checkoutState.isLoading"
                 :is-loading-providers="loadingPaymentProviders"
                 @submit="handlePaymentSubmit"
@@ -275,7 +278,7 @@
                 </button>
 
                 <button
-                  @click="handleOrderCompletion"
+                  @click="handleOrderCompletionNewWay"
                   :disabled="!canProceedToNextStep || checkoutState.isLoading"
                   class="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -303,6 +306,15 @@
             />
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- 3DS Modal -->
+    <div v-if="show3DSModal && threeDSHtml" class="fixed top-0 inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0;">
+      <div class="bg-white rounded-lg shadow-lg p-0 relative w-full max-w-lg flex flex-col items-center">
+        <button @click="close3DSModal"
+          class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
+        <iframe :srcdoc="threeDSHtml" style="width: 100%; height: 560px; border: 0" class="rounded-b-lg"></iframe>
       </div>
     </div>
   </div>
@@ -371,6 +383,12 @@ const orderReference = ref<string>("");
 const codExtraFee = ref<number>(500); // 5 TL in kuruş
 const loadingPaymentProviders = ref<boolean>(false);
 const componentMounted = ref<boolean>(false);
+
+// 3DS Modal state
+const show3DSModal = ref<boolean>(false);
+const threeDSHtml = ref<string>("");
+const paymentId = ref<string>("");
+const conversationId = ref<string>("");
 
 // Control flags
 const isInitializing = ref<boolean>(false);
@@ -501,6 +519,21 @@ const initializeCheckout = async () => {
 
 const clearError = () => {
   checkoutState.value.error = null;
+};
+
+// 3DS Modal functions
+const open3DSModal = (html: string, pId: string, cId: string) => {
+  threeDSHtml.value = html;
+  paymentId.value = pId;
+  conversationId.value = cId;
+  show3DSModal.value = true;
+};
+
+const close3DSModal = () => {
+  show3DSModal.value = false;
+  threeDSHtml.value = "";
+  paymentId.value = "";
+  conversationId.value = "";
 };
 
 // Data update handlers
@@ -693,6 +726,200 @@ const handleOrderCompletion = async () => {
     await router.push(`/order/${orderId}`);
   } catch (error: any) {
     console.error("Order completion error:", error);
+  }
+};
+
+// 3DS Ödeme Başlatma Fonksiyonu
+const handleOrderCompletionNewWay = async () => {
+  try {
+    checkoutState.value.error = null;
+
+    if (!cart.value?.cart) return;
+
+    // Debug: Cart items'ları kontrol et
+    console.log("=== CART DEBUG ===");
+    console.log("Cart items:", cart.value.cart.items);
+    console.log("Items count:", cart.value.cart.items?.length);
+    console.log("Order total from cart:", orderSummary.value.pricing.total);
+
+    // Basket items oluştur (cart'tan ürünleri al)
+    const basketItems: Array<{
+      id: string;
+      price: string;
+      name: string;
+      category1: string;
+      itemType: "PHYSICAL" | "VIRTUAL";
+    }> = cart.value.cart.items?.map((item, index) => {
+      // Quantity * unit_price'ı hesapla (kuruş cinsinden)
+      const totalItemPrice = (item.unit_price || 0) * (item.quantity || 1);
+      // Doğrudan kuruştan TL'ye çevir ve iyzico formatına uygun yap
+      const itemPrice = (totalItemPrice).toFixed(2);
+      
+      console.log(`Item ${index + 1}:`, {
+        id: item.id,
+        title: item.title,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        total_item_price: totalItemPrice,
+        total_price: item.total,
+        formatted_price: checkoutHelper.formatPrice(totalItemPrice),
+        final_price: itemPrice
+      });
+      
+      return {
+        id: `BI${index + 1}`,
+        price: itemPrice,
+        name: item.title || `Ürün ${index + 1}`,
+        category1: "Giyim",
+        itemType: "PHYSICAL", 
+      };
+    }) || [];
+
+    // Kargo ücreti varsa basket items'a ekle
+    if (userSelectedShipping.value && orderSummary.value.pricing.shipping > 0) {
+      // Doğrudan kuruştan TL'ye çevir
+      const shippingPrice = (orderSummary.value.pricing.shipping).toFixed(2);
+      basketItems.push({
+        id: "SHIPPING",
+        name: "Kargo",
+        category1: "Lojistik",
+        itemType: "VIRTUAL",
+        price: shippingPrice,
+      });
+      
+      console.log("Kargo ücreti eklendi:", {
+        shipping_price: orderSummary.value.pricing.shipping,
+        formatted_shipping: checkoutHelper.formatPrice(orderSummary.value.pricing.shipping),
+        final_shipping: shippingPrice
+      });
+    }
+
+    // Toplam tutarı hesapla (kargo dahil)
+    const totalWithShipping = orderSummary.value.pricing.total + (userSelectedShipping.value ? orderSummary.value.pricing.shipping : 0);
+    // Doğrudan kuruştan TL'ye çevir
+    const totalAmount = (totalWithShipping).toFixed(2);
+    
+    // Basket items toplamını kontrol et
+    const basketTotal = basketItems.reduce((sum, item) => sum + parseFloat(item.price), 0);
+    
+    console.log("Toplam hesaplama:", {
+      orderTotal: orderSummary.value.pricing.total,
+      shipping: orderSummary.value.pricing.shipping,
+      userSelectedShipping: userSelectedShipping.value,
+      totalWithShipping: totalWithShipping,
+      formatted_total: checkoutHelper.formatPrice(totalWithShipping),
+      final_amount: totalAmount,
+      basket_total: basketTotal.toFixed(2),
+      amounts_match: basketTotal.toFixed(2) === totalAmount
+    });
+    
+    console.log("Basket Items:", basketItems);
+    console.log("Total Amount:", totalAmount);
+
+    // Müşteri bilgilerini buyer formatına çevir
+    const buyerInfo = {
+      id: customerInfo.value.email || "BUYER001",
+      name: customerInfo.value.firstName || "Ad",
+      surname: customerInfo.value.lastName || "Soyad",
+      identityNumber: "11111111111", // Gerçek projede müşteriden alınmalı
+      email: customerInfo.value.email || "test@test.com",
+      gsmNumber: customerInfo.value.phone || "+905350000000",
+      registrationDate: new Date().toISOString().replace('T', ' ').substring(0, 19),
+      lastLoginDate: new Date().toISOString().replace('T', ' ').substring(0, 19),
+      registrationAddress: checkoutHelper.formatAddress(shippingAddress.value),
+      city: shippingAddress.value.city || "Istanbul",
+      country: "Turkey",
+      zipCode: shippingAddress.value.postalCode || "34000",
+    };
+
+    // Kart bilgilerini payment data'dan al
+    console.log("PaymentData içeriği:", JSON.stringify(paymentData.value, null, 2));
+    console.log("PaymentData.data:", paymentData.value.data);
+    
+    // Expiry date'i ay ve yıl olarak ayır
+    const expiryParts = paymentData.value.data?.expiryDate?.split('/') || [];
+    const expireMonth = expiryParts[0] || "";
+    const expireYear = expiryParts[1] ? `20${expiryParts[1]}` : ""; // 33 -> 2033
+    
+    const cardInfo = {
+      cardHolderName: paymentData.value.data?.cardName || "",
+      cardNumber: (paymentData.value.data?.cardNumber || "").replace(/\s/g, ""), // Boşlukları kaldır
+      expireMonth: expireMonth,
+      expireYear: expireYear,
+      cvc: paymentData.value.data?.cvv || ""
+    };
+
+    console.log("Extracted cardInfo:", {
+      cardHolderName: `"${cardInfo.cardHolderName}" (length: ${cardInfo.cardHolderName.length})`,
+      cardNumber: `"${cardInfo.cardNumber}" (length: ${cardInfo.cardNumber.length})`,
+      expireMonth: `"${cardInfo.expireMonth}" (length: ${cardInfo.expireMonth.length})`,
+      expireYear: `"${cardInfo.expireYear}" (length: ${cardInfo.expireYear.length})`,
+      cvc: `"${cardInfo.cvc}" (length: ${cardInfo.cvc.length})`
+    });
+
+    // Kart bilgilerini validate et
+    if (!cardInfo.cardHolderName || cardInfo.cardHolderName.length < 2) {
+      console.error("CardHolderName validation failed:", cardInfo.cardHolderName);
+      throw new Error("Kart sahibi adı en az 2 karakter olmalıdır.");
+    }
+    
+    if (!cardInfo.cardNumber || cardInfo.cardNumber.length < 13) {
+      throw new Error("Kart numarası geçersiz.");
+    }
+    
+    if (!cardInfo.expireMonth || cardInfo.expireMonth.length < 1) {
+      throw new Error("Son kullanma ayı geçersiz.");
+    }
+    
+    if (!cardInfo.expireYear || cardInfo.expireYear.length < 4) {
+      throw new Error("Son kullanma yılı geçersiz.");
+    }
+    
+    if (!cardInfo.cvc || cardInfo.cvc.length < 3) {
+      throw new Error("CVC kodu geçersiz.");
+    }
+
+    console.log("Kart bilgileri doğrulandı:", {
+      cardHolderName: cardInfo.cardHolderName,
+      cardNumber: "****" + cardInfo.cardNumber.slice(-4),
+      expireMonth: cardInfo.expireMonth,
+      expireYear: cardInfo.expireYear,
+      cvcLength: cardInfo.cvc.length
+    });
+
+    // useIyzicoPayment composable'ını kullan
+    const { processPayment } = useIyzicoPayment();
+
+    // Composable kullanarak ödeme işlemini başlat
+    const result = await processPayment({
+      card: cardInfo,
+      amount: totalAmount,
+      buyer: buyerInfo,
+      basketItems: basketItems
+    });
+
+    if (result.success && result.data) {
+      console.log("3DS başlatma başarılı");
+
+      // 3DS HTML içeriğini göstermek için gerekli veriler
+      const pId = result.data.paymentId || "";
+      const cId = result.data.conversationId || "";
+      const conversationData = result.data.conversationData || "";
+
+      // 3DS HTML içeriğini modal'da göster
+      const html = result.data.threeDSHtml;
+
+      console.log("3DS HTML içeriği hazır, modal açılıyor");
+      
+      // 3DS modal'ını aç
+      open3DSModal(html, pId, cId);
+      
+    } else {
+      throw new Error(result.error || '3DS başlatma başarısız');
+    }
+  } catch (error: any) {
+    console.error('3DS Init Error:', error);
+    checkoutState.value.error = `3DS başlatma hatası: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`;
   }
 };
 

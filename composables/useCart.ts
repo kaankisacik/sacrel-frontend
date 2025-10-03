@@ -246,6 +246,7 @@ export const useCart = () => {
   };
 
   return {
+    getCartId,
     // Low-level API methods
     createCart,
     getCart,

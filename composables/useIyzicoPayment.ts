@@ -59,7 +59,7 @@ interface Buyer {
   city: string;
   country: string;
   zipCode: string;
-  ip: string;
+  ip?: string;
 }
 
 interface Address {
@@ -75,7 +75,7 @@ interface BasketItem {
   price: string;
   name: string;
   category1: string;
-  category2: string;
+  category2?: string;
   itemType: 'PHYSICAL' | 'VIRTUAL';
 }
 
@@ -108,10 +108,12 @@ interface Init3DSResponse {
   errorMessage?: string;
 }
 
+
 interface Auth3DSRequest {
   locale: string;
   conversationId: string;
   paymentId: string;
+  cartId: string;
   conversationData?: string;
 }
 
@@ -140,6 +142,15 @@ interface Auth3DSResponse {
   mdStatus: number;
   hostReference: string;
   errorMessage?: string;
+  medusa: MedusaPaymentData;
+}
+
+interface MedusaPaymentData {
+  cart_completed: boolean;
+  cart_id: string;
+  order_id: string;
+  payment_captured: boolean;
+  payment_session_id: string;
 }
 
 interface WebhookData {

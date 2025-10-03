@@ -4,7 +4,9 @@
 
     <!-- Loading State -->
     <div v-if="isLoadingProviders" class="text-center py-8">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-4"></div>
+      <div
+        class="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-4"
+      ></div>
       <p class="text-gray-600">Ödeme seçenekleri yükleniyor...</p>
     </div>
 
@@ -16,7 +18,9 @@
           v-for="provider in paymentProviders"
           :key="provider.id"
           class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-          :class="{ 'border-black bg-gray-50': selectedProviderId === provider.id }"
+          :class="{
+            'border-black bg-gray-50': selectedProviderId === provider.id,
+          }"
         >
           <input
             v-model="selectedProviderId"
@@ -35,27 +39,48 @@
       <!-- Payment Method Components -->
       <div v-if="selectedProviderId" class="border-t pt-6">
         <!-- Debug Info -->
-        <div class="mb-4 p-2 bg-yellow-100 border border-yellow-300 rounded text-xs">
-          <p><strong>Debug:</strong> Selected Provider: {{ selectedProviderId }}</p>
+        <div
+          class="mb-4 p-2 bg-yellow-100 border border-yellow-300 rounded text-xs"
+        >
+          <p>
+            <strong>Debug:</strong> Selected Provider: {{ selectedProviderId }}
+          </p>
           <p><strong>Payment Method:</strong> {{ localPaymentData.method }}</p>
-          <p><strong>Is Credit Card:</strong> {{ isCreditCardProvider(selectedProviderId) }}</p>
-          <p><strong>Available Providers:</strong> {{ paymentProviders.map(p => p.id).join(', ') }}</p>
+          <p>
+            <strong>Is Credit Card:</strong>
+            {{ isCreditCardProvider(selectedProviderId) }}
+          </p>
+          <p>
+            <strong>Available Providers:</strong>
+            {{ paymentProviders.map((p) => p.id).join(", ") }}
+          </p>
           <p><strong>Form Valid:</strong> {{ isFormValid }}</p>
+          <p v-if="localPaymentData.cardNumber">
+            <strong>Card Number (cleaned):</strong>
+            {{ localPaymentData.cardNumber.replace(/\s/g, "") }}
+          </p>
+          <p v-if="errors.cardNumber" class="text-red-600">
+            <strong>Card Error:</strong> {{ errors.cardNumber }}
+          </p>
         </div>
-        
+
         <!-- Credit Card Form -->
         <div v-if="isCreditCardProvider(selectedProviderId)" class="space-y-4">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="sm:col-span-2">
-              <label for="cardNumber" class="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                for="cardNumber"
+                class="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Kart Numarası <span class="text-red-500">*</span>
               </label>
               <input
+                type="text"
                 id="cardNumber"
                 v-model="formattedCardNumber"
-                type="text"
                 class="w-full px-3 py-2 border rounded-md focus:ring-black focus:border-black transition-colors"
                 :class="getFieldClasses('cardNumber')"
+                @focus="errors.cardNumber = ''"
                 placeholder="1234 5678 9012 3456"
                 maxlength="19"
                 :disabled="isLoading"
@@ -65,9 +90,12 @@
                 {{ errors.cardNumber }}
               </p>
             </div>
-            
+
             <div>
-              <label for="expiryDate" class="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                for="expiryDate"
+                class="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Son Kullanma <span class="text-red-500">*</span>
               </label>
               <input
@@ -85,9 +113,12 @@
                 {{ errors.expiryDate }}
               </p>
             </div>
-            
+
             <div>
-              <label for="cvv" class="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                for="cvv"
+                class="block text-sm font-medium text-gray-700 mb-1"
+              >
                 CVV <span class="text-red-500">*</span>
               </label>
               <input
@@ -105,9 +136,12 @@
                 {{ errors.cvv }}
               </p>
             </div>
-            
+
             <div class="sm:col-span-2">
-              <label for="cardName" class="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                for="cardName"
+                class="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Kart Üzerindeki İsim <span class="text-red-500">*</span>
               </label>
               <input
@@ -128,10 +162,15 @@
         </div>
 
         <!-- Bank Transfer Info -->
-        <div v-else-if="selectedProviderId === 'bank_transfer'" class="space-y-4">
+        <div
+          v-else-if="selectedProviderId === 'bank_transfer'"
+          class="space-y-4"
+        >
           <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h3 class="font-medium text-blue-900 mb-2">Banka Bilgileri</h3>
-            <p class="text-sm text-blue-800 mb-2">Sipariş numaranız: {{ orderReference }}</p>
+            <p class="text-sm text-blue-800 mb-2">
+              Sipariş numaranız: {{ orderReference }}
+            </p>
             <div class="text-sm text-blue-800">
               <p><strong>Banka:</strong> Örnek Bankası</p>
               <p><strong>IBAN:</strong> TR12 3456 7890 1234 5678 9012 34</p>
@@ -141,7 +180,10 @@
         </div>
 
         <!-- Cash on Delivery Info -->
-        <div v-else-if="selectedProviderId === 'cash_on_delivery'" class="space-y-4">
+        <div
+          v-else-if="selectedProviderId === 'cash_on_delivery'"
+          class="space-y-4"
+        >
           <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <h3 class="font-medium text-yellow-900 mb-2">Kapıda Ödeme</h3>
             <p class="text-sm text-yellow-800 mb-3">
@@ -165,7 +207,9 @@
                   value="card"
                   class="text-yellow-600 focus:ring-yellow-500"
                 />
-                <span class="ml-2 text-sm text-yellow-800">Kredi/Banka Kartı</span>
+                <span class="ml-2 text-sm text-yellow-800"
+                  >Kredi/Banka Kartı</span
+                >
               </label>
             </div>
 
@@ -189,12 +233,26 @@
 
     <!-- No Payment Providers -->
     <div v-else class="text-center py-8">
-      <div class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      <div
+        class="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center"
+      >
+        <svg
+          class="w-8 h-8 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
       </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-2">Ödeme Seçeneği Bulunamadı</h3>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">
+        Ödeme Seçeneği Bulunamadı
+      </h3>
       <p class="text-gray-600">Lütfen daha sonra tekrar deneyin.</p>
     </div>
 
@@ -207,21 +265,21 @@
       >
         Geri
       </button>
-      
+
       <button
         type="button"
         @click="handleNext"
         :disabled="!selectedProviderId || isLoading || !isFormValid"
         class="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {{ isLoading ? 'Yükleniyor...' : 'Sipariş Özetine Geç' }}
+        {{ isLoading ? "Yükleniyor..." : "Sipariş Özetine Geç" }}
       </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { checkoutHelper } from '~/utils/checkoutHelpers';
+import { checkoutHelper } from "~/utils/checkoutHelpers";
 
 interface PaymentProvider {
   id: string;
@@ -244,21 +302,51 @@ interface Props {
   orderReference: string;
   isLoading?: boolean;
   isLoadingProviders?: boolean;
+  orderTotal?: number; // Add order total prop
+  orderSummary?: any; // Add order summary prop
+  userSelectedShipping?: boolean; // Add user selected shipping prop
 }
 
 interface Emits {
-  (e: 'update:selectedProviderId', value: string): void;
-  (e: 'update:paymentData', value: any): void;
-  (e: 'submit', data: { providerId: string; paymentData: any }): void;
-  (e: 'previous'): void;
-  (e: 'providerSelected', providerId: string): void;
+  (e: "update:selectedProviderId", value: string): void;
+  (e: "update:paymentData", value: any): void;
+  (e: "submit", data: { providerId: string; paymentData: any }): void;
+  (e: "previous"): void;
+  (e: "providerSelected", providerId: string): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isLoading: false,
   isLoadingProviders: false,
+  orderTotal: 0,
+  userSelectedShipping: false,
 });
 
+const binNumber = ref("");
+const binCheckResult = ref<any>(null);
+
+// Get payment amount - use the same calculation as OrderSummary
+const paymentAmount = computed(() => {
+  // Use the same calculation as OrderSummary component
+  if (props.orderSummary?.pricing) {
+    const total = props.orderSummary.pricing.total + (props.userSelectedShipping ? props.orderSummary.pricing.shipping : 0);
+    return total.toFixed(2);
+  }
+  
+  // Fallback: try to get from props (order total)
+  if (props.orderTotal && props.orderTotal > 0) {
+    return props.orderTotal.toFixed(2);
+  }
+  
+  // Fallback: try to get from cart store
+  const cartStore = useCartStore();
+  if (cartStore.cart?.cart?.total) {
+    return cartStore.cart.cart.total.toFixed(2);
+  }
+  
+  // Last fallback
+  return "100";
+}); 
 const emit = defineEmits<Emits>();
 
 // Local state
@@ -269,61 +357,93 @@ const touchedFields = ref<Set<string>>(new Set());
 
 // Computed
 const formattedCardNumber = computed({
-  get: () => localPaymentData.value.cardNumber || '',
+  get: () => localPaymentData.value.cardNumber || "",
   set: (value: string) => {
     localPaymentData.value.cardNumber = checkoutHelper.formatCardNumber(value);
   },
 });
 
 const formattedExpiryDate = computed({
-  get: () => localPaymentData.value.expiryDate || '',
+  get: () => localPaymentData.value.expiryDate || "",
   set: (value: string) => {
     localPaymentData.value.expiryDate = checkoutHelper.formatExpiryDate(value);
   },
 });
 
 const isFormValid = computed(() => {
-  console.log('isFormValid check:', {
+  console.log("isFormValid check:", {
     selectedProviderId: selectedProviderId.value,
     isCreditCard: isCreditCardProvider(selectedProviderId.value),
     localPaymentData: localPaymentData.value,
-    errorsCount: Object.keys(errors.value).length
+    errorsCount: Object.keys(errors.value).length,
   });
-  
+
   if (!selectedProviderId.value) {
-    console.log('No provider selected');
+    console.log("No provider selected");
     return false;
   }
-  
+
   if (isCreditCardProvider(selectedProviderId.value)) {
     const isValid = Boolean(
       localPaymentData.value.cardNumber &&
-      localPaymentData.value.expiryDate &&
-      localPaymentData.value.cvv &&
-      localPaymentData.value.cardName &&
-      Object.keys(errors.value).length === 0
+        localPaymentData.value.expiryDate &&
+        localPaymentData.value.cvv &&
+        localPaymentData.value.cardName &&
+        Object.keys(errors.value).length === 0
     );
-    console.log('Credit card validation:', {
+    console.log("Credit card validation:", {
       cardNumber: !!localPaymentData.value.cardNumber,
       expiryDate: !!localPaymentData.value.expiryDate,
       cvv: !!localPaymentData.value.cvv,
       cardName: !!localPaymentData.value.cardName,
       errorsCount: Object.keys(errors.value).length,
-      isValid
+      isValid,
     });
     return isValid;
   }
-  
-  if (selectedProviderId.value === 'cash_on_delivery') {
+
+  if (selectedProviderId.value === "cash_on_delivery") {
     const isValid = Boolean(localPaymentData.value.codOption);
-    console.log('COD validation:', { codOption: localPaymentData.value.codOption, isValid });
+    console.log("COD validation:", {
+      codOption: localPaymentData.value.codOption,
+      isValid,
+    });
     return isValid;
   }
-  
+
   // For other payment methods (bank transfer, etc.)
-  console.log('Other payment method - returning true');
+  console.log("Other payment method - returning true");
   return true;
 });
+
+const { checkBin } = useIyzicoPayment();
+async function checkBinNumber() {
+  binNumber.value = (localPaymentData.value.cardNumber.replaceAll(" ", "").substring(0,6));
+  if (!binNumber.value || binNumber.value.length !== 6) {
+    alert("Lütfen 6 haneli BIN numarası girin");
+    return false;
+  }
+
+  try {
+    const result = await checkBin({
+      price: paymentAmount.value,
+      binNumber: binNumber.value,
+    });
+
+    if (result.status === "success") {
+      binCheckResult.value = result;
+      console.log("BIN Check Result:", binCheckResult.value);
+      return true;
+    } else {
+      alert("Eksik veya hatalı bilgi girdiniz");
+      return false;
+    }
+  } catch (error) {
+    console.error("BIN Check Error:", error);
+    alert("İşlem başarısız oldu, lütfen bilgileri kontrol edip tekrar deneyiniz");
+    return false;
+  }
+}
 
 // Watchers - simplified and efficient
 watch(
@@ -341,50 +461,57 @@ watch(
   { deep: true }
 );
 
-watch(
-  selectedProviderId,
-  (newValue) => {
-    emit('update:selectedProviderId', newValue);
-    localPaymentData.value.provider = newValue;
-    localPaymentData.value.method = newValue;
-  }
-);
+watch(selectedProviderId, (newValue) => {
+  emit("update:selectedProviderId", newValue);
+  localPaymentData.value.provider = newValue;
+  localPaymentData.value.method = newValue;
+});
 
 watch(
   localPaymentData,
   (newValue) => {
-    emit('update:paymentData', newValue);
-    checkoutHelper.saveFormData('payment', newValue);
+    emit("update:paymentData", newValue);
+    checkoutHelper.saveFormData("payment", newValue);
   },
   { deep: true }
 );
 
 // Methods
 const isCreditCardProvider = (providerId: string): boolean => {
-  const creditCardProviders = ['stripe', 'credit_card', 'card', 'pp_fake-cc_dev-fake-cc', 'pp_iyzico_iyzico'];
+  const creditCardProviders = [
+    "stripe",
+    "credit_card",
+    "card",
+    "pp_fake-cc_dev-fake-cc",
+    "pp_iyzico_iyzico",
+  ];
   const isCreditCard = creditCardProviders.includes(providerId);
-  console.log('isCreditCardProvider check:', { providerId, isCreditCard, creditCardProviders });
+  console.log("isCreditCardProvider check:", {
+    providerId,
+    isCreditCard,
+    creditCardProviders,
+  });
   return isCreditCard;
 };
 
 const onProviderChange = () => {
-  console.log('Provider changed to:', selectedProviderId.value);
-  emit('providerSelected', selectedProviderId.value);
-  
+  console.log("Provider changed to:", selectedProviderId.value);
+  emit("providerSelected", selectedProviderId.value);
+
   // Reset payment data when provider changes
   const baseData = {
     provider: selectedProviderId.value,
     method: selectedProviderId.value,
     data: {},
   };
-  
+
   // Set default data based on provider type
-  if (selectedProviderId.value === 'cash_on_delivery') {
+  if (selectedProviderId.value === "cash_on_delivery") {
     localPaymentData.value = {
       ...baseData,
-      codOption: 'cash',
+      codOption: "cash",
     };
-  } else if (selectedProviderId.value === 'pp_system_default') {
+  } else if (selectedProviderId.value === "pp_system_default") {
     localPaymentData.value = {
       ...baseData,
       // No additional fields needed for system default
@@ -392,50 +519,50 @@ const onProviderChange = () => {
   } else {
     localPaymentData.value = baseData;
   }
-  
-  console.log('Payment data reset to:', localPaymentData.value);
-  
+
+  console.log("Payment data reset to:", localPaymentData.value);
+
   errors.value = {};
   touchedFields.value.clear();
 };
 
 const validateField = (fieldName: string) => {
   touchedFields.value.add(fieldName);
-  
+
   switch (fieldName) {
-    case 'cardNumber':
+    case "cardNumber":
       if (!localPaymentData.value.cardNumber) {
-        errors.value.cardNumber = 'Kart numarası zorunludur';
-      } else if (!checkoutHelper.validateCardNumber(localPaymentData.value.cardNumber)) {
-        errors.value.cardNumber = 'Geçerli bir kart numarası giriniz';
+        errors.value.cardNumber = "Kart numarası zorunludur";
       } else {
         delete errors.value.cardNumber;
       }
       break;
-      
-    case 'expiryDate':
+
+    case "expiryDate":
       if (!localPaymentData.value.expiryDate) {
-        errors.value.expiryDate = 'Son kullanma tarihi zorunludur';
-      } else if (!checkoutHelper.validateExpiryDate(localPaymentData.value.expiryDate)) {
-        errors.value.expiryDate = 'Geçerli bir tarih giriniz (MM/YY)';
+        errors.value.expiryDate = "Son kullanma tarihi zorunludur";
+      } else if (
+        !checkoutHelper.validateExpiryDate(localPaymentData.value.expiryDate)
+      ) {
+        errors.value.expiryDate = "Geçerli bir tarih giriniz (MM/YY)";
       } else {
         delete errors.value.expiryDate;
       }
       break;
-      
-    case 'cvv':
+
+    case "cvv":
       if (!localPaymentData.value.cvv) {
-        errors.value.cvv = 'CVV kodu zorunludur';
+        errors.value.cvv = "CVV kodu zorunludur";
       } else if (!checkoutHelper.validateCVV(localPaymentData.value.cvv)) {
-        errors.value.cvv = 'Geçerli bir CVV kodu giriniz';
+        errors.value.cvv = "Geçerli bir CVV kodu giriniz";
       } else {
         delete errors.value.cvv;
       }
       break;
-      
-    case 'cardName':
+
+    case "cardName":
       if (!localPaymentData.value.cardName) {
-        errors.value.cardName = 'Kart üzerindeki isim zorunludur';
+        errors.value.cardName = "Kart üzerindeki isim zorunludur";
       } else {
         delete errors.value.cardName;
       }
@@ -445,32 +572,47 @@ const validateField = (fieldName: string) => {
 
 const validateAllFields = () => {
   if (isCreditCardProvider(selectedProviderId.value)) {
-    const fields = ['cardNumber', 'expiryDate', 'cvv', 'cardName'];
-    fields.forEach(field => validateField(field));
+    const fields = ["cardNumber", "expiryDate", "cvv", "cardName"];
+    fields.forEach((field) => validateField(field));
   }
 };
 
 const getFieldClasses = (fieldName: string) => {
   if (!touchedFields.value.has(fieldName)) {
-    return 'border-gray-300';
+    return "border-gray-300";
   }
-  
-  return errors.value[fieldName] 
-    ? 'border-red-300 focus:border-red-500 focus:ring-red-500' 
-    : 'border-green-300 focus:border-green-500 focus:ring-green-500';
+
+  return errors.value[fieldName]
+    ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+    : "border-green-300 focus:border-green-500 focus:ring-green-500";
 };
 
-const handleNext = () => {
-  console.log('=== HANDLE NEXT CALLED ===');
-  console.log('Button clicked, starting submission process...');
-  
+const handleNext = async () => {
+  console.log("=== HANDLE NEXT CALLED ===");
+  console.log("Button clicked, starting submission process...");
+
   // Validate all fields for credit card
   if (isCreditCardProvider(selectedProviderId.value)) {
-    console.log('Credit card provider detected, validating fields...');
+    console.log("Credit card provider detected, validating fields...");
     validateAllFields();
+    
+    // If form is not valid, don't proceed
+    if (!isFormValid.value) {
+      console.log("Form validation failed, stopping submission");
+      return;
+    }
+    
+    // Perform BIN check for credit card payments
+    console.log("Performing BIN check...");
+    const binCheckPassed = await checkBinNumber();
+    
+    if (!binCheckPassed) {
+      console.log("BIN check failed, stopping submission");
+      return;
+    }
   }
-  
-  console.log('Payment Form Debug:', {
+
+  console.log("Payment Form Debug:", {
     selectedProviderId: selectedProviderId.value,
     localPaymentData: localPaymentData.value,
     errors: errors.value,
@@ -483,38 +625,31 @@ const handleNext = () => {
     cardName: localPaymentData.value.cardName,
   });
 
-  // Always try to submit regardless of form validation
-  console.log('EMITTING SUBMIT EVENT...');
-  console.log('Emit data:', {
+  // Submit the form
+  console.log("EMITTING SUBMIT EVENT...");
+  console.log("Emit data:", {
     providerId: selectedProviderId.value,
     paymentData: localPaymentData.value,
   });
-  
+
   try {
-    emit('submit', {
+    emit("submit", {
       providerId: selectedProviderId.value,
       paymentData: localPaymentData.value,
     });
-    console.log('✅ SUBMIT EVENT EMITTED SUCCESSFULLY');
+    console.log("✅ SUBMIT EVENT EMITTED SUCCESSFULLY");
   } catch (error) {
-    console.error('❌ ERROR EMITTING SUBMIT EVENT:', error);
-  }
-  
-  // Additional debug - check if form validation was the issue
-  if (!isFormValid.value) {
-    console.log('⚠️ Form was not valid but we still submitted');
-  } else {
-    console.log('✅ Form was valid');
+    console.error("❌ ERROR EMITTING SUBMIT EVENT:", error);
   }
 };
 
 // Load saved data on mount
 onMounted(() => {
-  const savedData = checkoutHelper.loadFormData('payment');
+  const savedData = checkoutHelper.loadFormData("payment");
   if (savedData) {
     localPaymentData.value = { ...localPaymentData.value, ...savedData };
   }
-  
+
   // Ensure method is set if provider is already selected
   if (selectedProviderId.value && !localPaymentData.value.method) {
     localPaymentData.value.method = selectedProviderId.value;

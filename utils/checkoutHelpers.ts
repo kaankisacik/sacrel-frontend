@@ -193,6 +193,7 @@ class CheckoutHelper {
   // Payment method helpers
   getPaymentMethodName(method: string): string {
     const methodNames: Record<string, string> = {
+      pp_iyzico_iyzico: "Kredi Kartı",
       credit_card: "Kredi Kartı",
       debit_card: "Banka Kartı",
       bank_transfer: "Banka Havalesi",
