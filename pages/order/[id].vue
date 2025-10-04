@@ -126,6 +126,7 @@
                   {{ getItemTitle(item) }}
                 </h4>
                 <p class="text-sm text-gray-600">{{ getItemVariant(item) }}</p>
+                <p class="text-sm text-gray-600">{{ item.subtitle }}</p>
                 <p class="text-sm text-gray-600">Adet: {{ item.quantity }}</p>
               </div>
               <div class="text-sm font-medium text-gray-900">
@@ -330,22 +331,35 @@ const getItemVariant = (item: any): string => {
 };
 
 const getItemImage = (item: any): string => {
-  const product = item.variant?.product;
-
+  // Try multiple paths for getting the product image
+  const product = item.variant?.product || item.product;
+  
   if (product?.thumbnail) {
     return product.thumbnail;
   }
-
-  if (
-    product?.images &&
-    Array.isArray(product.images) &&
-    product.images.length > 0
-  ) {
-    return product.images[0].url || product.images[0];
+  
+  if (product?.images && Array.isArray(product.images) && product.images.length > 0) {
+    const firstImage = product.images[0];
+    if (typeof firstImage === 'string') {
+      return firstImage;
+    }
+    if (firstImage?.url) {
+      return firstImage.url;
+    }
   }
-
+  
+  // Try item-level thumbnail
+  if (item.thumbnail) {
+    return item.thumbnail;
+  }
+  
+  // Try variant-level image
+  if (item.variant?.image) {
+    return item.variant.image;
+  }
+  
   // Return the SVG placeholder to avoid 404 requests
-  return "/images/placeholder.svg";
+  return '/images/placeholder.svg';
 };
 
 // Load order on mount

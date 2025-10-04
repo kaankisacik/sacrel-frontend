@@ -149,6 +149,7 @@
               <CheckoutCustomerInfoForm
                 key="customer-info-form"
                 :customer-info="customerInfo"
+                :saved-customer-info="savedCustomerInfo"
                 @update:customerInfo="handleCustomerInfoUpdate"
                 :is-loading="checkoutState.isLoading"
                 @submit="handleCustomerInfoSubmit"
@@ -164,6 +165,7 @@
                 @update:selected-shipping-option-id="handleShippingOptionUpdate"
                 :saved-addresses="savedAddresses"
                 :shipping-options="shippingOptionsForForm"
+                :customer-phone="customerInfo.phone"
                 :is-loading="checkoutState.isLoading"
                 :show-shipping-options="availableShippingOptions.length > 0"
                 @submit="handleShippingSubmit"
@@ -379,6 +381,7 @@ const {
 const pageLoading = ref<boolean>(false);
 const pageError = ref<string>("");
 const savedAddresses = ref<any[]>([]);
+const savedCustomerInfo = ref<any>(null);
 const orderReference = ref<string>("");
 const codExtraFee = ref<number>(500); // 5 TL in kuruş
 const loadingPaymentProviders = ref<boolean>(false);
@@ -480,15 +483,22 @@ const initializeCheckout = async () => {
       }
 
       // Generate order reference
-      orderReference.value = checkoutHelper.generateOrderReference();
+      orderReference.value = (cart.value?.cart?.id)?.split("_")[1] || "";
 
       // Load customer addresses if logged in
       try {
+        await customerStore.getCustomer(); // This will also load customer info
         await customerStore.getCustomerAddresses();
         savedAddresses.value =
           customerStore.currentCustomerAddresses.addresses || [];
+        
+        // Set saved customer info
+        if (customerStore.currentCustomer?.customer) {
+          savedCustomerInfo.value = customerStore.currentCustomer.customer;
+        }
       } catch (error) {
         // User might not be logged in, continue without saved addresses
+        console.log("User not logged in, continuing without saved data");
       }
 
       // Load payment providers for current region
@@ -783,7 +793,7 @@ const handleOrderCompletionNewWay = async () => {
       registrationDate: new Date().toISOString().replace('T', ' ').substring(0, 19),
       lastLoginDate: new Date().toISOString().replace('T', ' ').substring(0, 19),
       registrationAddress: checkoutHelper.formatAddress(shippingAddress.value),
-      city: shippingAddress.value.city || "Istanbul",
+      city: shippingAddress.value.city || "Istanbul", // İl/Şehir bilgisini city alanına gönder
       country: "Turkey",
       zipCode: shippingAddress.value.postalCode || "34000",
     };
@@ -801,7 +811,7 @@ const handleOrderCompletionNewWay = async () => {
       const itemPrice = (totalItemPrice).toFixed(2);
       
       return {
-        id: `BI${index + 1}`,
+        id: item.id || `BI${index + 1}`,
         price: itemPrice,
         name: item.title || `Ürün ${index + 1}`,
         category1: "Giyim",
@@ -836,7 +846,8 @@ const handleOrderCompletionNewWay = async () => {
       card: cardInfo,
       amount: totalAmount,
       buyer: buyerInfo,
-      basketItems: basketItems
+      basketItems: basketItems,
+      cartId: cart.value?.cart?.id || ""
     });
 
     if (result.success && result.data) {

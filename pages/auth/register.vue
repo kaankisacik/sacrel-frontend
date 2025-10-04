@@ -99,7 +99,7 @@
                 type="tel"
                 autocomplete="tel"
                 class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="+90 555 123 45 67"
+                placeholder="555 123 45 67"
                 pattern="[0-9+]*"
                 inputmode="numeric"
                 maxlength="13"

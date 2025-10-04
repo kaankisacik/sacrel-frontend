@@ -3,7 +3,7 @@
     <div class="flex items-start justify-between mb-4">
       <h2 class="text-lg font-semibold text-gray-900">Teslimat Adresi</h2>
       <div v-if="savedAddresses.length > 0" class="flex items-center space-x-2">
-        <span class="text-sm text-gray-600">Yeni adres ekle</span>
+        <span class="text-sm text-gray-600">Düzenle</span>
         <button type="button" @click="toggleAddressMode"
           class="relative inline-flex h-5 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
           :class="isAddingNewAddress ? 'bg-black' : 'bg-gray-200'">
@@ -57,7 +57,7 @@
         </div>
 
         <!-- City and District -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label for="city" class="block text-sm font-medium text-gray-700 mb-1">
               İl <span class="text-red-500">*</span>
@@ -81,10 +81,7 @@
               {{ errors.district }}
             </p>
           </div>
-        </div>
 
-        <!-- Postal Code and Phone -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label for="postalCode" class="block text-sm font-medium text-gray-700 mb-1">
               Posta Kodu <span class="text-red-500">*</span>
@@ -97,19 +94,24 @@
               {{ errors.postalCode }}
             </p>
           </div>
+        </div>
 
-          <div>
+        <!-- Postal Code and Phone -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          
+
+          <!-- <div >
             <label for="addressPhone" class="block text-sm font-medium text-gray-700 mb-1">
               Telefon
             </label>
             <input id="addressPhone" v-model="localShippingAddress.phone" type="tel"
               class="w-full px-3 py-2 border rounded-md focus:ring-black focus:border-black transition-colors"
-              :class="getFieldClasses('phone')" placeholder="+90 5XX XXX XX XX" :disabled="isLoading"
+              :class="getFieldClasses('phone')" placeholder="5XX XXX XX XX" :disabled="isLoading"
               @blur="validateField('phone')" />
             <p v-if="errors.phone" class="mt-1 text-sm text-red-600">
               {{ errors.phone }}
             </p>
-          </div>
+          </div> -->
         </div>
       </form>
     </div>
@@ -200,6 +202,7 @@ interface Props {
   savedAddresses?: SavedAddress[];
   shippingOptions?: any[];
   selectedShippingOptionId?: string;
+  customerPhone?: string;
   isLoading?: boolean;
   showShippingOptions?: boolean;
 }
@@ -219,6 +222,7 @@ const props = withDefaults(defineProps<Props>(), {
   savedAddresses: () => [],
   shippingOptions: () => [],
   selectedShippingOptionId: '',
+  customerPhone: '',
   isLoading: false,
   showShippingOptions: true,
 });
@@ -226,7 +230,11 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>();
 
 // Local state
-const localShippingAddress = ref<ShippingAddress>({ ...props.shippingAddress });
+const localShippingAddress = ref<ShippingAddress>({ 
+  ...props.shippingAddress,
+  // Use customer phone if no phone is set in shipping address
+  phone: props.shippingAddress.phone || props.customerPhone || ''
+});
 const selectedAddressId = ref<string>('');
 const selectedShippingOptionId = ref<string>(props.selectedShippingOptionId);
 const isAddingNewAddress = ref<boolean>(props.savedAddresses.length === 0);
@@ -270,12 +278,27 @@ watch(
   () => props.shippingAddress,
   (newValue) => {
     isUpdatingFromProps = true;
-    localShippingAddress.value = { ...newValue };
+    localShippingAddress.value = { 
+      ...newValue,
+      // Preserve customer phone if no phone in shipping address
+      phone: newValue.phone || props.customerPhone || ''
+    };
     nextTick(() => {
       isUpdatingFromProps = false;
     });
   },
   { deep: true }
+);
+
+// Watch for customer phone changes
+watch(
+  () => props.customerPhone,
+  (newPhone) => {
+    // Update phone only if current phone is empty or was previously customer phone
+    if (!localShippingAddress.value.phone || localShippingAddress.value.phone === props.customerPhone) {
+      localShippingAddress.value.phone = newPhone || '';
+    }
+  }
 );
 
 // Emit local changes back to parent (only when not updating from props)
@@ -353,7 +376,7 @@ const resetForm = () => {
     district: '',
     postalCode: '',
     countryCode: '',
-    phone: '',
+    phone: props.customerPhone || '', // Use customer phone if available
   };
 
   // Clear all errors and touched fields
@@ -477,6 +500,11 @@ onMounted(() => {
   const savedData = checkoutHelper.loadFormData('shipping');
   if (savedData) {
     localShippingAddress.value = { ...localShippingAddress.value, ...savedData };
+  }
+  
+  // Set customer phone if available and no phone is set yet
+  if (props.customerPhone && !localShippingAddress.value.phone) {
+    localShippingAddress.value.phone = props.customerPhone;
   }
 });
 

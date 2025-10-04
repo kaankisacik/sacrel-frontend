@@ -1,8 +1,34 @@
 <template>
   <div class="bg-white rounded-lg shadow-md p-6">
-    <h2 class="text-lg font-semibold text-gray-900 mb-4">İletişim Bilgileri</h2>
+    <div class="flex items-start justify-between mb-4">
+      <h2 class="text-lg font-semibold text-gray-900">İletişim Bilgileri</h2>
+      <div v-if="savedCustomerInfo" class="flex items-center space-x-2">
+        <span class="text-sm text-gray-600">Düzenle</span>
+        <button type="button" @click="toggleCustomerMode"
+          class="relative inline-flex h-5 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+          :class="isAddingNewInfo ? 'bg-black' : 'bg-gray-200'">
+          <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+            :class="isAddingNewInfo ? 'translate-x-6' : 'translate-x-1'" />
+        </button>
+      </div>
+    </div>
 
-    <form @submit.prevent="handleSubmit" class="space-y-4">
+    <!-- Saved Customer Info Display -->
+    <div v-if="savedCustomerInfo && !isAddingNewInfo" class="mb-6">
+      <div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+        <div class="text-sm font-medium text-gray-900 mb-2">
+          Kayıtlı Bilgileriniz
+        </div>
+        <div class="text-sm text-gray-600 space-y-1">
+          <div>{{ savedCustomerInfo.first_name }} {{ savedCustomerInfo.last_name }}</div>
+          <div>{{ savedCustomerInfo.email }}</div>
+          <div v-if="savedCustomerInfo.phone">{{ savedCustomerInfo.phone }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Info Form -->
+    <form v-if="!savedCustomerInfo || isAddingNewInfo" @submit.prevent="handleSubmit" class="space-y-4">
       <!-- Email -->
       <div>
         <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
@@ -51,7 +77,7 @@
         </label>
         <input id="phone" v-model="localCustomerInfo.phone" type="tel"
           class="w-full px-3 py-2 border rounded-md focus:ring-black focus:border-black transition-colors"
-          :class="getFieldClasses('phone')" placeholder="+90 5XX XXX XX XX" :disabled="isLoading"
+          :class="getFieldClasses('phone')" placeholder="5XX XXX XX XX" :disabled="isLoading"
           @blur="validateField('phone')" />
         <p v-if="errors.phone" class="mt-1 text-sm text-red-600">
           {{ errors.phone }}
@@ -66,6 +92,14 @@
         </button>
       </div>
     </form>
+
+    <!-- Navigation Buttons for Saved Customer Info -->
+    <div v-if="savedCustomerInfo && !isAddingNewInfo" class="flex justify-end pt-4">
+      <button type="button" @click="handleSubmit" :disabled="!isFormValid || isLoading"
+        class="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+        {{ isLoading ? 'Devam Ediliyor...' : 'Teslimat Adresine Geç' }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -79,8 +113,17 @@ interface CustomerInfo {
   phone?: string;
 }
 
+interface SavedCustomerInfo {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone?: string;
+}
+
 interface Props {
   customerInfo: CustomerInfo;
+  savedCustomerInfo?: SavedCustomerInfo | null;
   isLoading?: boolean;
 }
 
@@ -91,13 +134,14 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
   isLoading: false,
+  savedCustomerInfo: null,
 });
 
 const emit = defineEmits<Emits>();
 
 // Local state
 const localCustomerInfo = ref<CustomerInfo>({ ...props.customerInfo });
-
+const isAddingNewInfo = ref<boolean>(!props.savedCustomerInfo);
 
 const errors = ref<Record<string, string>>({});
 const touchedFields = ref<Set<string>>(new Set());
@@ -105,6 +149,12 @@ const isInitialized = ref<boolean>(false);
 
 // Computed
 const isFormValid = computed(() => {
+  // If using saved customer info, form is always valid
+  if (props.savedCustomerInfo && !isAddingNewInfo.value) {
+    return true;
+  }
+  
+  // For manual info entry, validate the form
   const validation = checkoutHelper.validateCustomerInfo(localCustomerInfo.value);
   return validation.isValid;
 });
@@ -138,6 +188,44 @@ watch(
 );
 
 // Methods
+const toggleCustomerMode = () => {
+  isAddingNewInfo.value = !isAddingNewInfo.value;
+  
+  if (!isAddingNewInfo.value && props.savedCustomerInfo) {
+    // Using saved customer info - populate form with saved data
+    localCustomerInfo.value = {
+      email: props.savedCustomerInfo.email,
+      firstName: props.savedCustomerInfo.first_name,
+      lastName: props.savedCustomerInfo.last_name,
+      phone: props.savedCustomerInfo.phone || '',
+    };
+    
+    // Clear errors when switching to saved info
+    errors.value = {};
+    touchedFields.value.clear();
+    
+    // Emit the saved data
+    emit('update:customerInfo', localCustomerInfo.value);
+  } else {
+    // Reset form when switching to new info mode
+    resetForm();
+  }
+};
+
+const resetForm = () => {
+  localCustomerInfo.value = {
+    email: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+  };
+  
+  errors.value = {};
+  touchedFields.value.clear();
+  
+  emit('update:customerInfo', localCustomerInfo.value);
+};
+
 const validateField = (fieldName: string) => {
   touchedFields.value.add(fieldName);
 
@@ -229,6 +317,13 @@ const getFieldClasses = (fieldName: string) => {
 };
 
 const handleSubmit = () => {
+  // If using saved customer info, submit directly
+  if (props.savedCustomerInfo && !isAddingNewInfo.value) {
+    emit('submit', localCustomerInfo.value);
+    return;
+  }
+  
+  // For manual entry, validate first
   validateAllFields();
 
   if (isFormValid.value) {
@@ -238,19 +333,30 @@ const handleSubmit = () => {
 
 // Load saved data on mount
 onMounted(() => {
-  const savedData = checkoutHelper.loadFormData('customer');
-  if (savedData) {
-    console.log('Loaded saved customer data:', savedData);
-    // Set flag to prevent watcher loops
+  // If we have saved customer info and not in new info mode, use saved data
+  if (props.savedCustomerInfo && !isAddingNewInfo.value) {
     isUpdatingFromSavedData = true;
-    localCustomerInfo.value = { ...localCustomerInfo.value, ...savedData };
+    localCustomerInfo.value = {
+      email: props.savedCustomerInfo.email,
+      firstName: props.savedCustomerInfo.first_name,
+      lastName: props.savedCustomerInfo.last_name,
+      phone: props.savedCustomerInfo.phone || '',
+    };
+  } else {
+    // Try to load from localStorage as fallback
+    const savedData = checkoutHelper.loadFormData('customer');
+    if (savedData) {
+      console.log('Loaded saved customer data:', savedData);
+      isUpdatingFromSavedData = true;
+      localCustomerInfo.value = { ...localCustomerInfo.value, ...savedData };
+    }
   }
 
   // Mark as initialized after loading saved data
   nextTick(() => {
     isInitialized.value = true;
-    // Reset the flag and emit if there was saved data
-    if (savedData) {
+    // Emit the initial data
+    if (isUpdatingFromSavedData) {
       isUpdatingFromSavedData = false;
       emit('update:customerInfo', localCustomerInfo.value);
     } else {

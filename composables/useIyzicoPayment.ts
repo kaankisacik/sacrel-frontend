@@ -303,6 +303,7 @@ export const useIyzicoPayment = () => {
     amount: string;
     buyer: Buyer;
     basketItems: BasketItem[];
+    cartId: string;
   }) => {
     try {
       // 1. BIN Check (opsiyonel)
@@ -323,7 +324,7 @@ export const useIyzicoPayment = () => {
         paidPrice: paymentData.amount,
         installment: 1,
         paymentChannel: "WEB",
-        basketId: `B${Date.now()}`,
+        basketId: paymentData.cartId, // Gerçek sepet ID'si kullan
         paymentGroup: "PRODUCT",
         paymentCard: paymentData.card,
         buyer: paymentData.buyer,

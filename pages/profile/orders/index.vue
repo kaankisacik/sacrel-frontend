@@ -84,7 +84,9 @@
                 <div class="flex-1">
                   <h4 class="text-sm font-medium text-gray-900">{{ getItemTitle(item) }}</h4>
                   <p class="text-sm text-gray-600">{{ getItemVariant(item) }}</p>
+                  <p class="text-sm text-gray-600">{{ item.subtitle }}</p>
                   <p class="text-sm text-gray-600">Adet: {{ item.quantity }}</p>
+
                 </div>
                 <div class="text-sm font-medium text-gray-900">
                   {{ checkoutHelper.formatPrice(item.total || (item.unit_price * item.quantity) || 0) }}
