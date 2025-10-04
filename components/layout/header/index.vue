@@ -5,14 +5,9 @@
         <div class="w-full flex items-center ">
           <!-- Desktop Logo -->
           <div class="hidden lg:flex items-center space-x-6 ">
-            <NuxtLink href="/" class="flex items-center space-x-2 scale-125">
-              <img
-                src="/images/sacrel_logo.png"
-                alt="SACREL Logo"
-                width="54.1411859"
-                height="55.4379808"
-                class="cursor-pointer hover:opacity-80 transition duration-300 ease-in-out"
-              />
+            <NuxtLink href="/" @click="clearCategoryQuery" class="flex items-center space-x-2 scale-125">
+              <img src="/images/sacrel_logo.png" alt="SACREL Logo" width="54.1411859" height="55.4379808"
+                class="cursor-pointer hover:opacity-80 transition duration-300 ease-in-out" />
               <span class="text-6xl font-normal text-sacrel-primary transition duration-300 ease-in-out tracking-wider">
                 SACREL
               </span>
@@ -21,14 +16,8 @@
 
           <!-- Mobile Logo -->
           <div class="flex lg:hidden items-center space-x-2">
-            <NuxtLink href="/" class="flex items-center space-x-2">
-              <img
-                src="/images/sacrel_logo.png"
-                alt="SACREL Logo"
-                width="40"
-                height="40"
-                class="cursor-pointer"
-              />
+            <NuxtLink href="/" @click="clearCategoryQuery" class="flex items-center space-x-2">
+              <img src="/images/sacrel_logo.png" alt="SACREL Logo" width="40" height="40" class="cursor-pointer" />
               <span class="text-2xl font-secondary text-sacrel-primary">SACREL</span>
             </NuxtLink>
           </div>
@@ -85,27 +74,20 @@
     </div>
 
     <!-- Mobile Menu -->
-    <Transition
-      enter-active-class="transition-all duration-300 ease-out"
-      leave-active-class="transition-all duration-300 ease-in"
-      enter-from-class="opacity-0 transform -translate-x-full"
-      leave-to-class="opacity-0 transform -translate-x-full"
-    >
-      <div v-if="menuStore.isMobileMenuOpen" class="fixed inset-0 z-[60] bg-black bg-opacity-50 lg:hidden" @click="menuStore.toggleMobileMenu()">
+    <Transition enter-active-class="transition-all duration-300 ease-out"
+      leave-active-class="transition-all duration-300 ease-in" enter-from-class="opacity-0 transform -translate-x-full"
+      leave-to-class="opacity-0 transform -translate-x-full">
+      <div v-if="menuStore.isMobileMenuOpen" class="fixed inset-0 z-[60] bg-black bg-opacity-50 lg:hidden"
+        @click="menuStore.toggleMobileMenu()">
         <div class="fixed inset-y-0 left-0 w-80 bg-[#FEFCF7] shadow-lg overflow-y-auto" @click.stop>
           <!-- Mobile Menu Header -->
           <div class="flex items-center justify-between p-4 border-b border-sacrel-neutral">
             <NuxtLink to="/" @click="menuStore.toggleMobileMenu()" class="flex items-center space-x-2">
-              <img
-                src="/images/sacrel_logo.png"
-                alt="SACREL Logo"
-                width="40"
-                height="40"
-                class="cursor-pointer"
-              />
+              <img src="/images/sacrel_logo.png" alt="SACREL Logo" width="40" height="40" class="cursor-pointer" />
               <span class="text-2xl font-secondary text-sacrel-primary">SACREL</span>
             </NuxtLink>
-            <button @click="menuStore.toggleMobileMenu()" class="text-sacrel-primary hover:text-sacrel-accent transition">
+            <button @click="menuStore.toggleMobileMenu()"
+              class="text-sacrel-primary hover:text-sacrel-accent transition">
               <Icon name="material-symbols:close" class="h-6 w-6" />
             </button>
           </div>
@@ -113,15 +95,12 @@
           <!-- Mobile Search -->
           <div class="p-4 border-b border-sacrel-neutral">
             <div class="relative">
-              <input
-                v-model="mobileSearchQuery"
-                @keyup.enter="performMobileSearch"
-                type="text"
+              <input v-model="mobileSearchQuery" @keyup.enter="performMobileSearch" type="text"
                 placeholder="Ürün ara..."
-                class="w-full border-2 border-sacrel-neutral focus:border-sacrel-primary focus:outline-none rounded-lg text-sacrel-primary font-mono text-sm px-3 py-2 pr-10"
-              />
+                class="w-full border-2 border-sacrel-neutral focus:border-sacrel-primary focus:outline-none rounded-lg text-sacrel-primary font-mono text-sm px-3 py-2 pr-10" />
               <button @click="performMobileSearch" class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                <Icon name="material-symbols:search" class="h-5 w-5 text-sacrel-primary hover:text-sacrel-accent transition" />
+                <Icon name="material-symbols:search"
+                  class="h-5 w-5 text-sacrel-primary hover:text-sacrel-accent transition" />
               </button>
             </div>
           </div>
@@ -129,18 +108,18 @@
           <!-- User Actions -->
           <div class="p-4 border-b border-sacrel-neutral">
             <div class="flex flex-col space-y-3">
-              <NuxtLink to="/profile" @click="menuStore.toggleMobileMenu()" 
+              <NuxtLink to="/profile" @click="menuStore.toggleMobileMenu()"
                 class="flex items-center space-x-3 text-sacrel-primary hover:text-sacrel-accent transition p-2 rounded-lg hover:bg-sacrel-neutral/10">
                 <Icon name="material-symbols:person-outline" class="h-6 w-6" />
                 <span class="font-medium">Profil</span>
               </NuxtLink>
-              
+
               <NuxtLink to="/profile/favorites" @click="menuStore.toggleMobileMenu()"
                 class="flex items-center space-x-3 text-sacrel-primary hover:text-sacrel-accent transition p-2 rounded-lg hover:bg-sacrel-neutral/10">
                 <Icon name="material-symbols:favorite-outline" class="h-6 w-6" />
                 <span class="font-medium">Favoriler</span>
               </NuxtLink>
-              
+
               <NuxtLink to="/cart" @click="menuStore.toggleMobileMenu()"
                 class="flex items-center space-x-3 text-sacrel-primary hover:text-sacrel-accent transition p-2 rounded-lg hover:bg-sacrel-neutral/10">
                 <Icon name="material-symbols:shopping-bag-outline-sharp" class="h-6 w-6" />
@@ -199,7 +178,7 @@
                 class="text-sacrel-primary hover:text-sacrel-accent transition font-medium">
                 Kullanım Şartları
               </NuxtLink> -->
-              
+
               <!-- Auth Actions -->
               <div v-if="!isUserAuthenticated" class="pt-4 border-t border-sacrel-neutral">
                 <NuxtLink to="/auth/login" @click="menuStore.toggleMobileMenu()"
@@ -211,7 +190,7 @@
                   Üye Ol
                 </NuxtLink>
               </div>
-              
+
               <div v-else class="pt-4 border-t border-sacrel-neutral">
                 <button @click="logout(); menuStore.toggleMobileMenu()"
                   class="block w-full text-center bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition font-medium">
@@ -233,10 +212,11 @@ const productStore = useProductStore();
 const { isUserAuthenticated } = storeToRefs(authStore);
 const { totalQuantity } = storeToRefs(useCartStore());
 const { logout } = authStore;
+const { categoryQuery, selectedCategories, selectedPriceRange, selectedColors, sortBy } = storeToRefs(useProductStore());
+
 
 // Categories for mobile menu
 const { getCategories } = useCategories()
-const { categoryQuery } = storeToRefs(useProductStore())
 const router = useRouter()
 const mobileCategories = ref([])
 
@@ -250,7 +230,11 @@ function goToProductsByCategory(categoryHandle) {
 }
 
 function clearCategoryQuery() {
-  categoryQuery.value = '';
+  categoryQuery.value = "";
+  selectedCategories.value = [];
+  selectedPriceRange.value = "";
+  selectedColors.value = [];
+  sortBy.value = "newest";
 }
 
 // Search functionality
@@ -309,7 +293,7 @@ const performMobileSearch = async () => {
 // Close search when pressing Escape
 onMounted(() => {
   fetchCategories();
-  
+
   const handleEscape = (e) => {
     if (e.key === 'Escape' && isSearchOpen.value) {
       isSearchOpen.value = false;

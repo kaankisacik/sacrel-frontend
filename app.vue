@@ -5,8 +5,15 @@
 </template>
 
 <script setup>
+
+
+
 onNuxtReady(async () => {
   useAuthStore();
   await useProductStore().getProducts()
+
+
+
+
 });
 </script>

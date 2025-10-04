@@ -3,21 +3,9 @@
     <div class="container mx-auto px-4">
       <!-- Success Header -->
       <div class="text-center mb-12">
-        <div
-          class="w-24 h-24 bg-green-100 rounded-full mx-auto mb-6 flex items-center justify-center"
-        >
-          <svg
-            class="w-12 h-12 text-green-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 13l4 4L19 7"
-            />
+        <div class="w-24 h-24 bg-green-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+          <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>
         </div>
         <h1 class="text-3xl font-bold text-gray-900 mb-4">
@@ -30,10 +18,7 @@
       </div>
 
       <!-- Order Details -->
-      <div
-        v-if="!isLoading && order"
-        class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden"
-      >
+      <div v-if="!isLoading && order" class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
         <div class="p-6 border-b border-gray-200">
           <h2 class="text-xl font-semibold text-gray-900 mb-4">
             Sipariş Detayları
@@ -66,40 +51,62 @@
             <div>
               <h3 class="text-sm font-medium text-gray-500 mb-2">Durum</h3>
               <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
-              >
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                 {{ checkoutHelper.getOrderStatus(order.fulfillment_status) }}
               </span>
             </div>
 
-            <div
-              v-if="
-                order.fulfillments?.length > 0 &&
-                order.fulfillments[0]?.labels?.[0]?.tracking_number
-              "
-              class="flex flex-col items-start text-xs text-gray-600"
-            >
+            <div v-if="
+              order.fulfillments?.length > 0 &&
+              order.fulfillments[0]?.labels?.[0]?.tracking_number
+            " class="flex flex-col items-start text-xs text-gray-600">
               <h3 class="flex items-center gap-x-1 text-sm font-medium text-gray-500 mb-2">
-                <svg
-                  class="w-3 h-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                  />
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
                 {{ order.fulfillments[0].shipping_option.shipping_profile.name }}
-                Kargo Takip Kodu
+                Takip Kodu
               </h3>
-              <div class="flex items-center space-x-2">
-                <span class="font-bold text-lg text-black">{{
-                  order.fulfillments[0].labels[0].tracking_number
-                }}</span>
+              <div class="space-y-3">
+                <!-- Tracking Link -->
+                <div class="flex items-center">
+                  <NuxtLink
+                    :to="`https://www.dhl.com/tr-tr/home/tracking.html?tracking-id=${order.fulfillments[0].labels[0].tracking_number}&submit=1`"
+                    target="_blank"
+                    class="inline-flex items-center gap-2 bg-sacrel-accent/80 hover:bg-sacrel-accent-dark text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Kargoyu Takip Et
+                  </NuxtLink>
+                </div>
+
+                <!-- Tracking Details -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <!-- Tracking Number -->
+                  <div class="bg-gray-50 rounded-lg p-3">
+                    <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                      Takip Numarası
+                    </div>
+                    <div class="font-bold text-sm text-gray-900 font-mono">
+                      {{ order.fulfillments[0].labels[0].tracking_number }}
+                    </div>
+                  </div>
+
+                  <!-- Shipped Date -->
+                  <div class="bg-gray-50 rounded-lg p-3">
+                    <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                      Kargo Çıkış Tarihi
+                    </div>
+                    <div class="font-bold text-sm text-gray-900">
+                      {{ formatDate(order.fulfillments[0].shipped_at) }}
+                    </div>
+                  </div>
+
+
+                </div>
               </div>
             </div>
           </div>
@@ -111,19 +118,9 @@
             Sipariş Edilen Ürünler
           </h3>
           <div class="space-y-4">
-            <div
-              v-for="item in order.items"
-              :key="item.id"
-              class="flex items-center space-x-4"
-            >
-              <div
-                class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg overflow-hidden"
-              >
-                <img
-                  :src="getItemImage(item)"
-                  :alt="getItemTitle(item)"
-                  class="w-full h-full object-cover"
-                />
+            <div v-for="item in order.items" :key="item.id" class="flex items-center space-x-4">
+              <div class="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
+                <img :src="getItemImage(item)" :alt="getItemTitle(item)" class="w-full h-full object-cover" />
               </div>
               <div class="flex-1">
                 <h4 class="text-sm font-medium text-gray-900">
@@ -185,10 +182,7 @@
       </div>
 
       <!-- Loading State -->
-      <div
-        v-else-if="isLoading"
-        class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8"
-      >
+      <div v-else-if="isLoading" class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8">
         <div class="animate-pulse">
           <div class="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
           <div class="space-y-3">
@@ -200,25 +194,11 @@
       </div>
 
       <!-- Error State -->
-      <div
-        v-else
-        class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8 text-center"
-      >
-        <div
-          class="w-16 h-16 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center"
-        >
-          <svg
-            class="w-8 h-8 text-red-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
+      <div v-else class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8 text-center">
+        <div class="w-16 h-16 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+          <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
         <h3 class="text-lg font-semibold text-gray-900 mb-2">
@@ -230,20 +210,13 @@
       </div>
 
       <!-- Action Buttons -->
-      <div
-        class="mt-12 text-center space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center"
-      >
-        <NuxtLink
-          to="/products"
-          class="inline-block bg-black text-white px-6 py-3 rounded-md font-medium hover:bg-gray-800 transition duration-300"
-        >
+      <div class="mt-12 text-center space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
+        <NuxtLink to="/products"
+          class="inline-block bg-black text-white px-6 py-3 rounded-md font-medium hover:bg-gray-800 transition duration-300">
           Alışverişe Devam Et
         </NuxtLink>
-        <NuxtLink
-          v-if="order"
-          to="/profile/orders"
-          class="inline-block border border-gray-300 text-gray-900 px-6 py-3 rounded-md font-medium hover:bg-gray-50 transition duration-300"
-        >
+        <NuxtLink v-if="order" to="/profile/orders"
+          class="inline-block border border-gray-300 text-gray-900 px-6 py-3 rounded-md font-medium hover:bg-gray-50 transition duration-300">
           Siparişlerimi Görüntüle
         </NuxtLink>
       </div>
@@ -256,9 +229,7 @@
         <div class="space-y-3 text-sm text-blue-800">
           <div class="flex items-start space-x-3">
             <span
-              class="flex-shrink-0 w-5 h-5 bg-blue-200 rounded-full flex items-center justify-center text-xs font-bold"
-              >1</span
-            >
+              class="flex-shrink-0 w-5 h-5 bg-blue-200 rounded-full flex items-center justify-center text-xs font-bold">1</span>
             <p>
               Siparişinizi hazırlama aşamasına alacağız ve size e-posta ile
               bilgi vereceğiz.
@@ -266,9 +237,7 @@
           </div>
           <div class="flex items-start space-x-3">
             <span
-              class="flex-shrink-0 w-5 h-5 bg-blue-200 rounded-full flex items-center justify-center text-xs font-bold"
-              >2</span
-            >
+              class="flex-shrink-0 w-5 h-5 bg-blue-200 rounded-full flex items-center justify-center text-xs font-bold">2</span>
             <p>
               Siparişiniz kargoya verildiğinde takip numaranızı e-posta ile
               göndereceğiz.
@@ -276,9 +245,7 @@
           </div>
           <div class="flex items-start space-x-3">
             <span
-              class="flex-shrink-0 w-5 h-5 bg-blue-200 rounded-full flex items-center justify-center text-xs font-bold"
-              >3</span
-            >
+              class="flex-shrink-0 w-5 h-5 bg-blue-200 rounded-full flex items-center justify-center text-xs font-bold">3</span>
             <p>Tahmini teslimat süresi 1-3 iş günüdür.</p>
           </div>
         </div>

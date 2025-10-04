@@ -1,41 +1,44 @@
 <template>
-  <div class="space-y-4 p-4">
-    <div class="bg-yellow-100 p-4 rounded">
-      <p>{{ status }}</p>
-    </div>
-
-    <!-- Debug bilgileri -->
-    <div v-if="debugMode" class="bg-gray-100 p-4 rounded mt-4">
-      <h3 class="font-bold mb-2">Debug Bilgileri:</h3>
-      <div class="text-sm space-y-1">
-        <p><strong>Status:</strong> {{ callbackData.status }}</p>
-        <p><strong>PaymentId:</strong> {{ callbackData.paymentId }}</p>
-        <p>
-          <strong>ConversationData:</strong> {{ callbackData.conversationData }}
-        </p>
-        <p>
-          <strong>ConversationId:</strong> {{ callbackData.conversationId }}
-        </p>
-        <p><strong>mdStatus:</strong> {{ callbackData.mdStatus }}</p>
-        <p><strong>URL:</strong> {{ fullUrl }}</p>
-        <p><strong>Query Params:</strong> {{ JSON.stringify(route.query) }}</p>
-        <p><strong>Timestamp:</strong> {{ new Date().toISOString() }}</p>
+  <div class="min-h-screen flex items-center justify-center bg-gray-50">
+    <div class="max-w-md w-full space-y-4 p-6">
+      <div class=" p-4 rounded text-center">
+        <p>{{ status }}</p>
       </div>
-    </div>
 
-    <!-- Loading spinner -->
-    <div v-if="isProcessing" class="flex justify-center p-4">
-      <div
-        class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"
-      ></div>
+      <!-- Debug bilgileri -->
+      <!-- <div v-if="debugMode" class="bg-gray-100 p-4 rounded mt-4">
+        <h3 class="font-bold mb-2">Debug Bilgileri:</h3>
+        <div class="text-sm space-y-1">
+          <p><strong>Status:</strong> {{ callbackData.status }}</p>
+          <p><strong>PaymentId:</strong> {{ callbackData.paymentId }}</p>
+          <p>
+            <strong>ConversationData:</strong> {{ callbackData.conversationData }}
+          </p>
+          <p>
+            <strong>ConversationId:</strong> {{ callbackData.conversationId }}
+          </p>
+          <p><strong>mdStatus:</strong> {{ callbackData.mdStatus }}</p>
+          <p><strong>URL:</strong> {{ fullUrl }}</p>
+          <p><strong>Query Params:</strong> {{ JSON.stringify(route.query) }}</p>
+          <p><strong>Timestamp:</strong> {{ new Date().toISOString() }}</p>
+        </div>
+      </div> -->
+
+      <!-- Loading spinner -->
+      <div v-if="isProcessing" class="flex justify-center p-4">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
+definePageMeta({
+  layout: "empty",
+});
 const config = useRuntimeConfig();
 const route = useRoute();
-const status = ref("Ödeme sonucu kontrol ediliyor...");
+const status = ref("Ödeme sonucu kontrol ediliyor lütfen bekleyin...");
 const fullUrl = ref("");
 const debugMode = ref(true);
 const isProcessing = ref(true);
@@ -80,7 +83,7 @@ onMounted(async () => {
 async function finish() {
   try {
     isProcessing.value = true;
-    status.value = "Ödeme sonucu işleniyor...";
+    status.value = "Ödeme sonucu işleniyor lütfen bekleyin...";
 
     console.log("=== PROCESSING CALLBACK ===");
     console.log("Callback Data:", callbackData.value);
@@ -115,7 +118,7 @@ async function finish() {
         return;
       }
 
-      status.value = "Ödeme doğrulaması işleniyor...";
+      status.value = "Ödeme doğrulaması işleniyor lütfen bekleyin...";
 
       // 5. 3DS Tamamlama isteği gönder
       const authBody = {
@@ -163,6 +166,7 @@ async function finish() {
                 mdStatus: callbackData.value.mdStatus,
                 authCode: authRes.authCode,
                 price: authRes.price,
+                orderId: authRes.medusa?.order_id || null, // Order ID'yi ekle
               },
               "*"
             );
@@ -176,9 +180,8 @@ async function finish() {
         }
       } else {
         console.log("Auth3DS failed:", authRes);
-        status.value = `Ödeme doğrulama başarısız: ${
-          authRes.errorMessage || "Bilinmeyen hata"
-        }`;
+        status.value = `Ödeme doğrulama başarısız: ${authRes.errorMessage || "Bilinmeyen hata"
+          }`;
         handlePaymentFailure();
       }
     } else if (callbackData.value.status === "failure") {

@@ -39,7 +39,7 @@
       <!-- Payment Method Components -->
       <div v-if="selectedProviderId" class="border-t pt-6">
         <!-- Debug Info -->
-        <div
+        <!-- <div
           class="mb-4 p-2 bg-yellow-100 border border-yellow-300 rounded text-xs"
         >
           <p>
@@ -62,7 +62,7 @@
           <p v-if="errors.cardNumber" class="text-red-600">
             <strong>Card Error:</strong> {{ errors.cardNumber }}
           </p>
-        </div>
+        </div> -->
 
         <!-- Credit Card Form -->
         <div v-if="isCreditCardProvider(selectedProviderId)" class="space-y-4">
@@ -435,6 +435,7 @@ async function checkBinNumber() {
       console.log("BIN Check Result:", binCheckResult.value);
       return true;
     } else {
+      console.log("BIN Check Failed:", result);
       alert("Eksik veya hatalı bilgi girdiniz");
       return false;
     }

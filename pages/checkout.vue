@@ -732,96 +732,52 @@ const handleOrderCompletion = async () => {
 // 3DS Ödeme Başlatma Fonksiyonu
 const handleOrderCompletionNewWay = async () => {
   try {
+    checkoutState.value.isLoading = true;
     checkoutState.value.error = null;
 
-    if (!cart.value?.cart) return;
-
-    // Debug: Cart items'ları kontrol et
-    console.log("=== CART DEBUG ===");
-    console.log("Cart items:", cart.value.cart.items);
-    console.log("Items count:", cart.value.cart.items?.length);
-    console.log("Order total from cart:", orderSummary.value.pricing.total);
-
-    // Basket items oluştur (cart'tan ürünleri al)
-    const basketItems: Array<{
-      id: string;
-      price: string;
-      name: string;
-      category1: string;
-      itemType: "PHYSICAL" | "VIRTUAL";
-    }> = cart.value.cart.items?.map((item, index) => {
-      // Quantity * unit_price'ı hesapla (kuruş cinsinden)
-      const totalItemPrice = (item.unit_price || 0) * (item.quantity || 1);
-      // Doğrudan kuruştan TL'ye çevir ve iyzico formatına uygun yap
-      const itemPrice = (totalItemPrice).toFixed(2);
-      
-      console.log(`Item ${index + 1}:`, {
-        id: item.id,
-        title: item.title,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        total_item_price: totalItemPrice,
-        total_price: item.total,
-        formatted_price: checkoutHelper.formatPrice(totalItemPrice),
-        final_price: itemPrice
-      });
-      
-      return {
-        id: `BI${index + 1}`,
-        price: itemPrice,
-        name: item.title || `Ürün ${index + 1}`,
-        category1: "Giyim",
-        itemType: "PHYSICAL", 
-      };
-    }) || [];
-
-    // Kargo ücreti varsa basket items'a ekle
-    if (userSelectedShipping.value && orderSummary.value.pricing.shipping > 0) {
-      // Doğrudan kuruştan TL'ye çevir
-      const shippingPrice = (orderSummary.value.pricing.shipping).toFixed(2);
-      basketItems.push({
-        id: "SHIPPING",
-        name: "Kargo",
-        category1: "Lojistik",
-        itemType: "VIRTUAL",
-        price: shippingPrice,
-      });
-      
-      console.log("Kargo ücreti eklendi:", {
-        shipping_price: orderSummary.value.pricing.shipping,
-        formatted_shipping: checkoutHelper.formatPrice(orderSummary.value.pricing.shipping),
-        final_shipping: shippingPrice
-      });
+    if (!cart.value?.cart) {
+      throw new Error("Sepet bulunamadı");
     }
 
-    // Toplam tutarı hesapla (kargo dahil)
-    const totalWithShipping = orderSummary.value.pricing.total + (userSelectedShipping.value ? orderSummary.value.pricing.shipping : 0);
-    // Doğrudan kuruştan TL'ye çevir
-    const totalAmount = (totalWithShipping).toFixed(2);
+    // useIyzicoPayment composable'ını kullan
+    const { processPayment } = useIyzicoPayment();
+
+    // Kart bilgilerini payment data'dan al
+    const expiryParts = paymentData.value.data?.expiryDate?.split('/') || [];
+    const expireMonth = expiryParts[0] || "";
+    const expireYear = expiryParts[1] ? `20${expiryParts[1]}` : "";
     
-    // Basket items toplamını kontrol et
-    const basketTotal = basketItems.reduce((sum, item) => sum + parseFloat(item.price), 0);
-    
-    console.log("Toplam hesaplama:", {
-      orderTotal: orderSummary.value.pricing.total,
-      shipping: orderSummary.value.pricing.shipping,
-      userSelectedShipping: userSelectedShipping.value,
-      totalWithShipping: totalWithShipping,
-      formatted_total: checkoutHelper.formatPrice(totalWithShipping),
-      final_amount: totalAmount,
-      basket_total: basketTotal.toFixed(2),
-      amounts_match: basketTotal.toFixed(2) === totalAmount
-    });
-    
-    console.log("Basket Items:", basketItems);
-    console.log("Total Amount:", totalAmount);
+    const cardInfo = {
+      cardHolderName: paymentData.value.data?.cardName || "",
+      cardNumber: (paymentData.value.data?.cardNumber || "").replace(/\s/g, ""),
+      expireMonth: expireMonth,
+      expireYear: expireYear,
+      cvc: paymentData.value.data?.cvv || ""
+    };
+
+    // Kart bilgilerini validate et
+    if (!cardInfo.cardHolderName || cardInfo.cardHolderName.length < 2) {
+      throw new Error("Kart sahibi adı en az 2 karakter olmalıdır.");
+    }
+    if (!cardInfo.cardNumber || cardInfo.cardNumber.length < 13) {
+      throw new Error("Kart numarası geçersiz.");
+    }
+    if (!cardInfo.expireMonth || cardInfo.expireMonth.length < 1) {
+      throw new Error("Son kullanma ayı geçersiz.");
+    }
+    if (!cardInfo.expireYear || cardInfo.expireYear.length < 4) {
+      throw new Error("Son kullanma yılı geçersiz.");
+    }
+    if (!cardInfo.cvc || cardInfo.cvc.length < 3) {
+      throw new Error("CVC kodu geçersiz.");
+    }
 
     // Müşteri bilgilerini buyer formatına çevir
     const buyerInfo = {
       id: customerInfo.value.email || "BUYER001",
       name: customerInfo.value.firstName || "Ad",
       surname: customerInfo.value.lastName || "Soyad",
-      identityNumber: "11111111111", // Gerçek projede müşteriden alınmalı
+      identityNumber: "11111111111", // Test değeri
       email: customerInfo.value.email || "test@test.com",
       gsmNumber: customerInfo.value.phone || "+905350000000",
       registrationDate: new Date().toISOString().replace('T', ' ').substring(0, 19),
@@ -832,65 +788,50 @@ const handleOrderCompletionNewWay = async () => {
       zipCode: shippingAddress.value.postalCode || "34000",
     };
 
-    // Kart bilgilerini payment data'dan al
-    console.log("PaymentData içeriği:", JSON.stringify(paymentData.value, null, 2));
-    console.log("PaymentData.data:", paymentData.value.data);
-    
-    // Expiry date'i ay ve yıl olarak ayır
-    const expiryParts = paymentData.value.data?.expiryDate?.split('/') || [];
-    const expireMonth = expiryParts[0] || "";
-    const expireYear = expiryParts[1] ? `20${expiryParts[1]}` : ""; // 33 -> 2033
-    
-    const cardInfo = {
-      cardHolderName: paymentData.value.data?.cardName || "",
-      cardNumber: (paymentData.value.data?.cardNumber || "").replace(/\s/g, ""), // Boşlukları kaldır
-      expireMonth: expireMonth,
-      expireYear: expireYear,
-      cvc: paymentData.value.data?.cvv || ""
-    };
+    // Basket items oluştur (cart'tan ürünleri al)
+    const basketItems: Array<{
+      id: string;
+      price: string;
+      name: string;
+      category1: string;
+      category2?: string;
+      itemType: 'PHYSICAL' | 'VIRTUAL';
+    }> = cart.value.cart.items?.map((item, index) => {
+      const totalItemPrice = (item.unit_price || 0) * (item.quantity || 1);
+      const itemPrice = (totalItemPrice).toFixed(2);
+      
+      return {
+        id: `BI${index + 1}`,
+        price: itemPrice,
+        name: item.title || `Ürün ${index + 1}`,
+        category1: "Giyim",
+        itemType: "PHYSICAL" as 'PHYSICAL',
+      };
+    }) || [];
 
-    console.log("Extracted cardInfo:", {
-      cardHolderName: `"${cardInfo.cardHolderName}" (length: ${cardInfo.cardHolderName.length})`,
-      cardNumber: `"${cardInfo.cardNumber}" (length: ${cardInfo.cardNumber.length})`,
-      expireMonth: `"${cardInfo.expireMonth}" (length: ${cardInfo.expireMonth.length})`,
-      expireYear: `"${cardInfo.expireYear}" (length: ${cardInfo.expireYear.length})`,
-      cvc: `"${cardInfo.cvc}" (length: ${cardInfo.cvc.length})`
+    // Kargo ücreti varsa basket items'a ekle
+    if (userSelectedShipping.value && orderSummary.value.pricing.shipping > 0) {
+      const shippingPrice = (orderSummary.value.pricing.shipping).toFixed(2);
+      basketItems.push({
+        id: "SHIPPING",
+        name: "Kargo",
+        category1: "Lojistik",
+        itemType: "VIRTUAL" as 'VIRTUAL',
+        price: shippingPrice,
+      });
+    }
+
+    // Toplam tutarı hesapla (kargo dahil)
+    const totalWithShipping = orderSummary.value.pricing.total + (userSelectedShipping.value ? orderSummary.value.pricing.shipping : 0);
+    const totalAmount = (totalWithShipping).toFixed(2);
+
+    console.log("3DS ödeme başlatılıyor...", {
+      totalAmount,
+      buyerInfo,
+      basketItems
     });
 
-    // Kart bilgilerini validate et
-    if (!cardInfo.cardHolderName || cardInfo.cardHolderName.length < 2) {
-      console.error("CardHolderName validation failed:", cardInfo.cardHolderName);
-      throw new Error("Kart sahibi adı en az 2 karakter olmalıdır.");
-    }
-    
-    if (!cardInfo.cardNumber || cardInfo.cardNumber.length < 13) {
-      throw new Error("Kart numarası geçersiz.");
-    }
-    
-    if (!cardInfo.expireMonth || cardInfo.expireMonth.length < 1) {
-      throw new Error("Son kullanma ayı geçersiz.");
-    }
-    
-    if (!cardInfo.expireYear || cardInfo.expireYear.length < 4) {
-      throw new Error("Son kullanma yılı geçersiz.");
-    }
-    
-    if (!cardInfo.cvc || cardInfo.cvc.length < 3) {
-      throw new Error("CVC kodu geçersiz.");
-    }
-
-    console.log("Kart bilgileri doğrulandı:", {
-      cardHolderName: cardInfo.cardHolderName,
-      cardNumber: "****" + cardInfo.cardNumber.slice(-4),
-      expireMonth: cardInfo.expireMonth,
-      expireYear: cardInfo.expireYear,
-      cvcLength: cardInfo.cvc.length
-    });
-
-    // useIyzicoPayment composable'ını kullan
-    const { processPayment } = useIyzicoPayment();
-
-    // Composable kullanarak ödeme işlemini başlat
+    // 3DS ödeme işlemini başlat
     const result = await processPayment({
       card: cardInfo,
       amount: totalAmount,
@@ -901,25 +842,22 @@ const handleOrderCompletionNewWay = async () => {
     if (result.success && result.data) {
       console.log("3DS başlatma başarılı");
 
-      // 3DS HTML içeriğini göstermek için gerekli veriler
-      const pId = result.data.paymentId || "";
-      const cId = result.data.conversationId || "";
-      const conversationData = result.data.conversationData || "";
+      paymentId.value = result.data.paymentId || "";
+      conversationId.value = result.data.conversationId || "";
 
       // 3DS HTML içeriğini modal'da göster
-      const html = result.data.threeDSHtml;
+      open3DSModal(result.data.threeDSHtml, paymentId.value, conversationId.value);
 
-      console.log("3DS HTML içeriği hazır, modal açılıyor");
-      
-      // 3DS modal'ını aç
-      open3DSModal(html, pId, cId);
-      
+      console.log("3DS modal açıldı");
     } else {
       throw new Error(result.error || '3DS başlatma başarısız');
     }
+
   } catch (error: any) {
     console.error('3DS Init Error:', error);
-    checkoutState.value.error = `3DS başlatma hatası: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`;
+    checkoutState.value.error = `Ödeme başarısız: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`;
+  } finally {
+    checkoutState.value.isLoading = false;
   }
 };
 
@@ -1025,10 +963,59 @@ const loadShippingOptionsManually = async (cartId: string) => {
 // Initialize on mount with defensive checks
 const initializationId = ref(Math.random().toString(36).substring(7));
 
+// PostMessage handler for 3DS payment results
+const handlePaymentMessage = (event: MessageEvent) => {
+  console.log('Received payment message:', event.data);
+
+  if (event.data.type === 'payment_completed') {
+    console.log('Payment completed:', event.data);
+
+    // Modal'ı kapat
+    close3DSModal();
+
+    // Ödeme sonucuna göre işlem yap
+    if (event.data.status === 'success') {
+      console.log('Ödeme başarıyla tamamlandı! Order ID:', event.data.orderId);
+      
+      // Başarılı ödeme sonrası cart'ı temizle
+      const { clearCurrentCart } = useCart();
+      clearCurrentCart();
+      console.log('Cart cleared after successful payment');
+      
+      // Cart store'u da temizle
+      cartStore.clearCart();
+      
+      // Başarılı ödeme - order success sayfasına yönlendir
+      if (event.data.orderId) {
+        router.push(`/order/${event.data.orderId}`);
+      } else {
+        // Order ID yoksa genel başarı mesajı göster
+        checkoutState.value.error = null;
+        console.log('Ödeme başarılı ancak sipariş ID bulunamadı');
+        // Ana sayfaya yönlendir veya başka bir işlem yap
+        router.push('/');
+      }
+    } else if (event.data.status === 'failure') {
+      // Başarısız ödeme - checkout'ta kal ve hata mesajı göster
+      checkoutState.value.error = 'Ödeme başarısız oldu. Lütfen kart bilgilerinizi kontrol edip tekrar deneyin.';
+      console.log('Ödeme başarısız oldu.');
+    }
+  } else if (event.data.type === 'close_modal') {
+    // Modal'ı kapat
+    console.log('Closing payment modal');
+    close3DSModal();
+  }
+};
+
 onMounted(async () => {
   // Use nextTick to ensure component is fully mounted
   await nextTick();
   componentMounted.value = true;
+
+  // PostMessage listener ekle
+  if (process.client && typeof window !== 'undefined') {
+    window.addEventListener('message', handlePaymentMessage);
+  }
 
   // If cart is already available and empty, don't show loading
   if (cart.value && isEmpty.value) {
@@ -1045,6 +1032,11 @@ onMounted(async () => {
 // Cleanup on unmount
 onUnmounted(() => {
   componentMounted.value = false;
+
+  // PostMessage listener'ı kaldır
+  if (process.client && typeof window !== 'undefined') {
+    window.removeEventListener('message', handlePaymentMessage);
+  }
 
   // Reset checkout state
   resetCheckout();
