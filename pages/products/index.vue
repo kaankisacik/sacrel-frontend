@@ -14,25 +14,20 @@
             </div>
         </div> -->
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="  mx-auto px-0 py-8">
       <!-- Filters and Content Layout -->
       <div class="lg:grid lg:grid-cols-4 lg:gap-x-8">
         <!-- Main Content -->
         <div class="lg:col-span-6">
           <!-- Sort Options -->
-          <div class="w-full flex items-center justify-between mb-6 2xl:px-8">
+          <div class="w-full flex items-center justify-between mb-6 px-0">
             <p class="text-sm text-gray-600">
               {{ filteredItems.length }} ürün bulundu
             </p>
             <div class="flex flex-col md:flex-row md:items-center md:space-x-4">
-              <label for="sort" class="hidden md:block text-sm text-gray-600"
-                >Sırala:</label
-              >
-              <select
-                id="sort"
-                v-model="sortBy"
-                class="text-sm border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500"
-              >
+              <label for="sort" class="hidden md:block text-sm text-gray-600">Sırala:</label>
+              <select id="sort" v-model="sortBy"
+                class="text-sm border-gray-300 rounded-md focus:ring-gray-500 focus:border-gray-500">
                 <option value="newest">Varsayılan</option>
                 <option value="price-low">Fiyat: Düşükten Yükseğe</option>
                 <option value="price-high">Fiyat: Yüksekten Düşüğe</option>
@@ -41,35 +36,19 @@
           </div>
 
           <!-- Loading State -->
-          <div
-            v-if="isLoading"
-            class="min-h-96 flex items-center justify-center"
-          >
+          <div v-if="isLoading" class="min-h-96 flex items-center justify-center">
             <div class="text-center">
-              <div
-                class="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"
-              ></div>
+              <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"></div>
               <p class="mt-4 text-gray-600">Yükleniyor...</p>
             </div>
           </div>
 
           <!-- Error State -->
           <div v-else-if="hasError" class="text-center py-12">
-            <div
-              class="w-24 h-24 bg-red-100 rounded-full mx-auto mb-6 flex items-center justify-center"
-            >
-              <svg
-                class="w-12 h-12 text-red-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
+            <div class="w-24 h-24 bg-red-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+              <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <h3 class="text-xl font-semibold text-gray-900 mb-2">
@@ -78,31 +57,18 @@
             <p class="text-gray-600 mb-4">
               {{ errorMessage || "An error occurred while loading data." }}
             </p>
-            <button
-              @click="refreshData"
-              class="bg-gray-900 text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300"
-            >
+            <button @click="refreshData"
+              class="bg-gray-900 text-white px-6 py-2 rounded-md hover:bg-gray-800 transition duration-300">
               Try Again
             </button>
           </div>
 
           <!-- No Items -->
           <div v-else-if="filteredItems.length === 0" class="text-center py-12">
-            <div
-              class="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-6 flex items-center justify-center"
-            >
-              <svg
-                class="w-12 h-12 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
+            <div class="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+              <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
             <h3 class="text-xl font-semibold text-gray-900 mb-2">
@@ -111,25 +77,16 @@
             <p class="text-gray-600 mb-4">
               Mevcut filtrelerinize uyan ürün yok.
             </p>
-            <button
-              @click="clearFilters"
-              class="text-gray-900 font-medium hover:text-gray-700"
-            >
+            <button @click="clearFilters" class="text-gray-900 font-medium hover:text-gray-700">
               Filtreleri temizle
             </button>
           </div>
 
           <!-- Items Grid -->
-          <div
-            v-else
-            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-x-24 gap-y-12"
-          >
+          <div v-else
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-y-12  md:gap-x-[21.4vw] xl:gap-x-[6.7vw] 2xl:gap-x-[5vw] px-0  ">
             <!-- Replace with your item component -->
-            <ProductCard
-              v-for="item in filteredItems"
-              :key="item.id"
-              :product="item"
-            />
+            <ProductCard v-for="item in filteredItems" :key="item.id" :product="item" />
           </div>
 
           <!-- Load More Button -->

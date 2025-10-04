@@ -31,6 +31,7 @@ export const useOrders = () => {
     limit?: number;
     offset?: number;
     fields?: string;
+    order?: string;
     [key: string]: any;
   }): Promise<PaginatedResponse<{ orders: StoreOrder[] }>> => {
     try {

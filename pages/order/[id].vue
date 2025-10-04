@@ -65,8 +65,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
-                {{ order.fulfillments[0].shipping_option.shipping_profile.name }}
-                Takip Kodu
+                {{ order.fulfillments[0].shipping_option.shipping_profile.name }} Kargo Bilgileri
               </h3>
               <div class="space-y-3">
                 <!-- Tracking Link -->

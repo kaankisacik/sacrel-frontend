@@ -166,22 +166,12 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="totalPages > 1" class="mt-8 flex justify-center">
-        <nav class="flex space-x-2">
-          <button
-            v-for="page in totalPages"
-            :key="page"
-            @click="loadOrders(page)"
-            :class="[
-              'px-3 py-2 text-sm font-medium rounded-md transition duration-300',
-              currentPage === page
-                ? 'bg-black text-white'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-            ]"
-          >
-            {{ page }}
-          </button>
-        </nav>
+      <div v-if="totalPages > 1" class="mt-8 flex justify-end ">
+        <UiPagination
+          :current-page="currentPage"
+          :total-pages="totalPages"
+          @page-change="handlePageChange"
+        />
       </div>
     </div>
 
@@ -273,12 +263,13 @@ const isCancelling = ref<boolean>(false);
 const loadOrders = async (page: number = 1) => {
   try {
     isLoading.value = true;
-    const limit = 3;
+    const limit = 10;
     const offset = (page - 1) * limit;
     
     const response = await orderService.getOrders({
       limit,
       offset,
+      order: '-created_at',
       fields:'fulfillments,id,display_id,status,fulfillment_status,total,fulfillments.labels.tracking_number,fulfillments.labels.tracking_url,subtotal,created_at,currency,items',
     });
     console.log('Orders loaded:', response);
@@ -312,6 +303,10 @@ const loadOrders = async (page: number = 1) => {
   } finally {
     isLoading.value = false;
   }
+};
+
+const handlePageChange = (page: number) => {
+  loadOrders(page);
 };
 
 
