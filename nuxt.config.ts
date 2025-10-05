@@ -8,13 +8,20 @@ export default defineNuxtConfig({
     "@nuxtjs/medusa",
     "@pinia/nuxt",
   ],
-
   vite: {
     optimizeDeps: {
       include: ["qs"],
     },
     define: {
       global: "globalThis",
+    },
+    build: {
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: true,
+        },
+      },
     },
   },
 

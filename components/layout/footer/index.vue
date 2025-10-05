@@ -1,127 +1,171 @@
 <template>
-  <footer class="bg-sacrel-primary py-12 px-6 w-full">
-    <div class="w-full  ">
-      <div class="max-w-3xl mx-auto text-center mb-8 ">
-        <h2 class="sacrel-heading-xl text-sacrel-light mb-4">SACREL</h2>
-        <p class="sacrel-body text-sacrel-neutral max-w-xl mx-auto">
-          Modern kadın için butik moda. Sadelik ve zarafeti buluşturan özel
-          tasarımlar.
-        </p>
+  <footer class="py-6 md:py-12 px-4 md:px-6 w-full relative bg-sacrel-primary">
+    <!-- Home page specific background applied via ClientOnly to prevent hydration mismatch -->
+    <ClientOnly>
+      <div
+        v-if="isHomePage"
+        class="absolute inset-0 bg-footer bg-cover bg-no-repeat"
+      ></div>
+      <div
+        v-if="isHomePage"
+        class="absolute inset-0 bg-black bg-opacity-50"
+      ></div>
+    </ClientOnly>
+
+    <div class="w-full relative z-10">
+      <!-- Main SACREL branding -->
+      <div class="max-w-6xl mx-auto text-center mb-6 md:mb-12">
+        <p class="text-xl sm:text-2xl lg:text-5xl text-white mb-2 px-2">In Collaboration with MY BUKLE</p>
       </div>
 
-      <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 text-center mb-8 ">
-        <div>
-          <h4 class="sacrel-heading-sm text-sacrel-light mb-4">Menü</h4>
-          <ul class="space-y-2">
-            <li>
-              <NuxtLink
-                to="/products"
-                class="sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300"
-                >Ürünler</NuxtLink
-              >
-            </li>
-            <li>
-              <NuxtLink
-                to="/about"
-                class="sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300"
-                >Hakkımızda</NuxtLink
-              >
-            </li>
-            <li>
-              <NuxtLink
-                to="/contact"
-                class="sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300"
-                >İletişim</NuxtLink
-              >
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 class="sacrel-heading-sm text-sacrel-light mb-4">İletişim</h4>
-          <div class="space-y-2">
-            <p class="sacrel-body-sm text-sacrel-neutral">+90 (539) 650 49 35</p>
-            <p class="sacrel-body-sm text-sacrel-neutral">sacrelco@gmail.com</p>
-            <p class="sacrel-body-sm text-sacrel-neutral">İstanbul</p>
+      <!-- Content grid -->
+      <div
+        class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 text-white my-8 sm:my-12 lg:my-24 tracking-[0.1em] lg:tracking-[0.2em] whitespace-normal lg:whitespace-nowrap"
+      >
+        <!-- Left Column -->
+        <div class="text-center lg:text-left text-base sm:text-lg lg:text-2xl">
+          <div class="space-y-3 sm:space-y-4">
+            <div>
+              <h4 class="mb-2 font-semibold">KURUMSAL</h4>
+              <ul class="space-y-1">
+                <li>
+                  <NuxtLink
+                    to="/about"
+                    :external="false"
+                    class="hover:text-sacrel-accent transition duration-300"
+                  >
+                    HAKKIMIZDA
+                  </NuxtLink>
+                </li>
+                <li>
+                  <NuxtLink
+                    to="/products"
+                    :external="false"
+                    class="hover:text-sacrel-accent transition duration-300"
+                  >
+                    ÜRÜNLER
+                  </NuxtLink>
+                </li>
+                <li>
+                  <NuxtLink
+                    to="/auth/register"
+                    :external="false"
+                    class="hover:text-sacrel-accent transition duration-300"
+                  >
+                    KAYIT
+                  </NuxtLink>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
-        <div>
-          <h4 class="sacrel-heading-sm text-sacrel-light mb-4">Takip Edin</h4>
-          <div class="space-y-2">
-            <NuxtLink
-              href="https://www.instagram.com/sacrel.co/"
-              target="_blank"
-              class="block sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300"
-              >Instagram</NuxtLink
-            >
-            <NuxtLink
-              href="https://wa.me/905396504935?text=Merhaba"
-              target="_blank"
-              class="block sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300"
-              >WhatsApp</NuxtLink
-            >
+        <!-- Center Column -->
+        <div class="text-center text-base sm:text-lg lg:text-2xl">
+          <div class="space-y-3 sm:space-y-4">
+            <div>
+              <h4 class="mb-2 font-semibold">Mesafeli Satış Sözleşmesi</h4>
+              <ul class="space-y-1">
+                <li>
+                  <NuxtLink
+                    to="/policies/privacy-policy"
+                    :external="false"
+                    class="hover:text-sacrel-accent transition duration-300"
+                  >
+                    Gizlilik Politikası
+                  </NuxtLink>
+                </li>
+                <li>
+                  <NuxtLink
+                    to="/policies/sales-agreement"
+                    :external="false"
+                    class="hover:text-sacrel-accent transition duration-300"
+                  >
+                    Satış Sözleşmesi
+                  </NuxtLink>
+                </li>
+                <li>
+                  <NuxtLink
+                    to="/policies/consumer-rights"
+                    :external="false"
+                    class="hover:text-sacrel-accent transition duration-300"
+                  >
+                    Tüketici Hakları
+                  </NuxtLink>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
-        <div>
-          <h4 class="sacrel-heading-sm text-sacrel-light mb-4">Yardım</h4>
-          <ul class="space-y-2">
-            <li>
-              <NuxtLink
-                to="/policies/privacy-policy"
-                class="sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300"
-                >Gizlilik Politikası</NuxtLink
-              >
-            </li>
-            <li>
-              <NuxtLink
-                to="/policies/sales-agreement"
-                class="sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300"
-                >Satış Sözleşmesi</NuxtLink
-              >
-            </li>
-            <li>
-              <NuxtLink
-                to="/policies/consumer-rights"
-                class="sacrel-body-sm text-sacrel-neutral hover:text-sacrel-accent transition duration-300"
-                >
-                Tüketici Hakları
-                </NuxtLink
-              >
-            </li>
-          </ul>
+        <!-- Right Column -->
+        <div class="text-center lg:text-right text-base sm:text-lg lg:text-2xl">
+          <div class="space-y-3 sm:space-y-4">
+            <div>
+              <h4 class="mb-2 font-semibold">İLETİŞİM</h4>
+              <div class="space-y-1">
+                <p>+90544 264 74 64</p>
+                <p class="break-all sm:break-normal">sacrelco@gmail.com</p>
+                <p class="font-semibold">İSTANBUL</p>
+              </div>
+            </div>
           </div>
+        </div>
       </div>
 
-      <div class=" max-w-3xl mx-auto border-t border-sacrel-neutral pt-6 text-center">
-        <div class="flex justify-center space-x-4 ">
+      <!-- Social Media -->
+      <div class="max-w-6xl mx-auto text-center mb-6">
+        <p class="text-base sm:text-lg lg:text-2xl text-white">@sacrel.com.tr</p>
+      </div>
+
+      <!-- Payment Methods -->
+      <div class="max-w-6xl mx-auto text-center">
+        <div class="flex justify-center space-x-3 sm:space-x-4 lg:space-x-6 mb-6">
           <img
             src="/images/iyzico.png"
-            alt="Bonafida Logo"
-            class=" h-8 "
+            alt="Iyzico"
+            class="h-8 sm:h-10 lg:h-14 bg-sacrel-primary p-1"
           />
           <img
             src="/images/mastercard.png"
-            alt="Bonafida Logo"
-            class=" h-8 "
+            alt="Mastercard"
+            class="h-8 sm:h-10 lg:h-14 bg-sacrel-primary p-1"
           />
           <img
             src="/images/visa.png"
-            alt="Bonafida Logo"
-            class=" h-8 "
+            alt="Visa"
+            class="h-8 sm:h-10 lg:h-14 bg-sacrel-primary p-1"
           />
         </div>
-        <p class="sacrel-caption text-sacrel-neutral  mt-4">
+        <p class="text-xs sm:text-sm text-gray-300 px-4">
           &copy; 2025
-          <a href="https://www.bonafidayazilim.com" target="_blank"
-            >BONAFIDA YAZILIM</a
-          >. Tüm hakları saklıdır.
+          <a
+            href="https://www.bonafidayazilim.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:text-sacrel-accent transition duration-300"
+          >
+            BONAFIDA YAZILIM
+          </a>
+          . Tüm hakları saklıdır.
         </p>
-        
       </div>
-
-    
     </div>
   </footer>
 </template>
+<script setup lang="ts">
+const route = useRoute();
+
+// Safer approach for SSR/hydration - always start with false
+const isHomePage = ref(false);
+
+// Only update on client-side to prevent hydration mismatch
+onMounted(() => {
+  isHomePage.value = route.path === "/";
+});
+
+// Watch for route changes
+watch(() => route.path, (newPath) => {
+  isHomePage.value = newPath === "/";
+});
+</script>

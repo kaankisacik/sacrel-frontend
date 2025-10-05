@@ -10,6 +10,9 @@ module.exports = {
   darkMode: 'class', // Dark mode'u class ile aktif et
   theme: {
     extend: {
+      backgroundImage: {
+        'footer': "url('/images/footer.jpg')",
+      },
       colors: {
         // SACREL Brand Colors - Light & Dark Mode Support
         sacrel: {
