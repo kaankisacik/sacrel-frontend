@@ -15,7 +15,9 @@
     <div class="w-full relative z-10">
       <!-- Main SACREL branding -->
       <div class="max-w-6xl mx-auto text-center mb-6 md:mb-12">
-        <p class="text-xl sm:text-2xl lg:text-5xl text-white mb-2 px-2">In Collaboration with MY BUKLE</p>
+        <p class="text-lg sm:text-xl lg:text-4xl text-white mb-2 px-2">
+          In Collaboration with MY BUKLE
+        </p>
       </div>
 
       <!-- Content grid -->
@@ -23,7 +25,7 @@
         class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 text-white my-8 sm:my-12 lg:my-24 tracking-[0.1em] lg:tracking-[0.2em] whitespace-normal lg:whitespace-nowrap"
       >
         <!-- Left Column -->
-        <div class="text-center lg:text-left text-base sm:text-lg lg:text-2xl">
+        <div class="text-center lg:text-left text-base sm:text-base lg:text-xl">
           <div class="space-y-3 sm:space-y-4">
             <div>
               <h4 class="mb-2 font-semibold">KURUMSAL</h4>
@@ -61,10 +63,10 @@
         </div>
 
         <!-- Center Column -->
-        <div class="text-center text-base sm:text-lg lg:text-2xl">
+        <div class="text-center text-base sm:text-base lg:text-xl">
           <div class="space-y-3 sm:space-y-4">
             <div>
-              <h4 class="mb-2 font-semibold">Mesafeli Satış Sözleşmesi</h4>
+              <h4 class="mb-2 font-semibold">MESAFELİ SATIŞ SÖZLEŞMESİ</h4>
               <ul class="space-y-1">
                 <li>
                   <NuxtLink
@@ -72,7 +74,7 @@
                     :external="false"
                     class="hover:text-sacrel-accent transition duration-300"
                   >
-                    Gizlilik Politikası
+                    GİZLİLİK POLİTİKASI
                   </NuxtLink>
                 </li>
                 <li>
@@ -81,7 +83,7 @@
                     :external="false"
                     class="hover:text-sacrel-accent transition duration-300"
                   >
-                    Satış Sözleşmesi
+                    SATIŞ SÖZLEŞMESİ
                   </NuxtLink>
                 </li>
                 <li>
@@ -90,7 +92,7 @@
                     :external="false"
                     class="hover:text-sacrel-accent transition duration-300"
                   >
-                    Tüketici Hakları
+                    TÜKETİCİ HAKLARI
                   </NuxtLink>
                 </li>
               </ul>
@@ -99,7 +101,7 @@
         </div>
 
         <!-- Right Column -->
-        <div class="text-center lg:text-right text-base sm:text-lg lg:text-2xl">
+        <div class="text-center lg:text-right text-base sm:text-base lg:text-xl">
           <div class="space-y-3 sm:space-y-4">
             <div>
               <h4 class="mb-2 font-semibold">İLETİŞİM</h4>
@@ -115,27 +117,27 @@
 
       <!-- Social Media -->
       <div class="max-w-6xl mx-auto text-center mb-6">
-        <p class="text-base sm:text-lg lg:text-2xl text-white">@sacrel.com.tr</p>
+        <p class="text-base sm:text-lg lg:text-2xl text-white">
+          @sacrel.com.tr
+        </p>
       </div>
 
       <!-- Payment Methods -->
       <div class="max-w-6xl mx-auto text-center">
-        <div class="flex justify-center space-x-3 sm:space-x-4 lg:space-x-6 mb-6">
+        <div
+          class="flex justify-center space-x-3 sm:space-x-4 lg:space-x-6 mb-6"
+        >
           <img
             src="/images/iyzico.png"
             alt="Iyzico"
-            class="h-8 sm:h-10 lg:h-14 bg-sacrel-primary p-1"
+            class="h-8 sm:h-10 lg:h-14"
           />
           <img
             src="/images/mastercard.png"
             alt="Mastercard"
-            class="h-8 sm:h-10 lg:h-14 bg-sacrel-primary p-1"
+            class="h-8 sm:h-10 lg:h-14"
           />
-          <img
-            src="/images/visa.png"
-            alt="Visa"
-            class="h-8 sm:h-10 lg:h-14 bg-sacrel-primary p-1"
-          />
+          <img src="/images/visa.png" alt="Visa" class="h-8 sm:h-10 lg:h-14" />
         </div>
         <p class="text-xs sm:text-sm text-gray-300 px-4">
           &copy; 2025
@@ -165,7 +167,10 @@ onMounted(() => {
 });
 
 // Watch for route changes
-watch(() => route.path, (newPath) => {
-  isHomePage.value = newPath === "/";
-});
+watch(
+  () => route.path,
+  (newPath) => {
+    isHomePage.value = newPath === "/";
+  }
+);
 </script>
