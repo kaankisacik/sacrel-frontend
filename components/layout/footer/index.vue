@@ -1,5 +1,5 @@
 <template>
-  <footer class="py-6 md:py-12 px-4 md:px-6 w-full relative bg-sacrel-primary">
+  <footer class="py-6 md:py-1 px-4 md:px-6 w-full relative bg-sacrel-primary">
     <!-- Home page specific background applied via ClientOnly to prevent hydration mismatch -->
     <ClientOnly>
       <div
@@ -13,22 +13,17 @@
     </ClientOnly>
 
     <div class="w-full relative z-10">
-      <!-- Main SACREL branding -->
-      <div class="max-w-6xl mx-auto text-center mb-6 md:mb-12">
-        <p class="text-lg sm:text-xl lg:text-4xl text-white mb-2 px-2">
-          In Collaboration with MY BUKLE
-        </p>
-      </div>
-
       <!-- Content grid -->
       <div
-        class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 text-white my-8 sm:my-12 lg:my-24 tracking-[0.1em] lg:tracking-[0.2em] whitespace-normal lg:whitespace-nowrap"
+        class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 xl:gap-64 text-white my-8 sm:my-6 lg:my-8 tracking-[0.1em] lg:tracking-[0.2em] whitespace-normal lg:whitespace-nowrap"
       >
         <!-- Left Column -->
-        <div class="text-center lg:text-left text-base sm:text-base lg:text-xl">
+        <div
+          class="text-base sm:text-base  lg:text-xl ml-24 lg:ml-0"
+        >
           <div class="space-y-3 sm:space-y-4">
             <div>
-              <h4 class="mb-2 font-semibold">KURUMSAL</h4>
+              <h4 class="mb-8 font-semibold">KURUMSAL</h4>
               <ul class="space-y-1">
                 <li>
                   <NuxtLink
@@ -36,7 +31,7 @@
                     :external="false"
                     class="hover:text-sacrel-accent transition duration-300"
                   >
-                    HAKKIMIZDA
+                    Hakkımızda
                   </NuxtLink>
                 </li>
                 <li>
@@ -45,7 +40,7 @@
                     :external="false"
                     class="hover:text-sacrel-accent transition duration-300"
                   >
-                    ÜRÜNLER
+                    Ürünler
                   </NuxtLink>
                 </li>
                 <li>
@@ -54,7 +49,7 @@
                     :external="false"
                     class="hover:text-sacrel-accent transition duration-300"
                   >
-                    KAYIT
+                    Kayıt
                   </NuxtLink>
                 </li>
               </ul>
@@ -63,10 +58,12 @@
         </div>
 
         <!-- Center Column -->
-        <div class="text-center text-base sm:text-base lg:text-xl">
+        <div
+          class="text-base sm:text-base   lg:text-xl ml-24 lg:ml-0"
+        >
           <div class="space-y-3 sm:space-y-4">
             <div>
-              <h4 class="mb-2 font-semibold">MESAFELİ SATIŞ SÖZLEŞMESİ</h4>
+              <h4 class="mb-8 font-semibold">DESTEK</h4>
               <ul class="space-y-1">
                 <li>
                   <NuxtLink
@@ -74,7 +71,7 @@
                     :external="false"
                     class="hover:text-sacrel-accent transition duration-300"
                   >
-                    GİZLİLİK POLİTİKASI
+                    Gizlilik Politikası
                   </NuxtLink>
                 </li>
                 <li>
@@ -83,7 +80,7 @@
                     :external="false"
                     class="hover:text-sacrel-accent transition duration-300"
                   >
-                    SATIŞ SÖZLEŞMESİ
+                    Mesafeli Satış Sözleşmesi
                   </NuxtLink>
                 </li>
                 <li>
@@ -92,7 +89,7 @@
                     :external="false"
                     class="hover:text-sacrel-accent transition duration-300"
                   >
-                    TÜKETİCİ HAKLARI
+                    Tüketici Hakları
                   </NuxtLink>
                 </li>
               </ul>
@@ -101,14 +98,16 @@
         </div>
 
         <!-- Right Column -->
-        <div class="text-center lg:text-right text-base sm:text-base lg:text-xl">
+        <div
+          class="text-base sm:text-base   lg:text-xl ml-24 lg:ml-0"
+        >
           <div class="space-y-3 sm:space-y-4">
             <div>
-              <h4 class="mb-2 font-semibold">İLETİŞİM</h4>
+              <h4 class="mb-8 font-semibold">İLETİŞİM</h4>
               <div class="space-y-1">
-                <p>+90544 264 74 64</p>
                 <p class="break-all sm:break-normal">sacrelco@gmail.com</p>
-                <p class="font-semibold">İSTANBUL</p>
+                <p>+90544 264 74 64</p>
+                <p class="font-semibold">İstanbul</p>
               </div>
             </div>
           </div>
@@ -117,6 +116,9 @@
 
       <!-- Social Media -->
       <div class="max-w-6xl mx-auto text-center mb-6">
+        <p class="text-base sm:text-lg lg:text-2xl text-white">
+          Hidden Within..
+        </p>
         <p class="text-base sm:text-lg lg:text-2xl text-white">
           @sacrel.com.tr
         </p>

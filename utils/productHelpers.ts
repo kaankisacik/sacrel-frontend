@@ -142,17 +142,33 @@ class ProductHelper implements IProductHelper {
   getColorBgTailwind(color: string): string {
     color = color.toLowerCase().trim();
     const colorMap: Record<string, string> = {
-      black: "bg-black",
-      white: "bg-white",
-      gray: "bg-gray-500",
-      purple: "bg-purple-500",
-      red: "bg-red-500",
-      blue: "bg-blue-500",
-      green: "bg-green-500",
-      yellow: "bg-yellow-500",
+      kahve: 'bg-amber-800',
+      kkahve: 'bg-amber-900',
+      bordo: 'bg-red-900',
+      bej: 'bg-amber-100',
+      antrasit: 'bg-gray-700',
+      gri: 'bg-gray-500',
+      siyah: 'bg-black',
+      vizon: 'bg-stone-400',
+      kırmızı: 'bg-red-500',
+      pembe: 'bg-pink-500',
+      mor: 'bg-purple-500',
+      sarı: 'bg-yellow-400',
+      turuncu: 'bg-orange-500',
+      beyaz: 'bg-white',
+      mavi: 'bg-blue-500',
+      lacivert: 'bg-blue-900',
+      yeşil: 'bg-green-500',
+      haki: 'bg-green-700',
+      altın: 'bg-yellow-500',
+      gümüş: 'bg-gray-300',
+      mürdüm: 'bg-purple-700',
+      lila: 'bg-purple-300',
     };
-    return colorMap[color] || "bg-gray-500";
-  }
+    return colorMap[color] || 'bg-gray-500';
+}
+
+  
 
   // Belirli bir renk için mevcut bedenleri döndürür
   getAvailableSizesForColor(

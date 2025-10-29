@@ -29,6 +29,15 @@
             ▲ {{ category.name }}
           </div>
         </li>
+        <li
+        >
+          <div
+            
+            class="block p-2 hover:text-sacrel-accent cursor-pointer"
+          >
+            <span class="opacity-0">▲</span> İLETİŞİM
+          </div>
+        </li>
       </ul>
     </div>
   </aside>
