@@ -161,15 +161,21 @@
                     </div>
                 </div>
 
-                <!-- Logout Section -->
+                <!-- Account Actions Section -->
                 <div class="bg-white shadow overflow-hidden sm:rounded-lg">
                     <div class="px-4 py-5 sm:px-6">
                         <h3 class="text-lg leading-6 font-medium text-gray-900">Hesap İşlemleri</h3>
                         <p class="mt-1 max-w-2xl text-sm text-gray-500">Hesabınızla ilgili işlemler</p>
                     </div>
-                    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+                    <div class="border-t border-gray-200 px-4 py-4 space-y-3">
+                        <button @click="handlePasswordReset"
+                            :disabled="isLoading"
+                            class="w-full inline-flex items-center justify-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <Icon name="heroicons:key" class="h-4 w-4 mr-2" />
+                            Şifre Değiştirme Linki Gönder
+                        </button>
                         <button @click="handleLogout"
-                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            class="w-full inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                             <Icon name="heroicons:arrow-right-on-rectangle" class="h-4 w-4 mr-2" />
                             Çıkış Yap
                         </button>
@@ -417,6 +423,29 @@ const closeAddressModal = () => {
     })
 
     district.value = ''
+}
+
+const handlePasswordReset = async () => {
+    if (!customer.value?.email) {
+        alert('E-posta adresi bulunamadı.');
+        return;
+    }
+
+    if (confirm('Şifre değiştirme bağlantısı e-posta adresinize gönderilsin mi?')) {
+        try {
+            console.log("email:",customer.value.email);
+            
+            const result = await authStore.forgotPassword(customer.value.email);
+            if (result.success) {
+                alert('Şifre değiştirme bağlantısı e-posta adresinize gönderildi. E-posta kutunuzu kontrol edin.');
+            } else {
+                alert('Şifre değiştirme bağlantısı gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
+            }
+        } catch (error) {
+            console.error('Şifre değiştirme hatası:', error);
+            alert('Şifre değiştirme bağlantısı gönderilirken bir hata oluştu. Lütfen tekrar deneyin.');
+        }
+    }
 }
 
 const handleLogout = async () => {

@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col justify-center py-0 sm:px-6 lg:px-8">
+  <div class="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <h2 class="mt-0 text-center text-3xl font-extrabold text-gray-900">
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
         Yeni hesap oluşturun
       </h2>
       <p class="mt-2 text-center text-sm text-gray-600">
@@ -92,7 +92,7 @@
               Telefon (Opsiyonel)
             </label>
             <div class="mt-1">
-            <input
+              <input
                 id="phone"
                 v-model="form.phone"
                 name="phone"
@@ -103,16 +103,17 @@
                 pattern="[0-9+]*"
                 inputmode="numeric"
                 maxlength="13"
-                @input="(e) => {
+                @input="
+                  (e) => {
                     let value = e.target.value.replace(/[^0-9]/g, '');
                     if (!value.startsWith('90')) {
-                        value = '90' + value;
+                      value = '90' + value;
                     }
                     e.target.value = '+' + value;
                     form.phone = '+' + value;
-                }"
-            />
-
+                  }
+                "
+              />
             </div>
           </div>
 
@@ -170,13 +171,15 @@
             />
             <label for="terms" class="ml-2 block text-sm text-gray-900">
               <NuxtLink
-                to="/policies/terms"
+                to="/policies/sales-agreement"
+                target="_blank"
                 class="text-indigo-600 hover:text-indigo-500"
-                >Kullanım koşullarını</NuxtLink
+                >Satış sözleşmesini</NuxtLink
               >
               ve
               <NuxtLink
-                to="/policies/privacy"
+                to="/policies/privacy-policy"
+                target="_blank"
                 class="text-indigo-600 hover:text-indigo-500"
                 >gizlilik politikasını</NuxtLink
               >

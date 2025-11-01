@@ -3,6 +3,8 @@ import { defineStore } from "pinia";
 export const useAuthStore = defineStore("authStore", () => {
   const isUserAuthenticated = ref(false);
   const isCheckingAuth = ref(false);
+  const isLoading = ref(false);
+  const error = ref<string | null>(null);
   const authService = useAuth();
   const customerService = useCustomer();
 
@@ -148,6 +150,54 @@ export const useAuthStore = defineStore("authStore", () => {
     return isUserAuthenticated.value;
   }
 
+  async function forgotPassword(email: string) {
+    isLoading.value = true;
+    error.value = null;
+    
+    try {
+      // Use the resetPassword method to send forgot password request
+      await authService.resetPassword(email);
+      return { success: true };
+    } catch (err) {
+      console.error('Forgot password error:', err);
+      error.value = 'Şifre sıfırlama bağlantısı gönderilirken bir hata oluştu.';
+      return { success: false };
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function resetPasswordWithToken(token: string, password: string) {
+    isLoading.value = true;
+    error.value = null;
+    
+    try {
+      // Use the updateAuth method to reset password with token
+      await authService.updateAuth({ password }, token);
+      return { success: true };
+    } catch (err) {
+      console.error('Reset password error:', err);
+      
+      // Handle specific error cases
+      const errorMessage = (err as any).message || '';
+      if (errorMessage.includes('expired') || errorMessage.includes('invalid token')) {
+        error.value = 'Şifre sıfırlama bağlantısının süresi dolmuş. Lütfen yeni bir şifre sıfırlama bağlantısı isteyin.';
+      } else if (errorMessage.includes('password')) {
+        error.value = 'Şifre en az 8 karakter uzunluğunda olmalıdır.';
+      } else {
+        error.value = 'Şifre sıfırlanırken bir hata oluştu. Lütfen tekrar deneyin.';
+      }
+      
+      return { success: false };
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  function clearError() {
+    error.value = null;
+  }
+
   // Initialize auth check when store is created
   if (process.client) {
     onNuxtReady(() => {
@@ -167,7 +217,12 @@ export const useAuthStore = defineStore("authStore", () => {
     register,
     logout,
     checkUserAuthenticated,
+    forgotPassword,
+    resetPasswordWithToken,
+    clearError,
     isUserAuthenticated,
     isCheckingAuth,
+    isLoading,
+    error,
   };
 });

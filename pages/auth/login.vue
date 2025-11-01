@@ -1,5 +1,5 @@
 <template>
-  <div class="  flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div class="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
         Hesabınıza giriş yapın
@@ -42,22 +42,22 @@
             </div>
           </div>
 
-          <!-- <div class="flex items-center justify-between">
-            <div class="flex items-center">
+          <div class="flex items-center justify-end">
+            <!-- <div class="flex items-center">
               Remember Me
               <input id="remember-me" v-model="form.rememberMe" name="remember-me" type="checkbox"
                 class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
               <label for="remember-me" class="ml-2 block text-sm text-gray-900">
                 Beni hatırla
               </label>
-            </div>
+            </div> -->
 
             <div class="text-sm">
               <NuxtLink to="/auth/forgot-password" class="font-medium text-indigo-600 hover:text-indigo-500">
                 Şifremi unuttum
               </NuxtLink>
             </div>
-          </div> -->
+          </div>
 
           <div>
             <button type="submit" :disabled="isLoading"
